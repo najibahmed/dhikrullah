@@ -1,6 +1,5 @@
 // lib/screens/session_counter_screen.dart
 import 'dart:math' as math;
-import 'package:dhikir_app/screens/dhikir_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -572,7 +571,7 @@ class _DhikirPage extends StatelessWidget {
             accentColor: dhikir.color,
             pulseAnim: pulseAnim,
             completionAnim: completionAnim,
-            onTap: onTap!,
+            onTap: onTap,
           ),
           // GestureDetector(
           //   onTap: onTap,

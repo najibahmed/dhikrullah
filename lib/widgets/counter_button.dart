@@ -13,7 +13,7 @@ class CounterButton extends StatelessWidget {
   final Color accentColor;
   final Animation<double> pulseAnim;
   final Animation<double> completionAnim;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const CounterButton({
     super.key,
