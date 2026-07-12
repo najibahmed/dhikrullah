@@ -6,22 +6,32 @@ import 'package:dhikir_app/core/routing/app_routes.dart';
 import 'package:dhikir_app/core/routing/route_names.dart';
 import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
 import 'package:dhikir_app/core/providers/favorites_provider.dart';
-import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/widgets/session_setup_sheet.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
+import 'package:dhikir_app/features/my_dhikir/providers/my_dhikir_provider.dart';
 
-class MyDhikirScreen extends StatefulWidget {
+class MyDhikirScreen extends StatelessWidget {
   const MyDhikirScreen({super.key});
 
   @override
-  State<MyDhikirScreen> createState() => _MyDhikirScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      // Scoped to this screen; auto-disposed when screen is popped.
+      create: (_) => MyDhikirProvider(),
+      child: const _MyDhikirView(),
+    );
+  }
 }
 
-class _MyDhikirScreenState extends State<MyDhikirScreen> with SingleTickerProviderStateMixin {
+class _MyDhikirView extends StatefulWidget {
+  const _MyDhikirView();
+
+  @override
+  State<_MyDhikirView> createState() => _MyDhikirViewState();
+}
+
+class _MyDhikirViewState extends State<_MyDhikirView> with SingleTickerProviderStateMixin {
   late TabController _tabCtrl;
-  // Which custom dhikir are selected for session
-  final Set<String> _selectedIds = {};
-  bool _selectionMode = false;
 
   @override
   void initState() {
@@ -36,9 +46,8 @@ class _MyDhikirScreenState extends State<MyDhikirScreen> with SingleTickerProvid
     super.dispose();
   }
 
-  void _refresh() => setState(() {});
-
   Future<void> _delete(CustomDhikirItem item) async {
+    final provider = context.read<MyDhikirProvider>();
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -57,8 +66,7 @@ class _MyDhikirScreenState extends State<MyDhikirScreen> with SingleTickerProvid
       ),
     );
     if (ok == true) {
-      await CustomDhikirService.delete(item.id);
-      _refresh();
+      await provider.delete(item.id);
     }
   }
 
@@ -92,8 +100,7 @@ class _MyDhikirScreenState extends State<MyDhikirScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    final customItems = CustomDhikirService.getAll();
-    final favorites = CustomDhikirService.getFavorites();
+    final customItems = context.watch<MyDhikirProvider>().items;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F4F1),
@@ -121,10 +128,7 @@ class _MyDhikirScreenState extends State<MyDhikirScreen> with SingleTickerProvid
               Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: GestureDetector(
-                  onTap: () async {
-                    final saved = await Navigator.pushNamed(context, RouteNames.addDhikir);
-                    if (saved == true) _refresh();
-                  },
+                  onTap: () => Navigator.pushNamed(context, RouteNames.addDhikir),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
@@ -166,36 +170,6 @@ class _MyDhikirScreenState extends State<MyDhikirScreen> with SingleTickerProvid
                 ),
               ),
             ),
-            // bottom: PreferredSize(
-            //   preferredSize: const Size.fromHeight(52),
-            //   child: Container(
-            //     margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-            //     height: 42,
-            //     decoration: BoxDecoration(
-            //       color: Colors.white,
-            //       borderRadius: BorderRadius.circular(14),
-            //       boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
-            //     ),
-            //     child: TabBar(
-            //       controller: _tabCtrl,
-            //       indicator: BoxDecoration(
-            //         color: const Color(0xFF4A5568),
-            //         borderRadius: BorderRadius.circular(11),
-            //       ),
-            //       indicatorSize: TabBarIndicatorSize.tab,
-            //       indicatorPadding: const EdgeInsets.all(3),
-            //       dividerColor: Colors.transparent,
-            //       labelColor: Colors.white,
-            //       unselectedLabelColor: const Color(0xFF718096),
-            //       labelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
-            //       unselectedLabelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
-            //       tabs: const [
-            //         Tab(text: 'My Dhikir'),
-            //         // Tab(text: 'Favourites')
-            //       ],
-            //     ),
-            //   ),
-            // ),
           ),
 
           SliverFillRemaining(
@@ -206,18 +180,9 @@ class _MyDhikirScreenState extends State<MyDhikirScreen> with SingleTickerProvid
                 // ── Tab 1: All custom dhikir ───────────────────────────
                 _CustomDhikirTab(
                   items: customItems,
-                  onRefresh: _refresh,
                   onDelete: _delete,
                   onStartSession: (items) => _showSessionSetup(items),
                 ),
-
-                // ── Tab 2: Favourites (custom + built-in) ──────────────
-                // _FavouritesTab(
-                //   favorites: favorites,
-                //   builtInList: built_in.dhikirList,
-                //   onRefresh: _refresh,
-                //   onStartSession: (items) => _showSessionSetup(items),
-                // ),
               ],
             ),
           ),
@@ -231,13 +196,11 @@ class _MyDhikirScreenState extends State<MyDhikirScreen> with SingleTickerProvid
 
 class _CustomDhikirTab extends StatelessWidget {
   final List<CustomDhikirItem> items;
-  final VoidCallback onRefresh;
   final Future<void> Function(CustomDhikirItem) onDelete;
   final void Function(List<SessionDhikir>) onStartSession;
 
   const _CustomDhikirTab({
     required this.items,
-    required this.onRefresh,
     required this.onDelete,
     required this.onStartSession,
   });
@@ -295,7 +258,6 @@ class _CustomDhikirTab extends StatelessWidget {
           ...items.map((item) => _CustomCard(
                 item: item,
                 onDelete: () => onDelete(item),
-                onRefresh: onRefresh,
                 onSessionSingle: () => onStartSession([SessionDhikir.fromCustom(item)]),
               )),
         ],
@@ -307,13 +269,11 @@ class _CustomDhikirTab extends StatelessWidget {
 class _CustomCard extends StatelessWidget {
   final CustomDhikirItem item;
   final VoidCallback onDelete;
-  final VoidCallback onRefresh;
   final VoidCallback onSessionSingle;
 
   const _CustomCard({
     required this.item,
     required this.onDelete,
-    required this.onRefresh,
     required this.onSessionSingle,
   });
 
@@ -389,14 +349,11 @@ class _CustomCard extends StatelessWidget {
                   icon: Icons.edit_rounded,
                   label: 'Edit',
                   color: const Color(0xFF718096),
-                  onTap: () async {
-                    final saved = await Navigator.pushNamed(
-                      context,
-                      RouteNames.addDhikir,
-                      arguments: AddDhikirArgs(existing: item),
-                    );
-                    if (saved == true) onRefresh();
-                  },
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    RouteNames.addDhikir,
+                    arguments: AddDhikirArgs(existing: item),
+                  ),
                 ),
                 _ActionBtn(
                   icon: Icons.play_arrow_rounded,
@@ -451,107 +408,3 @@ class _ActionBtn extends StatelessWidget {
     );
   }
 }
-
-// ─── Favourites Tab ───────────────────────────────────────────────────────────
-
-// class _FavouritesTab extends StatelessWidget {
-//   final List<CustomDhikirItem> favorites;
-//   final List<DhikirItem> builtInList;
-//   final VoidCallback onRefresh;
-//   final void Function(List<SessionDhikir>) onStartSession;
-
-//   const _FavouritesTab({
-//     required this.favorites,
-//     required this.builtInList,
-//     required this.onRefresh,
-//     required this.onStartSession,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     // All built-in dhikir available as session items
-//     final builtInSession = builtInList.map((d) => SessionDhikir.fromItem(d)).toList();
-//     final customSession = favorites.map((d) => SessionDhikir.fromCustom(d)).toList();
-//     final combined = [...builtInSession, ...customSession];
-
-//     return Padding(
-//       padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-//       child: SingleChildScrollView(
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             // Quick session: all built-in
-//             GestureDetector(
-//               onTap: () => onStartSession(combined),
-//               child: Container(
-//                 width: double.infinity,
-//                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-//                 decoration: BoxDecoration(
-//                   color: const Color(0xFF2D3748),
-//                   borderRadius: BorderRadius.circular(16),
-//                   boxShadow: [BoxShadow(color: const Color(0xFF2D3748).withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
-//                 ),
-//                 child: Row(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     const Icon(Icons.play_circle_rounded, color: Colors.white, size: 20),
-//                     const SizedBox(width: 8),
-//                     Text('Start Full Session — ${combined.length} Dhikir',
-//                         style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
-//                   ],
-//                 ),
-//               ),
-//             ),
-
-//             const SizedBox(height: 16),
-
-//             // Built-in section
-//             SectionHeader(
-//               title: 'Built-in Dhikir',
-//               count: builtInList.length,
-//               onSession: () => onStartSession(builtInSession),
-//             ),
-//             const SizedBox(height: 8),
-//             ListView(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), children: [
-//               ...builtInList.map((item) => FavRow(
-//                     id: item.id,
-//                     title: item.title,
-//                     arabic: item.arabicText,
-//                     transliteration: item.transliteration,
-//                     icon: item.icon,
-//                     colorHex: item.colorHex,
-//                     isFavourite: false,
-//                     showFavBtn: false,
-//                     onSession: () => onStartSession([SessionDhikir.fromItem(item)]),
-//                   )),
-//             ]),
-//             if (favorites.isNotEmpty) ...[
-//               const SizedBox(height: 16),
-//               SectionHeader(
-//                 title: 'My Favourite Dhikir',
-//                 count: favorites.length,
-//                 onSession: () => onStartSession(customSession),
-//               ),
-//               const SizedBox(height: 8),
-//               ...favorites.map((item) => FavRow(
-//                     id: item.id,
-//                     title: item.title,
-//                     arabic: item.arabicText,
-//                     transliteration: item.transliteration,
-//                     icon: item.icon,
-//                     colorHex: item.colorHex,
-//                     isFavourite: true,
-//                     showFavBtn: true,
-//                     onSession: () => onStartSession([SessionDhikir.fromCustom(item)]),
-//                     onToggleFav: () async {
-//                       await CustomDhikirService.toggleFavorite(item.id);
-//                       onRefresh();
-//                     },
-//                   )),
-//             ],
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

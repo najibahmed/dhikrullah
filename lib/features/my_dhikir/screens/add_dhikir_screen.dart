@@ -2,18 +2,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
-import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
+import 'package:dhikir_app/features/my_dhikir/providers/my_dhikir_provider.dart';
 
-class AddDhikirScreen extends StatefulWidget {
+class AddDhikirScreen extends StatelessWidget {
   final CustomDhikirItem? existing; // non-null = edit mode
   const AddDhikirScreen({super.key, this.existing});
 
   @override
-  State<AddDhikirScreen> createState() => _AddDhikirScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      // Scoped to this screen; auto-disposed when screen is popped.
+      create: (_) => MyDhikirProvider(),
+      child: _AddDhikirView(existing: existing),
+    );
+  }
 }
 
-class _AddDhikirScreenState extends State<AddDhikirScreen>
+class _AddDhikirView extends StatefulWidget {
+  final CustomDhikirItem? existing;
+  const _AddDhikirView({this.existing});
+
+  @override
+  State<_AddDhikirView> createState() => _AddDhikirViewState();
+}
+
+class _AddDhikirViewState extends State<_AddDhikirView>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _titleCtrl = TextEditingController();
@@ -123,28 +138,15 @@ class _AddDhikirScreenState extends State<AddDhikirScreen>
     setState(() => _saving = true);
     HapticFeedback.mediumImpact();
 
-    if (_isEdit) {
-      final e = widget.existing!;
-      e.title = _titleCtrl.text.trim();
-      e.arabicText = _arabicCtrl.text.trim();
-      e.transliteration = _translitCtrl.text.trim();
-      e.englishMeaning = _meaningCtrl.text.trim();
-      e.colorHex = _selectedColor;
-      e.icon = _selectedIcon;
-      await CustomDhikirService.update(e);
-    } else {
-      final item = CustomDhikirItem(
-        id: 'custom_${DateTime.now().millisecondsSinceEpoch}',
-        title: _titleCtrl.text.trim(),
-        arabicText: _arabicCtrl.text.trim(),
-        transliteration: _translitCtrl.text.trim(),
-        englishMeaning: _meaningCtrl.text.trim(),
-        colorHex: _selectedColor,
-        icon: _selectedIcon,
-        createdAt: DateTime.now(),
-      );
-      await CustomDhikirService.add(item);
-    }
+    await context.read<MyDhikirProvider>().save(
+          existing: widget.existing,
+          title: _titleCtrl.text.trim(),
+          arabicText: _arabicCtrl.text.trim(),
+          transliteration: _translitCtrl.text.trim(),
+          englishMeaning: _meaningCtrl.text.trim(),
+          colorHex: _selectedColor,
+          icon: _selectedIcon,
+        );
 
     if (mounted) {
       HapticFeedback.heavyImpact();
