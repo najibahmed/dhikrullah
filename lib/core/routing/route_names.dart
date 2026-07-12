@@ -1,0 +1,15 @@
+// lib/core/routing/route_names.dart
+//
+// Central registry of named-route strings. Add a constant here whenever
+// a screen becomes reachable via Navigator.pushNamed.
+
+class RouteNames {
+  RouteNames._();
+
+  static const String sessionCounter = '/session-counter';
+  static const String myDhikir = '/my-dhikir';
+  static const String analytics = '/analytics';
+  static const String dhikirDetail = '/dhikir-detail';
+  static const String dhikirCalendar = '/dhikir-calendar';
+  static const String addDhikir = '/add-dhikir';
+}
