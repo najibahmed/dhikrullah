@@ -13,7 +13,8 @@ class AddDhikirScreen extends StatefulWidget {
   State<AddDhikirScreen> createState() => _AddDhikirScreenState();
 }
 
-class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProviderStateMixin {
+class _AddDhikirScreenState extends State<AddDhikirScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _titleCtrl = TextEditingController();
   final _arabicCtrl = TextEditingController();
@@ -60,8 +61,6 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
     '🌟',
     '💫',
     '🔮',
-    '🧿',
-    '🪬',
     '🕌',
     '🌄',
     '🌅',
@@ -113,7 +112,8 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
     super.dispose();
   }
 
-  Color get _accentColor => Color(int.parse(_selectedColor.replaceFirst('#', 'FF'), radix: 16));
+  Color get _accentColor =>
+      Color(int.parse(_selectedColor.replaceFirst('#', 'FF'), radix: 16));
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) {
@@ -168,8 +168,11 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
             leading: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(10)),
-                child: const Icon(Icons.close_rounded, size: 18, color: Color(0xFF2D3748)),
+                decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.close_rounded,
+                    size: 18, color: Color(0xFF2D3748)),
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -180,9 +183,12 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                   onTap: _saving ? null : _save,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: _saving ? Colors.white.withValues(alpha: 0.4) : const Color(0xFF2D3748),
+                      color: _saving
+                          ? Colors.white.withValues(alpha: 0.4)
+                          : const Color(0xFF2D3748),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -207,7 +213,8 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                   children: [
                     Row(
                       children: [
-                        Text(_selectedIcon, style: const TextStyle(fontSize: 32)),
+                        Text(_selectedIcon,
+                            style: const TextStyle(fontSize: 32)),
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,7 +228,9 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                               ),
                             ),
                             Text(
-                              _isEdit ? 'Update your dhikir' : 'Create a personal dhikir',
+                              _isEdit
+                                  ? 'Update your dhikir'
+                                  : 'Create a personal dhikir',
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 color: const Color(0xFF4A5568),
@@ -253,12 +262,18 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3))],
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3))
+                        ],
                       ),
                       child: GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 8,
                           crossAxisSpacing: 8,
                           mainAxisSpacing: 8,
@@ -273,12 +288,19 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 150),
                               decoration: BoxDecoration(
-                                color: selected ? _accentColor : const Color(0xFFF6F4F1),
+                                color: selected
+                                    ? _accentColor
+                                    : const Color(0xFFF6F4F1),
                                 borderRadius: BorderRadius.circular(10),
-                                border: selected ? Border.all(color: const Color(0xFF4A5568), width: 1.5) : null,
+                                border: selected
+                                    ? Border.all(
+                                        color: const Color(0xFF4A5568),
+                                        width: 1.5)
+                                    : null,
                               ),
                               child: Center(
-                                child: Text(icon, style: const TextStyle(fontSize: 18)),
+                                child: Text(icon,
+                                    style: const TextStyle(fontSize: 18)),
                               ),
                             ),
                           );
@@ -296,12 +318,18 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3))],
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3))
+                        ],
                       ),
                       child: GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
                           crossAxisSpacing: 10,
                           mainAxisSpacing: 10,
@@ -310,7 +338,9 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                         itemCount: _colorOptions.length,
                         itemBuilder: (_, i) {
                           final hex = _colorOptions[i];
-                          final color = Color(int.parse(hex.replaceFirst('#', 'FF'), radix: 16));
+                          final color = Color(int.parse(
+                              hex.replaceFirst('#', 'FF'),
+                              radix: 16));
                           final selected = hex == _selectedColor;
                           return GestureDetector(
                             onTap: () => setState(() => _selectedColor = hex),
@@ -319,14 +349,27 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                               decoration: BoxDecoration(
                                 color: color,
                                 borderRadius: BorderRadius.circular(10),
-                                border:
-                                    selected ? Border.all(color: const Color(0xFF2D3748), width: 2) : Border.all(color: Colors.transparent, width: 2),
-                                boxShadow: selected ? [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 8, spreadRadius: 1)] : [],
+                                border: selected
+                                    ? Border.all(
+                                        color: const Color(0xFF2D3748),
+                                        width: 2)
+                                    : Border.all(
+                                        color: Colors.transparent, width: 2),
+                                boxShadow: selected
+                                    ? [
+                                        BoxShadow(
+                                            color: color.withValues(alpha: 0.5),
+                                            blurRadius: 8,
+                                            spreadRadius: 1)
+                                      ]
+                                    : [],
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  if (selected) const Icon(Icons.check_rounded, size: 12, color: Color(0xFF2D3748)),
+                                  if (selected)
+                                    const Icon(Icons.check_rounded,
+                                        size: 12, color: Color(0xFF2D3748)),
                                   if (selected) const SizedBox(width: 4),
                                   Text(
                                     _colorLabels[i],
@@ -354,7 +397,12 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3))],
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3))
+                        ],
                       ),
                       child: Column(
                         children: [
@@ -440,9 +488,15 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                     const _SectionLabel('Preview'),
                     const SizedBox(height: 10),
                     _PreviewCard(
-                      title: _titleCtrl.text.isEmpty ? 'Your Dhikir' : _titleCtrl.text,
-                      arabicText: _arabicCtrl.text.isEmpty ? 'النص العربي' : _arabicCtrl.text,
-                      transliteration: _translitCtrl.text.isEmpty ? 'transliteration' : _translitCtrl.text,
+                      title: _titleCtrl.text.isEmpty
+                          ? 'Your Dhikir'
+                          : _titleCtrl.text,
+                      arabicText: _arabicCtrl.text.isEmpty
+                          ? 'النص العربي'
+                          : _arabicCtrl.text,
+                      transliteration: _translitCtrl.text.isEmpty
+                          ? 'transliteration'
+                          : _translitCtrl.text,
                       icon: _selectedIcon,
                       color: _accentColor,
                     ),
@@ -457,11 +511,14 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                         width: double.infinity,
                         height: 56,
                         decoration: BoxDecoration(
-                          color: _saving ? const Color(0xFF718096) : const Color(0xFF2D3748),
+                          color: _saving
+                              ? const Color(0xFF718096)
+                              : const Color(0xFF2D3748),
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF2D3748).withValues(alpha: 0.3),
+                              color: const Color(0xFF2D3748)
+                                  .withValues(alpha: 0.3),
                               blurRadius: 14,
                               offset: const Offset(0, 5),
                             )
@@ -480,7 +537,8 @@ class _AddDhikirScreenState extends State<AddDhikirScreen> with SingleTickerProv
                               : Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(_selectedIcon, style: const TextStyle(fontSize: 18)),
+                                    Text(_selectedIcon,
+                                        style: const TextStyle(fontSize: 18)),
                                     const SizedBox(width: 10),
                                     Text(
                                       _isEdit ? 'Update Dhikir' : 'Save Dhikir',
@@ -580,8 +638,10 @@ class _FormField extends StatelessWidget {
           textDirection: textDirection,
           maxLines: maxLines,
           style: fontFamily == 'Amiri'
-              ? GoogleFonts.amiri(fontSize: fontSize, color: const Color(0xFF2D3748))
-              : GoogleFonts.inter(fontSize: fontSize, color: const Color(0xFF2D3748)),
+              ? GoogleFonts.amiri(
+                  fontSize: fontSize, color: const Color(0xFF2D3748))
+              : GoogleFonts.inter(
+                  fontSize: fontSize, color: const Color(0xFF2D3748)),
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
@@ -601,14 +661,17 @@ class _FormField extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFFC8181), width: 1.5),
+              borderSide:
+                  const BorderSide(color: Color(0xFFFC8181), width: 1.5),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFFFC8181), width: 2),
             ),
-            errorStyle: GoogleFonts.inter(fontSize: 11, color: const Color(0xFFE53E3E)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            errorStyle:
+                GoogleFonts.inter(fontSize: 11, color: const Color(0xFFE53E3E)),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           ),
         ),
       ],
@@ -656,7 +719,8 @@ class _PreviewCard extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Center(child: Text(icon, style: const TextStyle(fontSize: 26))),
+            child:
+                Center(child: Text(icon, style: const TextStyle(fontSize: 26))),
           ),
           const SizedBox(width: 14),
           Expanded(
