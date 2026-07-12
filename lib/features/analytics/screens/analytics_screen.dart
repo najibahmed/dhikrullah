@@ -1,61 +1,45 @@
-// lib/screens/analytics_screen.dart
+// lib/features/analytics/screens/analytics_screen.dart
 import 'dart:math' as math;
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:dhikir_app/core/data/dhikir_data.dart';
-import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
-import 'package:dhikir_app/core/models/dhikir_model.dart';
-import 'package:dhikir_app/core/persistence/hive_service.dart';
-
-// ─── Period enum ─────────────────────────────────────────────────────────────
-enum AnalyticsPeriod { daily, weekly, monthly }
-
-// ─── Analytics data model ────────────────────────────────────────────────────
-class DhikirStat {
-  final DhikirItem dhikir;
-  final int count;
-  final int sessions; // days where count > 0
-
-  const DhikirStat({required this.dhikir, required this.count, required this.sessions});
-}
-
-class PeriodBar {
-  final String label;
-  final Map<String, int> countsByDhikir; // id → count
-  final int total;
-
-  const PeriodBar({required this.label, required this.countsByDhikir, required this.total});
-}
+import 'package:dhikir_app/features/analytics/providers/analytics_provider.dart';
 
 // ─── Main Screen ─────────────────────────────────────────────────────────────
-class AnalyticsScreen extends StatefulWidget {
+class AnalyticsScreen extends StatelessWidget {
   const AnalyticsScreen({super.key});
 
   @override
-  State<AnalyticsScreen> createState() => _AnalyticsScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      // Scoped to this screen; auto-disposed when screen is popped.
+      create: (_) => AnalyticsProvider(),
+      child: const _AnalyticsView(),
+    );
+  }
 }
 
-class _AnalyticsScreenState extends State<AnalyticsScreen> with SingleTickerProviderStateMixin {
-  AnalyticsPeriod _period = AnalyticsPeriod.daily;
+class _AnalyticsView extends StatefulWidget {
+  const _AnalyticsView();
+
+  @override
+  State<_AnalyticsView> createState() => _AnalyticsViewState();
+}
+
+class _AnalyticsViewState extends State<_AnalyticsView> with SingleTickerProviderStateMixin {
   late TabController _tabCtrl;
-  late List<DhikirItem> builtInSession;
-  late List<CustomDhikirItem> customItems;
-  late List<DhikirItem> combined;
   static const _periodLabels = ['Daily', 'Weekly', 'Monthly'];
 
   @override
   void initState() {
-    builtInSession = dhikirList.map((d) => SessionDhikir.fromItem(d)).toList();
-    customItems = CustomDhikirService.getAll();
-    final customSession = customItems.map((d) => SessionDhikir.fromCustom(d)).toList();
-    combined = [...builtInSession, ...customSession];
     super.initState();
     _tabCtrl = TabController(length: 3, vsync: this);
     _tabCtrl.addListener(() {
       if (!_tabCtrl.indexIsChanging) {
-        setState(() => _period = AnalyticsPeriod.values[_tabCtrl.index]);
+        context.read<AnalyticsProvider>().period = AnalyticsPeriod.values[_tabCtrl.index];
       }
     });
   }
@@ -66,128 +50,16 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> with SingleTickerProv
     super.dispose();
   }
 
-  // ── Data builders ──────────────────────────────────────────────────────────
-
-  /// Returns stats per dhikir for the given date range
-  List<DhikirStat> _buildStats(DateTime from, DateTime to) {
-    final stats = <DhikirStat>[];
-    for (final item in combined) {
-      final progress = HiveService.getProgress(item.id);
-      int total = 0;
-      int sessions = 0;
-      DateTime d = from;
-      while (!d.isAfter(to)) {
-        final c = progress.countForDate(d);
-        total += c;
-        if (c > 0) sessions++;
-        d = d.add(const Duration(days: 1));
-      }
-      stats.add(DhikirStat(dhikir: item, count: total, sessions: sessions));
-    }
-    stats.sort((a, b) => b.count.compareTo(a.count));
-    return stats;
-  }
-
-  /// Builds bar chart data for the selected period
-  List<PeriodBar> _buildBars() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
-    switch (_period) {
-      case AnalyticsPeriod.daily:
-        // Last 7 days
-        return List.generate(7, (i) {
-          final d = today.subtract(Duration(days: 6 - i));
-          final label = _dayLabel(d);
-          final counts = <String, int>{};
-          int total = 0;
-          for (final item in combined) {
-            final c = HiveService.getProgress(item.id).countForDate(d);
-            if (c > 0) counts[item.id] = c;
-            total += c;
-          }
-          return PeriodBar(label: label, countsByDhikir: counts, total: total);
-        });
-
-      case AnalyticsPeriod.weekly:
-        // Last 8 weeks
-        return List.generate(8, (i) {
-          final weekStart = today.subtract(Duration(days: today.weekday % 7 + (7 - i) * 7));
-          final weekEnd = weekStart.add(const Duration(days: 6));
-          final label = 'W${8 - i}';
-          final counts = <String, int>{};
-          int total = 0;
-          for (final item in combined) {
-            final progress = HiveService.getProgress(item.id);
-            int c = 0;
-            DateTime d = weekStart;
-            while (!d.isAfter(weekEnd)) {
-              c += progress.countForDate(d);
-              d = d.add(const Duration(days: 1));
-            }
-            if (c > 0) counts[item.id] = c;
-            total += c;
-          }
-          return PeriodBar(label: label, countsByDhikir: counts, total: total);
-        });
-
-      case AnalyticsPeriod.monthly:
-        // Last 6 months
-        return List.generate(6, (i) {
-          final offset = 5 - i;
-          int m = now.month - offset;
-          int y = now.year;
-          while (m <= 0) {
-            m += 12;
-            y--;
-          }
-          final monthStart = DateTime(y, m, 1);
-          final monthEnd = DateTime(y, m + 1, 0);
-          final label = _monthShort(m);
-          final counts = <String, int>{};
-          int total = 0;
-          for (final item in combined) {
-            final progress = HiveService.getProgress(item.id);
-            int c = 0;
-            DateTime d = monthStart;
-            while (!d.isAfter(monthEnd)) {
-              c += progress.countForDate(d);
-              d = d.add(const Duration(days: 1));
-            }
-            if (c > 0) counts[item.id] = c;
-            total += c;
-          }
-          return PeriodBar(label: label, countsByDhikir: counts, total: total);
-        });
-    }
-  }
-
-  // ── Totals for summary cards ───────────────────────────────────────────────
-
-  (DateTime, DateTime) _currentRange() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    switch (_period) {
-      case AnalyticsPeriod.daily:
-        return (today, today);
-      case AnalyticsPeriod.weekly:
-        final weekStart = today.subtract(Duration(days: today.weekday % 7));
-        return (weekStart, today);
-      case AnalyticsPeriod.monthly:
-        return (DateTime(now.year, now.month, 1), today);
-    }
-  }
-
-  int _grandTotal(List<DhikirStat> stats) => stats.fold(0, (s, e) => s + e.count);
-
   // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    final bars = _buildBars();
-    final (from, to) = _currentRange();
-    final stats = _buildStats(from, to);
-    final grandTotal = _grandTotal(stats);
+    final provider = context.watch<AnalyticsProvider>();
+    final period = provider.period;
+    final bars = provider.buildBars();
+    final (from, to) = provider.currentRange();
+    final stats = provider.buildStats(from, to);
+    final grandTotal = provider.grandTotal(stats);
     final maxBar = bars.isEmpty ? 1 : bars.map((b) => b.total).reduce(math.max).clamp(1, 999999);
 
     return Scaffold(
@@ -255,7 +127,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> with SingleTickerProv
                     _SummaryRow(
                       stats: stats,
                       grandTotal: grandTotal,
-                      period: _period,
+                      period: period,
                     ),
 
                     const SizedBox(height: 20),
@@ -311,7 +183,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> with SingleTickerProv
                                   style: GoogleFonts.playfairDisplay(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748)),
                                 ),
                                 Text(
-                                  _periodLabel(),
+                                  _periodLabel(period),
                                   style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096)),
                                 ),
                               ],
@@ -364,8 +236,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> with SingleTickerProv
                     const SizedBox(height: 20),
 
                     // ── Daily breakdown for current period ────────────
-                    if (_period != AnalyticsPeriod.daily) ...[
-                      _DailyBreakdownCard(period: _period),
+                    if (period != AnalyticsPeriod.daily) ...[
+                      _DailyBreakdownCard(period: period),
                       const SizedBox(height: 20),
                     ],
 
@@ -381,19 +253,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> with SingleTickerProv
     );
   }
 
-  String _chartTitle() {
-    switch (_period) {
-      case AnalyticsPeriod.daily:
-        return 'Last 7 Days';
-      case AnalyticsPeriod.weekly:
-        return 'Last 8 Weeks';
-      case AnalyticsPeriod.monthly:
-        return 'Last 6 Months';
-    }
-  }
-
-  String _periodLabel() {
-    switch (_period) {
+  String _periodLabel(AnalyticsPeriod period) {
+    switch (period) {
       case AnalyticsPeriod.daily:
         return 'Today';
       case AnalyticsPeriod.weekly:
@@ -401,18 +262,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> with SingleTickerProv
       case AnalyticsPeriod.monthly:
         return 'This Month';
     }
-  }
-
-  static String _dayLabel(DateTime d) {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    final now = DateTime.now();
-    if (d.day == now.day && d.month == now.month) return 'Today';
-    return days[d.weekday % 7];
-  }
-
-  static String _monthShort(int m) {
-    const months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return months[m];
   }
 }
 
@@ -836,35 +685,9 @@ class _DailyBreakdownCard extends StatefulWidget {
 class _DailyBreakdownCardState extends State<_DailyBreakdownCard> {
   bool _expanded = false;
 
-  List<_DayEntry> _buildDayEntries() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final entries = <_DayEntry>[];
-
-    final int lookback = widget.period == AnalyticsPeriod.weekly ? 7 : 30;
-    for (int i = 0; i < lookback; i++) {
-      final d = today.subtract(Duration(days: i));
-      int total = 0;
-      final byDhikir = <String, int>{};
-      final builtInSession = dhikirList.map((d) => SessionDhikir.fromItem(d)).toList();
-      final customItems = CustomDhikirService.getAll();
-      final customSession = customItems.map((d) => SessionDhikir.fromCustom(d)).toList();
-      final combined = [...builtInSession, ...customSession];
-      for (final item in combined) {
-        final c = HiveService.getProgress(item.id).countForDate(d);
-        total += c;
-        if (c > 0) byDhikir[item.id] = c;
-      }
-      if (total > 0 || i == 0) {
-        entries.add(_DayEntry(date: d, total: total, byDhikir: byDhikir));
-      }
-    }
-    return entries;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final entries = _buildDayEntries();
+    final entries = context.watch<AnalyticsProvider>().buildDayEntries(widget.period);
     final shown = _expanded ? entries : entries.take(5).toList();
 
     return Container(
@@ -923,15 +746,8 @@ class _DailyBreakdownCardState extends State<_DailyBreakdownCard> {
   }
 }
 
-class _DayEntry {
-  final DateTime date;
-  final int total;
-  final Map<String, int> byDhikir;
-  const _DayEntry({required this.date, required this.total, required this.byDhikir});
-}
-
 class _DayLogRow extends StatelessWidget {
-  final _DayEntry entry;
+  final DayEntry entry;
   const _DayLogRow({required this.entry});
 
   String _dateLabel() {
@@ -949,10 +765,7 @@ class _DayLogRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final builtInSession = dhikirList.map((d) => SessionDhikir.fromItem(d)).toList();
-    final customItems = CustomDhikirService.getAll();
-    final customSession = customItems.map((d) => SessionDhikir.fromCustom(d)).toList();
-    final combined = [...builtInSession, ...customSession];
+    final combined = context.watch<AnalyticsProvider>().combined;
     final sorted = entry.byDhikir.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
 
     return Column(
@@ -1030,23 +843,9 @@ class _DayLogRow extends StatelessWidget {
 class _AllTimeTotals extends StatelessWidget {
   const _AllTimeTotals();
 
-  List<DhikirStat> _buildAllTime() {
-    final builtInSession = dhikirList.map((d) => SessionDhikir.fromItem(d)).toList();
-    final customItems = CustomDhikirService.getAll();
-    final customSession = customItems.map((d) => SessionDhikir.fromCustom(d)).toList();
-    final combined = [...builtInSession, ...customSession];
-    return combined.map((item) {
-      final progress = HiveService.getProgress(item.id);
-      final total = progress.dailyCounts.values.fold(0, (sum, c) => sum + c);
-      final sessions = progress.dailyCounts.values.where((c) => c > 0).length;
-      return DhikirStat(dhikir: item, count: total, sessions: sessions);
-    }).toList()
-      ..sort((a, b) => b.count.compareTo(a.count));
-  }
-
   @override
   Widget build(BuildContext context) {
-    final stats = _buildAllTime();
+    final stats = context.watch<AnalyticsProvider>().buildAllTime();
     final grandTotal = stats.fold(0, (s, e) => s + e.count);
 
     return Container(
