@@ -1,12 +1,13 @@
-// lib/screens/session_counter_screen.dart
+// lib/features/counter/screens/session_counter_screen.dart
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:dhikir_app/core/models/dhikir_model.dart';
 import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
-import 'package:dhikir_app/core/persistence/hive_service.dart';
 import 'package:dhikir_app/core/widgets/counter_button.dart';
+import 'package:dhikir_app/features/counter/providers/session_counter_provider.dart';
 
 // ─── Unified dhikir wrapper ───────────────────────────────────────────────────
 
@@ -61,7 +62,7 @@ class SessionDhikir implements DhikirItem {
 
 // ─── Session Counter Screen ───────────────────────────────────────────────────
 
-class SessionCounterScreen extends StatefulWidget {
+class SessionCounterScreen extends StatelessWidget {
   final List<SessionDhikir> dhikirList;
   final int initialIndex;
   final int sharedGoal; // -1 = unlimited
@@ -74,14 +75,28 @@ class SessionCounterScreen extends StatefulWidget {
   });
 
   @override
-  State<SessionCounterScreen> createState() => _SessionCounterScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      // Scoped to this screen; auto-disposed when screen is popped.
+      create: (_) => SessionCounterProvider(
+        dhikirList: dhikirList,
+        initialIndex: initialIndex,
+        sharedGoal: sharedGoal,
+      ),
+      child: const _SessionCounterView(),
+    );
+  }
 }
 
-class _SessionCounterScreenState extends State<SessionCounterScreen> with TickerProviderStateMixin {
+class _SessionCounterView extends StatefulWidget {
+  const _SessionCounterView();
+
+  @override
+  State<_SessionCounterView> createState() => _SessionCounterViewState();
+}
+
+class _SessionCounterViewState extends State<_SessionCounterView> with TickerProviderStateMixin {
   late PageController _pageCtrl;
-  late int _currentIndex;
-  late int _goal;
-  late DateTime _today;
 
   late AnimationController _pulseCtrl;
   late AnimationController _completionCtrl;
@@ -89,16 +104,11 @@ class _SessionCounterScreenState extends State<SessionCounterScreen> with Ticker
   late Animation<double> _pulseAnim;
   late Animation<double> _completionAnim;
 
-  final Map<String, bool> _sessionCompleted = {};
-
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialIndex;
-    _goal = widget.sharedGoal;
-    _today = DateTime.now();
-
-    _pageCtrl = PageController(initialPage: _currentIndex, viewportFraction: 1.0);
+    final provider = context.read<SessionCounterProvider>();
+    _pageCtrl = PageController(initialPage: provider.currentIndex, viewportFraction: 1.0);
 
     _pulseCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 120));
     _pulseAnim = Tween<double>(begin: 1.0, end: 0.93).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
@@ -118,31 +128,21 @@ class _SessionCounterScreenState extends State<SessionCounterScreen> with Ticker
     super.dispose();
   }
 
-  SessionDhikir get _current => widget.dhikirList[_currentIndex];
-
-  bool get _isUnlimited => _goal == -1;
-
-  int get _todayCount => HiveService.getProgress(_current.id).countForDate(_today);
-
-  bool get _isGoalMet => !_isUnlimited && _todayCount >= _goal;
-
-  double get _progress {
-    if (_isUnlimited) return (_todayCount / 100).clamp(0.0, 1.0);
-    return (_todayCount / _goal).clamp(0.0, 1.0);
-  }
-
   Future<void> _onTap() async {
-    final count = _todayCount;
-    if (!_isUnlimited && count >= _goal) {
+    final provider = context.read<SessionCounterProvider>();
+    final count = provider.todayCount;
+    final isUnlimited = provider.isUnlimited;
+    final goal = provider.goal;
+
+    if (!isUnlimited && count >= goal) {
       HapticFeedback.lightImpact();
       _pulseCtrl.forward().then((_) => _pulseCtrl.reverse());
       return;
     }
 
     final newCount = count + 1;
-    final effectiveTarget = _isUnlimited ? 999999 : _goal;
 
-    if (!_isUnlimited && newCount >= _goal) {
+    if (!isUnlimited && newCount >= goal) {
       await HapticFeedback.heavyImpact();
       await Future.delayed(const Duration(milliseconds: 80));
       await HapticFeedback.heavyImpact();
@@ -156,42 +156,39 @@ class _SessionCounterScreenState extends State<SessionCounterScreen> with Ticker
 
     _pulseCtrl.forward().then((_) => _pulseCtrl.reverse());
 
-    final result = await HiveService.incrementCount(_current.id, _today, target: effectiveTarget);
-
-    if (!_isUnlimited && result >= _goal && !(_sessionCompleted[_current.id] ?? false)) {
-      _sessionCompleted[_current.id] = true;
+    final justCompleted = await provider.incrementCurrent();
+    if (justCompleted) {
       _completionCtrl.forward(from: 0);
       // Auto-advance to next dhikir after 1.5s if not last
-      if (_currentIndex < widget.dhikirList.length - 1) {
+      final currentIndex = provider.currentIndex;
+      if (currentIndex < provider.dhikirList.length - 1) {
         Future.delayed(const Duration(milliseconds: 1500), () {
-          if (mounted) _navigateTo(_currentIndex + 1);
+          if (mounted) _navigateTo(currentIndex + 1);
         });
       }
     }
-
-    setState(() {});
   }
 
   void _navigateTo(int index) {
-    if (index < 0 || index >= widget.dhikirList.length) return;
+    final provider = context.read<SessionCounterProvider>();
+    if (index < 0 || index >= provider.dhikirList.length) return;
     _pageCtrl.animateToPage(
       index,
       duration: const Duration(milliseconds: 400),
       curve: Curves.easeInOutCubic,
     );
-    setState(() {
-      _currentIndex = index;
-      _completionCtrl.reset();
-    });
+    provider.setIndex(index);
+    _completionCtrl.reset();
   }
 
   Future<void> _resetCurrent() async {
+    final provider = context.read<SessionCounterProvider>();
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text("Reset Today's Count?", style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700)),
-        content: Text("Reset counter for ${_current.title}?"),
+        content: Text("Reset counter for ${provider.current.title}?"),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
           FilledButton(
@@ -204,38 +201,39 @@ class _SessionCounterScreenState extends State<SessionCounterScreen> with Ticker
       ),
     );
     if (ok == true) {
-      await HiveService.resetCount(_current.id, _today);
-      _sessionCompleted.remove(_current.id);
+      await provider.resetCurrent();
       _completionCtrl.reset();
-      setState(() {});
     }
   }
 
   Future<void> _showGoalDialog() async {
+    final provider = context.read<SessionCounterProvider>();
     final selected = await showModalBottomSheet<int>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _GoalSheet(
-        current: _goal,
-        accentColor: _current.color,
+        current: provider.goal,
+        accentColor: provider.current.color,
       ),
     );
-    if (selected != null && selected != _goal) {
-      setState(() {
-        _goal = selected;
-        _sessionCompleted.clear();
-        _completionCtrl.reset();
-      });
+    if (selected != null && selected != provider.goal) {
+      provider.setGoal(selected);
+      _completionCtrl.reset();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final dhikir = _current;
-    final count = _todayCount;
-    final isGoalMet = _isGoalMet;
-    final total = widget.dhikirList.length;
+    final provider = context.watch<SessionCounterProvider>();
+    final dhikirList = provider.dhikirList;
+    final dhikir = provider.current;
+    final currentIndex = provider.currentIndex;
+    final count = provider.todayCount;
+    final goal = provider.goal;
+    final isUnlimited = provider.isUnlimited;
+    final isGoalMet = provider.isGoalMet;
+    final total = dhikirList.length;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1A202C),
@@ -258,12 +256,8 @@ class _SessionCounterScreenState extends State<SessionCounterScreen> with Ticker
                   ),
                   Column(
                     children: [
-                      // Text(
-                      //   'Session Counter',
-                      //   style: GoogleFonts.playfairDisplay(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
-                      // ),
                       Text(
-                        '${_currentIndex + 1} of $total dhikir',
+                        '${currentIndex + 1} of $total dhikir',
                         style: GoogleFonts.inter(fontSize: 12, color: Colors.white54),
                       ),
                     ],
@@ -281,7 +275,7 @@ class _SessionCounterScreenState extends State<SessionCounterScreen> with Ticker
                           const Icon(Icons.flag_rounded, size: 12, color: Colors.white),
                           const SizedBox(width: 4),
                           Text(
-                            _isUnlimited ? '∞' : '$_goal',
+                            isUnlimited ? '∞' : '$goal',
                             style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
                           ),
                         ],
@@ -293,15 +287,15 @@ class _SessionCounterScreenState extends State<SessionCounterScreen> with Ticker
             ),
 
             // ── Progress dots ─────────────────────────────────────────
-            if (!_isUnlimited)
+            if (!isUnlimited)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(total, (i) {
-                    final d = widget.dhikirList[i];
-                    final done = _sessionCompleted[d.id] ?? false;
-                    final isCurrent = i == _currentIndex;
+                    final d = dhikirList[i];
+                    final done = provider.isCompleted(d.id);
+                    final isCurrent = i == currentIndex;
                     return GestureDetector(
                       onTap: () => _navigateTo(i),
                       child: AnimatedContainer(
@@ -329,26 +323,26 @@ class _SessionCounterScreenState extends State<SessionCounterScreen> with Ticker
               child: PageView.builder(
                 controller: _pageCtrl,
                 itemCount: total,
-                onPageChanged: (i) => setState(() {
-                  _currentIndex = i;
+                onPageChanged: (i) {
+                  provider.setIndex(i);
                   _completionCtrl.reset();
-                }),
+                },
                 itemBuilder: (_, i) {
-                  final d = widget.dhikirList[i];
-                  final dCount = HiveService.getProgress(d.id).countForDate(_today);
-                  final dGoalMet = !_isUnlimited && dCount >= _goal;
+                  final d = dhikirList[i];
+                  final dCount = provider.countFor(d.id);
+                  final dGoalMet = !isUnlimited && dCount >= goal;
 
                   return _DhikirPage(
                     dhikir: d,
                     count: dCount,
-                    goal: _goal,
+                    goal: goal,
                     isGoalMet: dGoalMet,
-                    isUnlimited: _isUnlimited,
-                    progress: _isUnlimited ? (dCount / 100).clamp(0.0, 1.0) : (dCount / _goal).clamp(0.0, 1.0),
+                    isUnlimited: isUnlimited,
+                    progress: provider.progressFor(dCount),
                     pulseAnim: _pulseAnim,
                     completionAnim: _completionAnim,
-                    isCurrent: i == _currentIndex,
-                    onTap: i == _currentIndex ? _onTap : null,
+                    isCurrent: i == currentIndex,
+                    onTap: i == currentIndex ? _onTap : null,
                   );
                 },
               ),
@@ -361,20 +355,20 @@ class _SessionCounterScreenState extends State<SessionCounterScreen> with Ticker
                 children: [
                   // Previous
                   GestureDetector(
-                    onTap: _currentIndex > 0 ? () => _navigateTo(_currentIndex - 1) : null,
+                    onTap: currentIndex > 0 ? () => _navigateTo(currentIndex - 1) : null,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: 52,
                       height: 52,
                       decoration: BoxDecoration(
-                        color: _currentIndex > 0 ? Colors.white.withValues(alpha: 0.12) : Colors.white.withValues(alpha: 0.04),
+                        color: currentIndex > 0 ? Colors.white.withValues(alpha: 0.12) : Colors.white.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: _currentIndex > 0 ? Colors.white24 : Colors.white.withValues(alpha: 0.06), width: 1),
+                        border: Border.all(color: currentIndex > 0 ? Colors.white24 : Colors.white.withValues(alpha: 0.06), width: 1),
                       ),
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,
                         size: 18,
-                        color: _currentIndex > 0 ? Colors.white : Colors.white24,
+                        color: currentIndex > 0 ? Colors.white : Colors.white24,
                       ),
                     ),
                   ),
@@ -411,21 +405,21 @@ class _SessionCounterScreenState extends State<SessionCounterScreen> with Ticker
 
                   // Next
                   GestureDetector(
-                    onTap: _currentIndex < total - 1 ? () => _navigateTo(_currentIndex + 1) : null,
+                    onTap: currentIndex < total - 1 ? () => _navigateTo(currentIndex + 1) : null,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: 52,
                       height: 52,
                       decoration: BoxDecoration(
-                        color: _currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.04),
+                        color: currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                            color: _currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.06), width: 1),
+                            color: currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.06), width: 1),
                       ),
                       child: Icon(
                         Icons.arrow_forward_ios_rounded,
                         size: 18,
-                        color: _currentIndex < total - 1 ? Colors.white : Colors.white24,
+                        color: currentIndex < total - 1 ? Colors.white : Colors.white24,
                       ),
                     ),
                   ),
@@ -573,90 +567,6 @@ class _DhikirPage extends StatelessWidget {
             completionAnim: completionAnim,
             onTap: onTap,
           ),
-          // GestureDetector(
-          //   onTap: onTap,
-          //   child: AnimatedBuilder(
-          //     animation: Listenable.merge([pulseAnim, completionAnim]),
-          //     builder: (context, child) {
-          //       final scale = isCurrent ? pulseAnim.value * (isGoalMet ? (1.0 + 0.05 * math.sin(completionAnim.value * math.pi)) : 1.0) : 1.0;
-          //       return Transform.scale(scale: scale, child: child);
-          //     },
-          //     child: SizedBox(
-          //       width: 200,
-          //       height: 200,
-          //       child: Stack(
-          //         alignment: Alignment.center,
-          //         children: [
-          //           // Glow on completion
-          //           if (isGoalMet)
-          //             Container(
-          //               width: 200,
-          //               height: 200,
-          //               decoration: BoxDecoration(
-          //                 shape: BoxShape.circle,
-          //                 boxShadow: [
-          //                   BoxShadow(
-          //                     color: dhikir.color.withValues(alpha: 0.5),
-          //                     blurRadius: 40,
-          //                     spreadRadius: 10,
-          //                   ),
-          //                 ],
-          //               ),
-          //             ),
-
-          //           // Arc
-          //           CustomPaint(
-          //             size: const Size(200, 200),
-          //             painter: _ArcPainter(progress: progress, color: dhikir.color, isGoalMet: isGoalMet),
-          //           ),
-
-          //           // Inner
-          //           Container(
-          //             width: 150,
-          //             height: 150,
-          //             decoration: BoxDecoration(
-          //               shape: BoxShape.circle,
-          //               color: isGoalMet ? dhikir.color : const Color(0xFF2D3748),
-          //               boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 6))],
-          //             ),
-          //             child: Column(
-          //               mainAxisAlignment: MainAxisAlignment.center,
-          //               children: [
-          //                 if (isGoalMet) ...[
-          //                   const Icon(Icons.check_rounded, size: 28, color: Color(0xFF2D3748)),
-          //                   const SizedBox(height: 4),
-          //                   Text(
-          //                     '$count',
-          //                     style: GoogleFonts.playfairDisplay(
-          //                       fontSize: 22,
-          //                       fontWeight: FontWeight.w700,
-          //                       color: const Color(0xFF2D3748),
-          //                     ),
-          //                   ),
-          //                 ] else ...[
-          //                   Text(
-          //                     '$count',
-          //                     style: GoogleFonts.playfairDisplay(
-          //                       fontSize: 52,
-          //                       fontWeight: FontWeight.w700,
-          //                       color: Colors.white,
-          //                       height: 1,
-          //                     ),
-          //                   ),
-          //                   const SizedBox(height: 4),
-          //                   Text(
-          //                     isUnlimited ? 'tap' : 'of $goal',
-          //                     style: GoogleFonts.inter(fontSize: 13, color: Colors.white54),
-          //                   ),
-          //                 ],
-          //               ],
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     ),
-          //   ),
-          // ),
 
           const Spacer(),
 
