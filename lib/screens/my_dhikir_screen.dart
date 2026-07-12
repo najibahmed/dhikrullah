@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../data/dhikir_data.dart' as built_in;
+import '../core/routing/app_routes.dart';
+import '../core/routing/route_names.dart';
 import '../models/custom_dhikir_model.dart';
 import '../models/dhikir_model.dart';
 import '../providers/favorites_provider.dart';
 import '../services/custom_dhikir_service.dart';
 import '../widgets/section_header.dart';
-import 'add_dhikir_screen.dart';
 import 'session_counter_screen.dart';
 
 class MyDhikirScreen extends StatefulWidget {
@@ -65,14 +66,10 @@ class _MyDhikirScreenState extends State<MyDhikirScreen> with SingleTickerProvid
 
   void _startSession(List<SessionDhikir> list, int goal) {
     if (list.isEmpty) return;
-    Navigator.push(
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (_) => SessionCounterScreen(
-          dhikirList: list,
-          sharedGoal: goal,
-        ),
-      ),
+      RouteNames.sessionCounter,
+      arguments: SessionCounterArgs(dhikirList: list, sharedGoal: goal),
     ).then((_) => setState(() {}));
   }
 
@@ -127,11 +124,8 @@ class _MyDhikirScreenState extends State<MyDhikirScreen> with SingleTickerProvid
                 padding: const EdgeInsets.only(right: 16),
                 child: GestureDetector(
                   onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const AddDhikirScreen()),
-                    );
-                    _refresh();
+                    final saved = await Navigator.pushNamed(context, RouteNames.addDhikir);
+                    if (saved == true) _refresh();
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -398,11 +392,12 @@ class _CustomCard extends StatelessWidget {
                   label: 'Edit',
                   color: const Color(0xFF718096),
                   onTap: () async {
-                    await Navigator.push(
+                    final saved = await Navigator.pushNamed(
                       context,
-                      MaterialPageRoute(builder: (_) => AddDhikirScreen(existing: item)),
+                      RouteNames.addDhikir,
+                      arguments: AddDhikirArgs(existing: item),
                     );
-                    onRefresh();
+                    if (saved == true) onRefresh();
                   },
                 ),
                 _ActionBtn(

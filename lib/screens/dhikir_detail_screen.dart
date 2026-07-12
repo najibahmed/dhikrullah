@@ -3,6 +3,8 @@ import 'package:dhikir_app/data/dhikir_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../core/routing/app_routes.dart';
+import '../core/routing/route_names.dart';
 import '../models/dhikir_model.dart';
 import '../services/custom_dhikir_service.dart';
 import '../services/hive_service.dart';
@@ -10,7 +12,6 @@ import '../widgets/counter_button.dart';
 import '../widgets/goal_pick_sheet.dart';
 import '../widgets/mile_stone_dot.dart';
 import '../widgets/pill_widget.dart';
-import 'dhikir_calendar_screen.dart';
 
 class DhikirDetailScreen extends StatefulWidget {
   final DhikirItem dhikir;
@@ -267,9 +268,10 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
                   child: const Icon(Icons.calendar_month_rounded, size: 18, color: Color(0xFF4A5568)),
                 ),
                 onPressed: () async {
-                  await Navigator.push(
+                  await Navigator.pushNamed(
                     context,
-                    MaterialPageRoute(builder: (_) => DhikirCalendarScreen(dhikir: widget.dhikir)),
+                    RouteNames.dhikirCalendar,
+                    arguments: DhikirCalendarArgs(dhikir: widget.dhikir),
                   );
                   _refresh();
                 },
@@ -575,11 +577,10 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
                               Pill(label: 'This Month', color: bgColor),
                               GestureDetector(
                                 onTap: () async {
-                                  await Navigator.push(
+                                  await Navigator.pushNamed(
                                     context,
-                                    MaterialPageRoute(
-                                      builder: (_) => DhikirCalendarScreen(dhikir: widget.dhikir),
-                                    ),
+                                    RouteNames.dhikirCalendar,
+                                    arguments: DhikirCalendarArgs(dhikir: widget.dhikir),
                                   );
                                   _refresh();
                                 },

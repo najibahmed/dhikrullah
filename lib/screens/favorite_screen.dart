@@ -3,6 +3,8 @@ import 'package:dhikir_app/screens/session_counter_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../core/routing/app_routes.dart';
+import '../core/routing/route_names.dart';
 import '../data/dhikir_data.dart' as built_in;
 import '../providers/favorites_provider.dart';
 import '../services/custom_dhikir_service.dart';
@@ -40,14 +42,10 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
 
   void _startSession(List<SessionDhikir> list, int goal) {
     if (list.isEmpty) return;
-    Navigator.push(
+    Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (_) => SessionCounterScreen(
-          dhikirList: list,
-          sharedGoal: goal,
-        ),
-      ),
+      RouteNames.sessionCounter,
+      arguments: SessionCounterArgs(dhikirList: list, sharedGoal: goal),
     ).then((_) => setState(() {}));
   }
 

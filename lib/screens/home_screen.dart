@@ -12,13 +12,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../core/app_colors.dart';
+import '../core/routing/app_routes.dart';
+import '../core/routing/route_names.dart';
 import '../data/dhikir_data.dart' as built_in;
 import '../providers/theme_provider.dart';
 import '../services/custom_dhikir_service.dart';
 import '../services/hive_service.dart';
 import '../widgets/counter_tab.dart';
-import 'analytics_screen.dart';
-import 'dhikir_detail_screen.dart';
 import 'favorite_screen.dart';
 import 'my_dhikir_screen.dart';
 import 'session_counter_screen.dart';
@@ -63,14 +63,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (confirmed == true && mounted) {
-      await Navigator.push(
+      await Navigator.pushNamed(
         context,
-        MaterialPageRoute(
-          builder: (_) => SessionCounterScreen(
-            dhikirList: list,
-            sharedGoal: goal,
-          ),
-        ),
+        RouteNames.sessionCounter,
+        arguments: SessionCounterArgs(dhikirList: list, sharedGoal: goal),
       );
       setState(() {});
     }
@@ -148,7 +144,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                 foregroundColor: AppColors.medium,
                 border: Border.all(color: AppColors.mintBorder),
                 onTap: () async {
-                  await Navigator.push(context, MaterialPageRoute(builder: (_) => const MyDhikirScreen()));
+                  await Navigator.pushNamed(context, RouteNames.myDhikir);
                   setState(() {});
                 },
               ),
@@ -159,7 +155,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                 backgroundColor: AppColors.dark,
                 foregroundColor: Colors.white,
                 onTap: () async {
-                  await Navigator.push(context, MaterialPageRoute(builder: (_) => const AnalyticsScreen()));
+                  await Navigator.pushNamed(context, RouteNames.analytics);
                   setState(() {});
                 },
               ),
@@ -232,9 +228,10 @@ class _DhikirGridCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () async {
-        await Navigator.push(
+        await Navigator.pushNamed(
           context,
-          MaterialPageRoute(builder: (_) => DhikirDetailScreen(dhikir: item)),
+          RouteNames.dhikirDetail,
+          arguments: DhikirDetailArgs(dhikir: item),
         );
         onReturn();
       },

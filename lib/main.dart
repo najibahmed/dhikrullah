@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import 'core/routing/app_routes.dart';
 import 'providers/theme_provider.dart';
 import 'providers/favorites_provider.dart';
 import 'services/hive_service.dart';
@@ -97,6 +98,7 @@ class DhikirApp extends StatelessWidget {
       ),
 
       home: const HomeScreen(),
+      onGenerateRoute: AppRoutes.generate,
     );
   }
 }
