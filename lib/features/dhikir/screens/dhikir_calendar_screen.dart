@@ -13,8 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../models/dhikir_model.dart';
-import '../providers/dhikir_calendar_provider.dart';
+import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/features/dhikir/providers/dhikir_calendar_provider.dart';
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 

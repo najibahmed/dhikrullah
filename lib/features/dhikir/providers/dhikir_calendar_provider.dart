@@ -5,8 +5,8 @@
 // Exposes pre-computed values so widgets only read, never compute.
 
 import 'package:flutter/material.dart';
-import '../models/dhikir_model.dart';
-import '../services/hive_service.dart';
+import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/core/persistence/hive_service.dart';
 
 class DhikirCalendarProvider extends ChangeNotifier {
   final String dhikirId;

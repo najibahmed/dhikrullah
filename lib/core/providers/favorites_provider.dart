@@ -6,8 +6,8 @@
 // service classes directly.
 
 import 'package:flutter/material.dart';
-import '../services/hive_service.dart';
-import '../services/custom_dhikir_service.dart';
+import 'package:dhikir_app/core/persistence/hive_service.dart';
+import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 
 class FavoritesProvider extends ChangeNotifier {
   // Internal cache for quick O(1) lookup.

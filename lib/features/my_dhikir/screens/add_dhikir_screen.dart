@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../models/custom_dhikir_model.dart';
-import '../services/custom_dhikir_service.dart';
+import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
+import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 
 class AddDhikirScreen extends StatefulWidget {
   final CustomDhikirItem? existing; // non-null = edit mode

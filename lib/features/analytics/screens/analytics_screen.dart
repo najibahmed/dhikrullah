@@ -1,13 +1,13 @@
 // lib/screens/analytics_screen.dart
 import 'dart:math' as math;
-import 'package:dhikir_app/screens/session_counter_screen.dart';
-import 'package:dhikir_app/services/custom_dhikir_service.dart';
+import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
+import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../data/dhikir_data.dart';
-import '../models/custom_dhikir_model.dart';
-import '../models/dhikir_model.dart';
-import '../services/hive_service.dart';
+import 'package:dhikir_app/core/data/dhikir_data.dart';
+import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
+import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/core/persistence/hive_service.dart';
 
 // ─── Period enum ─────────────────────────────────────────────────────────────
 enum AnalyticsPeriod { daily, weekly, monthly }

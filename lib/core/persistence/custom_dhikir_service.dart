@@ -7,8 +7,8 @@
 // custom dhikir share a single unified favourites store.
 
 import 'package:hive_flutter/hive_flutter.dart';
-import '../models/custom_dhikir_model.dart';
-import 'hive_service.dart';
+import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
+import 'package:dhikir_app/core/persistence/hive_service.dart';
 
 class CustomDhikirService {
   static const String _boxName = 'custom_dhikir_v1';

@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../data/dhikir_data.dart' as built_in;
-import '../core/routing/app_routes.dart';
-import '../core/routing/route_names.dart';
-import '../models/custom_dhikir_model.dart';
-import '../models/dhikir_model.dart';
-import '../providers/favorites_provider.dart';
-import '../services/custom_dhikir_service.dart';
-import '../widgets/section_header.dart';
-import 'session_counter_screen.dart';
+import 'package:dhikir_app/core/data/dhikir_data.dart' as built_in;
+import 'package:dhikir_app/core/routing/app_routes.dart';
+import 'package:dhikir_app/core/routing/route_names.dart';
+import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
+import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/core/providers/favorites_provider.dart';
+import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
+import 'package:dhikir_app/core/widgets/section_header.dart';
+import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 
 class MyDhikirScreen extends StatefulWidget {
   const MyDhikirScreen({super.key});

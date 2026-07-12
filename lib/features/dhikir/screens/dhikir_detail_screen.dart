@@ -1,17 +1,17 @@
 // lib/screens/dhikir_detail_screen.dart
-import 'package:dhikir_app/data/dhikir_data.dart';
+import 'package:dhikir_app/core/data/dhikir_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../core/routing/app_routes.dart';
-import '../core/routing/route_names.dart';
-import '../models/dhikir_model.dart';
-import '../services/custom_dhikir_service.dart';
-import '../services/hive_service.dart';
-import '../widgets/counter_button.dart';
-import '../widgets/goal_pick_sheet.dart';
-import '../widgets/mile_stone_dot.dart';
-import '../widgets/pill_widget.dart';
+import 'package:dhikir_app/core/routing/app_routes.dart';
+import 'package:dhikir_app/core/routing/route_names.dart';
+import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
+import 'package:dhikir_app/core/persistence/hive_service.dart';
+import 'package:dhikir_app/core/widgets/counter_button.dart';
+import 'package:dhikir_app/features/dhikir/widgets/goal_pick_sheet.dart';
+import 'package:dhikir_app/features/dhikir/widgets/mile_stone_dot.dart';
+import 'package:dhikir_app/features/dhikir/widgets/pill_widget.dart';
 
 class DhikirDetailScreen extends StatefulWidget {
   final DhikirItem dhikir;

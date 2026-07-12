@@ -5,18 +5,18 @@
 // MultiProvider so every screen can access ThemeProvider and
 // FavoritesProvider via context.
 
-import 'package:dhikir_app/providers/dhikir_calendar_provider.dart';
+import 'package:dhikir_app/features/dhikir/providers/dhikir_calendar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import 'core/routing/app_routes.dart';
-import 'providers/theme_provider.dart';
-import 'providers/favorites_provider.dart';
-import 'services/hive_service.dart';
-import 'services/custom_dhikir_service.dart';
-import 'screens/home_screen.dart';
+import 'package:dhikir_app/core/routing/app_routes.dart';
+import 'package:dhikir_app/core/providers/theme_provider.dart';
+import 'package:dhikir_app/core/providers/favorites_provider.dart';
+import 'package:dhikir_app/core/persistence/hive_service.dart';
+import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
+import 'package:dhikir_app/features/dhikir/screens/home_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

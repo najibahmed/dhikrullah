@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../services/custom_dhikir_service.dart';
-import '../services/hive_service.dart';
+import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
+import 'package:dhikir_app/core/persistence/hive_service.dart';
 
 class FavRow extends StatelessWidget {
   final String id;

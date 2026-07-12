@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:dhikir_app/widgets/arc_painter.dart';
+import 'package:dhikir_app/core/widgets/arc_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

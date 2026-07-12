@@ -3,10 +3,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../models/dhikir_model.dart';
-import '../models/custom_dhikir_model.dart';
-import '../services/hive_service.dart';
-import '../widgets/counter_button.dart';
+import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
+import 'package:dhikir_app/core/persistence/hive_service.dart';
+import 'package:dhikir_app/core/widgets/counter_button.dart';
 
 // ─── Unified dhikir wrapper ───────────────────────────────────────────────────
 

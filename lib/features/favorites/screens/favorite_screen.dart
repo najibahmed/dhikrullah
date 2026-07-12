@@ -1,15 +1,15 @@
-import 'package:dhikir_app/screens/my_dhikir_screen.dart';
-import 'package:dhikir_app/screens/session_counter_screen.dart';
+import 'package:dhikir_app/features/my_dhikir/screens/my_dhikir_screen.dart';
+import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../core/routing/app_routes.dart';
-import '../core/routing/route_names.dart';
-import '../data/dhikir_data.dart' as built_in;
-import '../providers/favorites_provider.dart';
-import '../services/custom_dhikir_service.dart';
-import '../widgets/fav_row.dart';
-import '../widgets/section_header.dart';
+import 'package:dhikir_app/core/routing/app_routes.dart';
+import 'package:dhikir_app/core/routing/route_names.dart';
+import 'package:dhikir_app/core/data/dhikir_data.dart' as built_in;
+import 'package:dhikir_app/core/providers/favorites_provider.dart';
+import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
+import 'package:dhikir_app/core/widgets/fav_row.dart';
+import 'package:dhikir_app/core/widgets/section_header.dart';
 
 class FavouritesScreen extends StatefulWidget {
   const FavouritesScreen({

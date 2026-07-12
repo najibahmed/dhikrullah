@@ -11,17 +11,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../core/app_colors.dart';
-import '../core/routing/app_routes.dart';
-import '../core/routing/route_names.dart';
-import '../data/dhikir_data.dart' as built_in;
-import '../providers/theme_provider.dart';
-import '../services/custom_dhikir_service.dart';
-import '../services/hive_service.dart';
-import '../widgets/counter_tab.dart';
-import 'favorite_screen.dart';
-import 'my_dhikir_screen.dart';
-import 'session_counter_screen.dart';
+import 'package:dhikir_app/core/theme/app_colors.dart';
+import 'package:dhikir_app/core/routing/app_routes.dart';
+import 'package:dhikir_app/core/routing/route_names.dart';
+import 'package:dhikir_app/core/data/dhikir_data.dart' as built_in;
+import 'package:dhikir_app/core/providers/theme_provider.dart';
+import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
+import 'package:dhikir_app/core/persistence/hive_service.dart';
+import 'package:dhikir_app/features/dhikir/widgets/counter_tab.dart';
+import 'package:dhikir_app/features/favorites/screens/favorite_screen.dart';
+import 'package:dhikir_app/features/my_dhikir/screens/my_dhikir_screen.dart';
+import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 
 // ─── HomeScreen ───────────────────────────────────────────────────────────────
 

@@ -1,17 +1,17 @@
 // ─── _CounterTab ──────────────────────────────────────────────────────────────
 
-import 'package:dhikir_app/data/dhikir_data.dart';
-import 'package:dhikir_app/widgets/fav_row.dart';
-import 'package:dhikir_app/widgets/section_header.dart';
+import 'package:dhikir_app/core/data/dhikir_data.dart';
+import 'package:dhikir_app/core/widgets/fav_row.dart';
+import 'package:dhikir_app/core/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../core/app_colors.dart';
-import '../providers/favorites_provider.dart';
-import '../screens/my_dhikir_screen.dart';
-import '../screens/session_counter_screen.dart';
-import '../services/custom_dhikir_service.dart';
+import 'package:dhikir_app/core/theme/app_colors.dart';
+import 'package:dhikir_app/core/providers/favorites_provider.dart';
+import 'package:dhikir_app/features/my_dhikir/screens/my_dhikir_screen.dart';
+import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
+import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 
 /// Shows all dhikir as a list with per-item session-start buttons.
 class CounterTab extends StatefulWidget {

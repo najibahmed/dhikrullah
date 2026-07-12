@@ -1,5 +1,5 @@
 // lib/data/dhikir_data.dart
-import '../models/dhikir_model.dart';
+import 'package:dhikir_app/core/models/dhikir_model.dart';
 
 const List<DhikirItem> dhikirList = [
   DhikirItem(

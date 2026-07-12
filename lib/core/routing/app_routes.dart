@@ -7,14 +7,14 @@
 
 import 'package:flutter/material.dart';
 
-import '../../models/custom_dhikir_model.dart';
-import '../../models/dhikir_model.dart';
-import '../../screens/add_dhikir_screen.dart';
-import '../../screens/analytics_screen.dart';
-import '../../screens/dhikir_calendar_screen.dart';
-import '../../screens/dhikir_detail_screen.dart';
-import '../../screens/my_dhikir_screen.dart';
-import '../../screens/session_counter_screen.dart';
+import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
+import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/features/my_dhikir/screens/add_dhikir_screen.dart';
+import 'package:dhikir_app/features/analytics/screens/analytics_screen.dart';
+import 'package:dhikir_app/features/dhikir/screens/dhikir_calendar_screen.dart';
+import 'package:dhikir_app/features/dhikir/screens/dhikir_detail_screen.dart';
+import 'package:dhikir_app/features/my_dhikir/screens/my_dhikir_screen.dart';
+import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'route_names.dart';
 
 class SessionCounterArgs {

@@ -9,8 +9,8 @@
 // only in which service creates / deletes the metadata record.
 
 import 'package:hive_flutter/hive_flutter.dart';
-import '../models/dhikir_model.dart';
-import '../models/custom_dhikir_model.dart';
+import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
 
 class HiveService {
   // ── Box names ───────────────────────────────────────────────────────────────
