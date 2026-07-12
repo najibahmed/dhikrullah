@@ -18,9 +18,9 @@ import 'package:dhikir_app/core/data/dhikir_data.dart' as built_in;
 import 'package:dhikir_app/core/providers/theme_provider.dart';
 import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/persistence/hive_service.dart';
+import 'package:dhikir_app/core/widgets/session_setup_sheet.dart';
 import 'package:dhikir_app/features/dhikir/widgets/counter_tab.dart';
 import 'package:dhikir_app/features/favorites/screens/favorite_screen.dart';
-import 'package:dhikir_app/features/my_dhikir/screens/my_dhikir_screen.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 
 // ─── HomeScreen ───────────────────────────────────────────────────────────────
