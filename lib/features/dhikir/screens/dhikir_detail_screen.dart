@@ -1,50 +1,52 @@
-// lib/screens/dhikir_detail_screen.dart
-import 'package:dhikir_app/core/data/dhikir_data.dart';
+// lib/features/dhikir/screens/dhikir_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:dhikir_app/core/routing/app_routes.dart';
 import 'package:dhikir_app/core/routing/route_names.dart';
 import 'package:dhikir_app/core/models/dhikir_model.dart';
-import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
-import 'package:dhikir_app/core/persistence/hive_service.dart';
 import 'package:dhikir_app/core/widgets/counter_button.dart';
+import 'package:dhikir_app/features/dhikir/providers/dhikir_detail_provider.dart';
 import 'package:dhikir_app/features/dhikir/widgets/goal_pick_sheet.dart';
 import 'package:dhikir_app/features/dhikir/widgets/mile_stone_dot.dart';
 import 'package:dhikir_app/features/dhikir/widgets/pill_widget.dart';
 
-class DhikirDetailScreen extends StatefulWidget {
+class DhikirDetailScreen extends StatelessWidget {
   final DhikirItem dhikir;
   const DhikirDetailScreen({super.key, required this.dhikir});
 
   @override
-  State<DhikirDetailScreen> createState() => _DhikirDetailScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      // Scoped to this screen; auto-disposed when screen is popped.
+      create: (_) => DhikirDetailProvider(dhikir),
+      child: _DhikirDetailView(dhikir: dhikir),
+    );
+  }
 }
 
-class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProviderStateMixin {
-  late DhikirProgress _progress;
-  late DateTime _today;
+class _DhikirDetailView extends StatefulWidget {
+  final DhikirItem dhikir;
+  const _DhikirDetailView({required this.dhikir});
 
-  // Counter animation controllers
+  @override
+  State<_DhikirDetailView> createState() => _DhikirDetailViewState();
+}
+
+class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProviderStateMixin {
+  // Counter animation controllers — kept in the widget since AnimationController
+  // needs a TickerProvider (vsync), which DhikirDetailProvider can't supply.
   late AnimationController _pulseCtrl;
   late AnimationController _completionCtrl;
   late Animation<double> _pulseAnim;
   late Animation<double> _completionAnim;
-
-  bool _justCompleted = false;
-
-  // -1 means unlimited
-  int _target = 100;
-
-  // Preset goals
-  static const List<int> _goalOptions = [33, 34, 99, 100, -1];
 
   Color get _accent => Color(int.parse(widget.dhikir.colorHex.replaceFirst('#', 'FF'), radix: 16));
 
   @override
   void initState() {
     super.initState();
-    _today = DateTime.now();
 
     _pulseCtrl = AnimationController(
       vsync: this,
@@ -62,8 +64,6 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
       parent: _completionCtrl,
       curve: Curves.elasticOut,
     );
-
-    _refresh();
   }
 
   @override
@@ -73,17 +73,13 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
     super.dispose();
   }
 
-  void _refresh() {
-    setState(() {
-      _progress = HiveService.getProgress(widget.dhikir.id);
-    });
-  }
-
   Future<void> _onCounterTap() async {
-    final count = _progress.countForDate(_today);
-    final isUnlimited = _target == -1;
+    final provider = context.read<DhikirDetailProvider>();
+    final count = provider.todayCount;
+    final isUnlimited = provider.isUnlimited;
+    final target = provider.target;
 
-    if (!isUnlimited && count >= _target) {
+    if (!isUnlimited && count >= target) {
       // Already completed — just pulse
       HapticFeedback.lightImpact();
       _pulseCtrl.forward().then((_) => _pulseCtrl.reverse());
@@ -92,7 +88,7 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
 
     // Haptic: stronger every 10, milestone at target
     final newCount = count + 1;
-    if (!isUnlimited && newCount >= _target) {
+    if (!isUnlimited && newCount >= target) {
       await HapticFeedback.heavyImpact();
       await Future.delayed(const Duration(milliseconds: 80));
       await HapticFeedback.heavyImpact();
@@ -115,18 +111,14 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
     // Pulse animation
     _pulseCtrl.forward().then((_) => _pulseCtrl.reverse());
 
-    final effectiveTarget = isUnlimited ? 100 : _target;
-    final result = await HiveService.incrementCount(widget.dhikir.id, _today, target: effectiveTarget);
-
-    if (!isUnlimited && result >= _target && !_justCompleted) {
-      _justCompleted = true;
+    final justCompleted = await provider.incrementCounter();
+    if (justCompleted) {
       _completionCtrl.forward(from: 0);
     }
-
-    _refresh();
   }
 
   Future<void> _resetCounter() async {
+    final provider = context.read<DhikirDetailProvider>();
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -145,41 +137,31 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
       ),
     );
     if (ok == true) {
-      await HiveService.resetCount(widget.dhikir.id, _today);
-      setState(() => _justCompleted = false);
+      await provider.resetCounter();
       _completionCtrl.reset();
-      _refresh();
     }
   }
 
   Future<void> _showGoalDialog() async {
+    final provider = context.read<DhikirDetailProvider>();
     final selected = await showModalBottomSheet<int>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => GoalPickerSheet(
-        currentTarget: _target,
+        currentTarget: provider.target,
         accentColor: _accent,
-        goalOptions: _goalOptions,
+        goalOptions: DhikirDetailProvider.goalOptions,
       ),
     );
-    if (selected != null && selected != _target) {
-      setState(() {
-        _target = selected;
-        _justCompleted = false;
-      });
+    if (selected != null && selected != provider.target) {
+      provider.setTarget(selected);
       _completionCtrl.reset();
     }
   }
 
-  Future<void> _toggleDay(int day) async {
-    HapticFeedback.lightImpact();
-    final date = DateTime(_today.year, _today.month, day);
-    await HiveService.toggleDate(widget.dhikir.id, date);
-    _refresh();
-  }
-
   Future<void> _resetMonth() async {
+    final provider = context.read<DhikirDetailProvider>();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -198,28 +180,26 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
       ),
     );
     if (confirmed == true) {
-      await HiveService.resetMonth(widget.dhikir.id, _today.year, _today.month);
-      setState(() => _justCompleted = false);
+      await provider.resetMonth();
       _completionCtrl.reset();
-      _refresh();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<DhikirDetailProvider>();
     final bgColor = _accent;
-    final year = _today.year;
-    final month = _today.month;
+    final today = provider.today;
+    final year = today.year;
+    final month = today.month;
     final daysInMonth = DateTime(year, month + 1, 0).day;
-    final completed = _progress.completedCountInMonth(year, month);
-    final todayCount = _progress.countForDate(_today);
-    final isUnlimited = _target == -1;
-    final isGoalMet = !isUnlimited && todayCount >= _target;
-    final progress = isUnlimited ? ((todayCount % 100) / 100).clamp(0.0, 1.0) : (todayCount / _target).clamp(0.0, 1.0);
-    final builtInFavIds = HiveService.builtInFavoriteIds.toSet();
-    final myFavorites = CustomDhikirService.getFavorites();
-    final myFavoritesIds = myFavorites.map((d) => d.id).toList();
-    final isFavourite = [...builtInFavIds, ...myFavoritesIds].contains(widget.dhikir.id);
+    final completed = provider.progress.completedCountInMonth(year, month);
+    final todayCount = provider.todayCount;
+    final target = provider.target;
+    final isUnlimited = provider.isUnlimited;
+    final isGoalMet = provider.isGoalMet;
+    final progress = provider.progressRatio;
+    final isFavourite = provider.isFavourite;
     return Scaffold(
       backgroundColor: const Color(0xFFF6F4F1),
       body: CustomScrollView(
@@ -250,16 +230,7 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
                     color: isFavourite ? const Color(0xFFFC8181) : const Color(0xFFCBD5E0),
                   ),
                 ),
-                onPressed: () async {
-                  final isContainsBuiltIn = dhikirList.any((d) => d.id == widget.dhikir.id);
-                  if (isContainsBuiltIn) {
-                    await HiveService.toggleBuiltInFavorite(widget.dhikir.id);
-                  } else {
-                    await CustomDhikirService.toggleFavorite(widget.dhikir.id);
-                  }
-
-                  _refresh();
-                },
+                onPressed: () => context.read<DhikirDetailProvider>().toggleFavourite(),
               ),
               IconButton(
                 icon: Container(
@@ -273,7 +244,6 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
                     RouteNames.dhikirCalendar,
                     arguments: DhikirCalendarArgs(dhikir: widget.dhikir),
                   );
-                  _refresh();
                 },
               ),
               IconButton(
@@ -452,7 +422,7 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
                                         const Icon(Icons.flag_rounded, size: 12, color: Colors.white),
                                         const SizedBox(width: 4),
                                         Text(
-                                          isUnlimited ? 'Goal: ∞' : 'Goal: $_target',
+                                          isUnlimited ? 'Goal: ∞' : 'Goal: $target',
                                           style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white),
                                         ),
                                       ],
@@ -488,7 +458,7 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
                         // The big circular counter button
                         CounterButton(
                           count: todayCount,
-                          target: _target,
+                          target: target,
                           progress: progress,
                           isGoalMet: isGoalMet,
                           isUnlimited: isUnlimited,
@@ -517,7 +487,7 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
                                       const Icon(Icons.auto_awesome_rounded, size: 16, color: Color(0xFF2D3748)),
                                       const SizedBox(width: 8),
                                       Text(
-                                        "MāshāAllah! $_target completed today",
+                                        "MāshāAllah! $target completed today",
                                         style: GoogleFonts.inter(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600,
@@ -531,7 +501,7 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
                                   key: const ValueKey('remaining'),
                                   padding: const EdgeInsets.only(top: 4),
                                   child: Text(
-                                    isUnlimited ? 'Keep going — no limit set' : '${_target - todayCount} remaining',
+                                    isUnlimited ? 'Keep going — no limit set' : '${target - todayCount} remaining',
                                     style: GoogleFonts.inter(
                                       fontSize: 13,
                                       color: const Color(0xFF718096),
@@ -543,10 +513,10 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
                         const SizedBox(height: 12),
 
                         // Mini dots milestone row
-                        if (_target != -1)
+                        if (target != -1)
                           MilestoneDots(
                             count: todayCount,
-                            target: _target,
+                            target: target,
                             accentColor: bgColor,
                           ),
                       ],
@@ -582,7 +552,6 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
                                     RouteNames.dhikirCalendar,
                                     arguments: DhikirCalendarArgs(dhikir: widget.dhikir),
                                   );
-                                  _refresh();
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -615,12 +584,12 @@ class _DhikirDetailScreenState extends State<DhikirDetailScreen> with TickerProv
                             itemBuilder: (context, index) {
                               final day = index + 1;
                               final date = DateTime(year, month, day);
-                              final isDone = _progress.isDateCompleted(date);
-                              final isToday = day == _today.day;
-                              final isFuture = date.isAfter(_today);
+                              final isDone = provider.progress.isDateCompleted(date);
+                              final isToday = day == today.day;
+                              final isFuture = date.isAfter(today);
 
                               return GestureDetector(
-                                onTap: isFuture ? null : () => _toggleDay(day),
+                                onTap: isFuture ? null : () => context.read<DhikirDetailProvider>().toggleDay(day),
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
                                   decoration: BoxDecoration(
