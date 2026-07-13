@@ -53,21 +53,52 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      child: GestureDetector(
-        onTap: provider.locationGranted
-            ? () => Navigator.pushNamed(context, RouteNames.prayerTime)
-            : () => provider.init(),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.3)),
+      child: Semantics(
+        button: true,
+        label: _semanticLabel(provider),
+        child: GestureDetector(
+          onTap: provider.locationGranted
+              ? () => Navigator.pushNamed(context, RouteNames.prayerTime)
+              : () => provider.init(),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: theme.dividerColor.withValues(alpha: 0.3)),
+            ),
+            child: ExcludeSemantics(child: _buildContent(context, theme, provider)),
           ),
-          child: _buildContent(context, theme, provider),
         ),
       ),
     );
+  }
+
+  /// Screen-reader summary for the whole card, since [ExcludeSemantics]
+  /// hides the individual Text/Icon children behind this single label.
+  String _semanticLabel(PrayerTimeProvider provider) {
+    switch (provider.status) {
+      case PrayerStatus.gpsDisabled:
+        return 'Prayer times unavailable. Enable device location.';
+      case PrayerStatus.permissionRequired:
+        return 'Prayer times unavailable. Enable location permission.';
+      case PrayerStatus.locationUnavailable:
+        return 'Prayer times unavailable. Unable to determine location.';
+      case PrayerStatus.error:
+        return 'Unable to calculate prayer times.';
+      case PrayerStatus.loading:
+        return 'Finding prayer times.';
+      case PrayerStatus.forbidden:
+        final period = provider.activeForbiddenPeriod;
+        final next = provider.nextPrayer;
+        return 'Forbidden prayer time: ${period?.name ?? ''}.'
+            '${next != null ? ' Next prayer ${next.name}.' : ''}';
+      case PrayerStatus.normal:
+        final current = provider.currentPrayer;
+        if (current == null) return 'Prayer times.';
+        final percent = (current.progress * 100).round();
+        return 'Current prayer ${current.name}, $percent percent through.';
+    }
   }
 
   Widget _buildContent(BuildContext context, ThemeData theme, PrayerTimeProvider provider) {
