@@ -10,6 +10,7 @@ import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:dhikir_app/features/prayer_time/models/forbidden_period.dart';
 import 'package:dhikir_app/features/prayer_time/services/location_service.dart';
 import 'package:dhikir_app/features/prayer_time/services/prayer_notification_service.dart';
 
@@ -143,6 +144,52 @@ class PrayerTimeProvider extends ChangeNotifier {
     if (current == null) return null;
     return current.end.difference(DateTime.now());
   }
+
+  /// The day's 5 disliked/forbidden prayer windows, or an empty list if
+  /// location hasn't been resolved yet.
+  List<ForbiddenPeriod> get forbiddenPeriods {
+    final times = today;
+    if (times == null) return const [];
+    return [
+      ForbiddenPeriod(
+        name: 'After Fajr',
+        start: times.fajr.toLocal(),
+        end: times.sunrise.toLocal(),
+      ),
+      ForbiddenPeriod(
+        name: 'Sunrise',
+        start: times.sunrise.toLocal(),
+        end: times.sunrise.toLocal().add(const Duration(minutes: 15)),
+      ),
+      ForbiddenPeriod(
+        name: 'Zawal',
+        start: times.dhuhr.toLocal().subtract(const Duration(minutes: 10)),
+        end: times.dhuhr.toLocal(),
+      ),
+      ForbiddenPeriod(
+        name: 'After Asr',
+        start: times.asr.toLocal(),
+        end: times.sunset.toLocal(),
+      ),
+      ForbiddenPeriod(
+        name: 'Sunset',
+        start: times.sunset.toLocal().subtract(const Duration(minutes: 15)),
+        end: times.sunset.toLocal(),
+      ),
+    ];
+  }
+
+  /// The forbidden period we're currently inside, or null if now falls
+  /// outside all of them.
+  ForbiddenPeriod? get activeForbiddenPeriod {
+    final now = DateTime.now();
+    for (final period in forbiddenPeriods) {
+      if (period.contains(now)) return period;
+    }
+    return null;
+  }
+
+  bool get isForbiddenTime => activeForbiddenPeriod != null;
 
   // ── Mutators ─────────────────────────────────────────────────────────────
 
