@@ -147,6 +147,11 @@ class _HomeWidgetState extends State<HomeWidget> {
             elevation: 0,
             actions: [
               // _ThemeToggleButton(),
+              IconButton(
+                tooltip: 'About',
+                icon: const Icon(Icons.info_outline, color: AppColors.dark),
+                onPressed: () => Navigator.pushNamed(context, RouteNames.about),
+              ),
               const SizedBox(width: 8),
               _NavButton(
                 label: 'My Dhikir',

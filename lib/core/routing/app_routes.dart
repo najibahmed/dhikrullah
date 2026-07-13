@@ -16,6 +16,7 @@ import 'package:dhikir_app/features/dhikir/screens/dhikir_detail_screen.dart';
 import 'package:dhikir_app/features/my_dhikir/screens/my_dhikir_screen.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'package:dhikir_app/features/prayer_time/screens/prayer_time_screen.dart';
+import 'package:dhikir_app/features/about/screens/about_screen.dart';
 import 'route_names.dart';
 
 class SessionCounterArgs {
@@ -98,6 +99,12 @@ class AppRoutes {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const PrayerTimeScreen(),
+        );
+
+      case RouteNames.about:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const AboutScreen(),
         );
 
       default:

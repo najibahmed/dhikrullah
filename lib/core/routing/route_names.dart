@@ -13,4 +13,5 @@ class RouteNames {
   static const String dhikirCalendar = '/dhikir-calendar';
   static const String addDhikir = '/add-dhikir';
   static const String prayerTime = '/prayer-time';
+  static const String about = '/about';
 }
