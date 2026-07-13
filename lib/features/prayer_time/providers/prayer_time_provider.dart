@@ -20,6 +20,11 @@ const _kMadhabKey = 'prayer_madhab';
 
 const prayerLabels = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
+/// Nafl prayer times with their own opt-in notification toggle, kept
+/// separate from [prayerLabels] since they aren't `Prayer` enum values
+/// and default to off (unlike the 5 obligatory prayers).
+const optionalNotificationLabels = ['Tahajjud'];
+
 /// Coarse status derived from the provider's existing fields — purely
 /// computed, not a separate persisted state machine.
 enum PrayerStatus {
@@ -44,6 +49,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   Madhab madhab = Madhab.hanafi;
   final Map<String, bool> prayerNotificationsEnabled = {
     for (final label in prayerLabels) label: true,
+    for (final label in optionalNotificationLabels) label: false,
   };
 
   PrayerTimes? _today;
@@ -98,6 +104,10 @@ class PrayerTimeProvider extends ChangeNotifier {
     for (final label in prayerLabels) {
       prayerNotificationsEnabled[label] =
           prefs.getBool('$_kNotifyPrefixKey$label') ?? true;
+    }
+    for (final label in optionalNotificationLabels) {
+      prayerNotificationsEnabled[label] =
+          prefs.getBool('$_kNotifyPrefixKey$label') ?? false;
     }
   }
 
@@ -261,6 +271,8 @@ class PrayerTimeProvider extends ChangeNotifier {
       today: todayTimes,
       tomorrow: tomorrowTimes,
       enabled: prayerNotificationsEnabled,
+      tahajjudToday: SunnahTimes(todayTimes).middleOfTheNight,
+      tahajjudTomorrow: SunnahTimes(tomorrowTimes).middleOfTheNight,
     );
   }
 }

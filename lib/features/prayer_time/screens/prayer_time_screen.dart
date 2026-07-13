@@ -1,8 +1,10 @@
 // lib/features/prayer_time/screens/prayer_time_screen.dart
 //
-// Full prayer time detail screen: date header, all 5 prayer times with
-// the current/next one highlighted, and a settings section (per-prayer
-// notification toggle + Hijri day-offset control).
+// Full prayer time detail screen: date header, all 6 prayer times with
+// a 3-state (completed/current/upcoming) indicator, additional daily
+// info (sunrise/sunset/Sehri/Iftar/night-third/Tahajjud/Qiyam),
+// forbidden-time windows, and a settings section (Madhab, per-prayer +
+// Tahajjud notification toggles, Hijri day-offset control).
 
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +65,13 @@ class PrayerTimeScreen extends StatelessWidget {
           else ...[
             _PrayerListSection(times: times, provider: provider),
             const Divider(height: 32),
+            _AdditionalInfoSection(times: times),
+            const Divider(height: 32),
+            _ForbiddenTimesSection(provider: provider),
+            const Divider(height: 32),
             _NotificationSettingsSection(provider: provider),
+            const Divider(height: 32),
+            _MadhabSection(provider: provider),
             const Divider(height: 32),
             _HijriOffsetSection(provider: provider),
           ],
@@ -82,29 +90,131 @@ class _PrayerListSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final next = times.nextPrayer();
+    final now = DateTime.now();
+    final current = times.currentPrayer();
 
     return Column(
       children: [
         for (final prayer in _prayerOrder)
+          Builder(builder: (context) {
+            final isCurrent = prayer == current;
+            final isCompleted =
+                !isCurrent && now.isAfter(times.timeForPrayer(prayer).toLocal());
+
+            final IconData icon;
+            final Color? color;
+            if (isCurrent) {
+              icon = Icons.mosque;
+              color = theme.colorScheme.primary;
+            } else if (isCompleted) {
+              icon = Icons.check_circle;
+              color = theme.colorScheme.onSurface.withValues(alpha: 0.4);
+            } else {
+              icon = Icons.circle_outlined;
+              color = theme.colorScheme.onSurface.withValues(alpha: 0.4);
+            }
+
+            return ListTile(
+              leading: Icon(icon, color: color),
+              title: Text(
+                prayer.displayName,
+                style: isCurrent
+                    ? theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.primary,
+                      )
+                    : theme.textTheme.titleMedium,
+              ),
+              trailing: Text(
+                TimeOfDay.fromDateTime(times.timeForPrayer(prayer).toLocal())
+                    .format(context),
+                style: theme.textTheme.titleMedium,
+              ),
+            );
+          }),
+      ],
+    );
+  }
+}
+
+class _AdditionalInfoSection extends StatelessWidget {
+  final PrayerTimes times;
+
+  const _AdditionalInfoSection({required this.times});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final sunnah = SunnahTimes(times);
+
+    Widget row(String label, DateTime time) => ListTile(
+          dense: true,
+          title: Text(label, style: theme.textTheme.bodyMedium),
+          trailing: Text(
+            TimeOfDay.fromDateTime(time.toLocal()).format(context),
+            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+          ),
+        );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Text('Additional Info', style: TextStyle(fontWeight: FontWeight.w700)),
+        ),
+        row('Sunrise', times.sunrise),
+        row('Sunset', times.sunset),
+        row('Sehri ends', times.fajr),
+        row('Iftar', times.maghrib),
+        row('Middle of night', sunnah.middleOfTheNight),
+        row('Last third of night', sunnah.lastThirdOfTheNight),
+        row('Tahajjud starts', sunnah.middleOfTheNight),
+        row('Qiyam', sunnah.lastThirdOfTheNight),
+      ],
+    );
+  }
+}
+
+class _ForbiddenTimesSection extends StatelessWidget {
+  final PrayerTimeProvider provider;
+
+  const _ForbiddenTimesSection({required this.provider});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final active = provider.activeForbiddenPeriod;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Text('Forbidden Times', style: TextStyle(fontWeight: FontWeight.w700)),
+        ),
+        for (final period in provider.forbiddenPeriods)
           ListTile(
+            dense: true,
             leading: Icon(
-              prayer == next ? Icons.mosque : Icons.mosque_outlined,
-              color: prayer == next ? theme.colorScheme.primary : null,
+              Icons.block,
+              color: period == active
+                  ? theme.colorScheme.error
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.4),
             ),
             title: Text(
-              prayer.displayName,
-              style: prayer == next
-                  ? theme.textTheme.titleMedium?.copyWith(
+              period.name,
+              style: period == active
+                  ? theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.primary,
+                      color: theme.colorScheme.error,
                     )
-                  : theme.textTheme.titleMedium,
+                  : theme.textTheme.bodyMedium,
             ),
             trailing: Text(
-              TimeOfDay.fromDateTime(times.timeForPrayer(prayer).toLocal())
-                  .format(context),
-              style: theme.textTheme.titleMedium,
+              '${TimeOfDay.fromDateTime(period.start).format(context)} – '
+              '${TimeOfDay.fromDateTime(period.end).format(context)}',
+              style: theme.textTheme.bodySmall,
             ),
           ),
       ],
@@ -132,7 +242,43 @@ class _NotificationSettingsSection extends StatelessWidget {
             value: provider.prayerNotificationsEnabled[label] ?? true,
             onChanged: (value) => provider.setPrayerNotification(label, value),
           ),
+        for (final label in optionalNotificationLabels)
+          SwitchListTile(
+            title: Text(label),
+            subtitle: const Text('Optional — off by default'),
+            value: provider.prayerNotificationsEnabled[label] ?? false,
+            onChanged: (value) => provider.setPrayerNotification(label, value),
+          ),
       ],
+    );
+  }
+}
+
+class _MadhabSection extends StatelessWidget {
+  final PrayerTimeProvider provider;
+
+  const _MadhabSection({required this.provider});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Madhab (Asr calculation)', style: TextStyle(fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          SegmentedButton<Madhab>(
+            segments: const [
+              ButtonSegment(value: Madhab.hanafi, label: Text('Hanafi')),
+              ButtonSegment(value: Madhab.shafi, label: Text('Shafi')),
+            ],
+            selected: {provider.madhab},
+            onSelectionChanged: (selection) => provider.setMadhab(selection.first),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
     );
   }
 }

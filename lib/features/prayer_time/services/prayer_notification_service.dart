@@ -18,6 +18,8 @@ const _kChannelDescription = 'Notifies you at the start of each prayer time';
 
 /// Fixed notification IDs: one slot per prayer for today (0-4) and
 /// tomorrow (5-9), so rescheduling just overwrites the same IDs.
+/// Tahajjud (not a `Prayer` enum value — derived via SunnahTimes) gets
+/// its own fixed slots 10 (today) / 11 (tomorrow).
 const _prayerOrder = [
   adhan.Prayer.fajr,
   adhan.Prayer.dhuhr,
@@ -25,6 +27,8 @@ const _prayerOrder = [
   adhan.Prayer.maghrib,
   adhan.Prayer.isha,
 ];
+
+const _kTahajjudLabel = 'Tahajjud';
 
 class PrayerNotificationService {
   PrayerNotificationService._();
@@ -61,6 +65,8 @@ class PrayerNotificationService {
     required adhan.PrayerTimes today,
     required adhan.PrayerTimes tomorrow,
     required Map<String, bool> enabled,
+    DateTime? tahajjudToday,
+    DateTime? tahajjudTomorrow,
   }) async {
     if (!_initialized) return;
     await _plugin.cancelAll();
@@ -96,6 +102,32 @@ class PrayerNotificationService {
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         );
         id++;
+      }
+    }
+
+    if (enabled[_kTahajjudLabel] == true) {
+      var tahajjudId = 10;
+      for (final time in [tahajjudToday, tahajjudTomorrow]) {
+        if (time != null) {
+          final scheduled = tz.TZDateTime.from(time, tz.local);
+          if (!scheduled.isBefore(tz.TZDateTime.now(tz.local))) {
+            await _plugin.zonedSchedule(
+              id: tahajjudId,
+              title: _kTahajjudLabel,
+              body: 'Time for Tahajjud.',
+              scheduledDate: scheduled,
+              notificationDetails: const NotificationDetails(
+                android: AndroidNotificationDetails(
+                  _kChannelId,
+                  _kChannelName,
+                  channelDescription: _kChannelDescription,
+                ),
+              ),
+              androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+            );
+          }
+        }
+        tahajjudId++;
       }
     }
   }
