@@ -14,6 +14,10 @@ const _kLastLngKey = 'prayer_last_lng';
 class LocationService {
   LocationService._();
 
+  /// Whether the device's location service (GPS) is turned on at all,
+  /// independent of whether this app has permission to use it.
+  static Future<bool> isServiceEnabled() => Geolocator.isLocationServiceEnabled();
+
   /// Requests location permission if not already granted.
   /// Returns true only when permission is granted (while-in-use or always).
   static Future<bool> checkAndRequestPermission() async {

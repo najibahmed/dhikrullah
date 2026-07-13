@@ -20,9 +20,24 @@ const _kMadhabKey = 'prayer_madhab';
 
 const prayerLabels = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
+/// Coarse status derived from the provider's existing fields — purely
+/// computed, not a separate persisted state machine.
+enum PrayerStatus {
+  loading,
+  permissionRequired,
+  gpsDisabled,
+  locationUnavailable,
+  error,
+  forbidden,
+  normal,
+}
+
 class PrayerTimeProvider extends ChangeNotifier {
   bool _initialized = false;
+  bool _loading = true;
   bool locationGranted = false;
+  bool gpsServiceEnabled = true;
+  bool locationError = false;
   Coordinates? coordinates;
 
   int hijriOffsetDays = 0;
@@ -49,18 +64,27 @@ class PrayerTimeProvider extends ChangeNotifier {
       coordinates = cached;
       locationGranted = true;
       _recompute();
+      _loading = false;
       notifyListeners();
     }
 
+    gpsServiceEnabled = await LocationService.isServiceEnabled();
     final granted = await LocationService.checkAndRequestPermission();
     locationGranted = granted;
     if (!granted) {
+      _loading = false;
       notifyListeners();
       return;
     }
 
-    coordinates = await LocationService.getCurrentCoordinates();
+    try {
+      coordinates = await LocationService.getCurrentCoordinates();
+      locationError = false;
+    } catch (_) {
+      locationError = true;
+    }
     _recompute();
+    _loading = false;
     notifyListeners();
 
     await PrayerNotificationService.init();
@@ -190,6 +214,18 @@ class PrayerTimeProvider extends ChangeNotifier {
   }
 
   bool get isForbiddenTime => activeForbiddenPeriod != null;
+
+  /// Coarse UI status, purely derived from the fields above.
+  PrayerStatus get status {
+    if (_loading) return PrayerStatus.loading;
+    if (!gpsServiceEnabled) return PrayerStatus.gpsDisabled;
+    if (!locationGranted) return PrayerStatus.permissionRequired;
+    if (coordinates == null) {
+      return locationError ? PrayerStatus.locationUnavailable : PrayerStatus.loading;
+    }
+    if (today == null) return PrayerStatus.error;
+    return isForbiddenTime ? PrayerStatus.forbidden : PrayerStatus.normal;
+  }
 
   // ── Mutators ─────────────────────────────────────────────────────────────
 
