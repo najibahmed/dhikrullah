@@ -15,6 +15,7 @@ import 'package:dhikir_app/features/prayer_time/services/prayer_notification_ser
 
 const _kHijriOffsetKey = 'prayer_hijri_offset_days';
 const _kNotifyPrefixKey = 'prayer_notify_';
+const _kMadhabKey = 'prayer_madhab';
 
 const prayerLabels = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
@@ -24,6 +25,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   Coordinates? coordinates;
 
   int hijriOffsetDays = 0;
+  Madhab madhab = Madhab.hanafi;
   final Map<String, bool> prayerNotificationsEnabled = {
     for (final label in prayerLabels) label: true,
   };
@@ -67,6 +69,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     hijriOffsetDays = prefs.getInt(_kHijriOffsetKey) ?? 0;
+    madhab = prefs.getString(_kMadhabKey) == 'shafi' ? Madhab.shafi : Madhab.hanafi;
     for (final label in prayerLabels) {
       prayerNotificationsEnabled[label] =
           prefs.getBool('$_kNotifyPrefixKey$label') ?? true;
@@ -91,7 +94,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   PrayerTimes? _prayerTimesFor(DateTime date) {
     if (coordinates == null) return null;
     final params = CalculationMethodParameters.muslimWorldLeague()
-      ..madhab = Madhab.shafi;
+      ..madhab = madhab;
     return PrayerTimes(
       date: date,
       coordinates: coordinates!,
@@ -114,6 +117,33 @@ class PrayerTimeProvider extends ChangeNotifier {
     return (name: prayer.displayName, time: times.timeForPrayer(prayer).toLocal());
   }
 
+  /// The prayer period we're currently inside — name, its start/end time,
+  /// and how far through it we are (0.0-1.0). `start`/`end` are always
+  /// consecutive prayer boundaries (adhan_dart's currentPrayer()/
+  /// nextPrayer() pairing), including the pre-Fajr (ishaBefore -> fajr)
+  /// and post-Isha (isha -> fajrAfter) wraparound cases.
+  ({String name, DateTime start, DateTime end, double progress})? get currentPrayer {
+    final times = today;
+    if (times == null) return null;
+    final current = times.currentPrayer();
+    final next = times.nextPrayer();
+    final start = times.timeForPrayer(current).toLocal();
+    final end = times.timeForPrayer(next).toLocal();
+    final totalSeconds = end.difference(start).inSeconds;
+    final elapsedSeconds = DateTime.now().difference(start).inSeconds;
+    final progress =
+        totalSeconds > 0 ? (elapsedSeconds / totalSeconds).clamp(0.0, 1.0) : 0.0;
+    return (name: current.displayName, start: start, end: end, progress: progress);
+  }
+
+  /// Time remaining until the current prayer period ends, or null if
+  /// location hasn't been resolved yet.
+  Duration? get currentPrayerRemaining {
+    final current = currentPrayer;
+    if (current == null) return null;
+    return current.end.difference(DateTime.now());
+  }
+
   // ── Mutators ─────────────────────────────────────────────────────────────
 
   Future<void> setHijriOffset(int offset) async {
@@ -121,6 +151,15 @@ class PrayerTimeProvider extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_kHijriOffsetKey, hijriOffsetDays);
+  }
+
+  Future<void> setMadhab(Madhab value) async {
+    madhab = value;
+    _recompute();
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kMadhabKey, value == Madhab.shafi ? 'shafi' : 'hanafi');
+    await _rescheduleNotifications();
   }
 
   Future<void> setPrayerNotification(String label, bool enabled) async {
