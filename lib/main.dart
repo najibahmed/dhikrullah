@@ -16,6 +16,7 @@ import 'package:dhikir_app/core/persistence/hive_service.dart';
 import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/theme/app_theme.dart';
 import 'package:dhikir_app/features/dhikir/screens/home_screen.dart';
+import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,7 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ChangeNotifierProvider(create: (_) => PrayerTimeProvider()),
       ],
       child: const DhikirApp(),
     ),

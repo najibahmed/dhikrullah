@@ -19,9 +19,12 @@ import 'package:dhikir_app/core/providers/theme_provider.dart';
 import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/persistence/hive_service.dart';
 import 'package:dhikir_app/core/widgets/session_setup_sheet.dart';
+import 'package:dhikir_app/core/widgets/date_header_row.dart';
 import 'package:dhikir_app/features/dhikir/widgets/counter_tab.dart';
 import 'package:dhikir_app/features/favorites/screens/favorite_screen.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
+import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/features/prayer_time/widgets/prayer_time_card.dart';
 
 // ─── HomeScreen ───────────────────────────────────────────────────────────────
 
@@ -116,6 +119,14 @@ class HomeWidget extends StatefulWidget {
 
 class _HomeWidgetState extends State<HomeWidget> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => context.read<PrayerTimeProvider>().init(),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final builtIn = built_in.dhikirList.map(SessionDhikir.fromItem).toList();
@@ -173,6 +184,14 @@ class _HomeWidgetState extends State<HomeWidget> {
               ),
             ),
           ),
+
+          // ── Date + prayer time ───────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: DateHeaderRow(
+              hijriOffsetDays: context.watch<PrayerTimeProvider>().hijriOffsetDays,
+            ),
+          ),
+          const SliverToBoxAdapter(child: PrayerTimeCard()),
 
           // ── Dhikir grid ───────────────────────────────────────────────────
           SliverPadding(
