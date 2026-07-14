@@ -64,8 +64,6 @@ class PrayerTimeScreen extends StatelessWidget {
             _NotificationSettingsSection(provider: provider),
             const Divider(height: 32),
             _MadhabSection(provider: provider),
-            const Divider(height: 32),
-            _HijriOffsetSection(provider: provider),
           ],
         ],
       ),
@@ -239,7 +237,7 @@ class _AdditionalInfoSection extends StatelessWidget {
         row('Iftar', times.maghrib),
         row('Middle of night', sunnah.middleOfTheNight),
         row('Last third of night', sunnah.lastThirdOfTheNight),
-        row('Tahajjud starts', sunnah.middleOfTheNight),
+        row('Tahajjud starts', sunnah.lastThirdOfTheNight),
         row('Qiyam', sunnah.lastThirdOfTheNight),
       ],
     );
@@ -349,43 +347,6 @@ class _MadhabSection extends StatelessWidget {
             selected: {provider.madhab},
             onSelectionChanged: (selection) =>
                 provider.setMadhab(selection.first),
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
-}
-
-class _HijriOffsetSection extends StatelessWidget {
-  final PrayerTimeProvider provider;
-
-  const _HijriOffsetSection({required this.provider});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Hijri date adjustment',
-              style: TextStyle(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 4),
-          Text(
-            'Shift by a day if it doesn\'t match your local moon-sighting announcement.',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          const SizedBox(height: 8),
-          SegmentedButton<int>(
-            segments: const [
-              ButtonSegment(value: -1, label: Text('-1')),
-              ButtonSegment(value: 0, label: Text('0')),
-              ButtonSegment(value: 1, label: Text('+1')),
-            ],
-            selected: {provider.hijriOffsetDays},
-            onSelectionChanged: (selection) =>
-                provider.setHijriOffset(selection.first),
           ),
           const SizedBox(height: 24),
         ],

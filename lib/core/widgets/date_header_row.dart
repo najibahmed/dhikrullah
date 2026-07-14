@@ -43,16 +43,18 @@ class DateHeaderRow extends StatelessWidget {
   final int hijriOffsetDays;
   final DateTime? sunrise;
   final DateTime? sunset;
+  final VoidCallback? onHijriTap;
 
   const DateHeaderRow({
     super.key,
     required this.hijriOffsetDays,
     this.sunrise,
     this.sunset,
+    this.onHijriTap,
   });
 
-  Widget _sunRow(BuildContext context, IconData icon, Color color,
-      DateTime time) {
+  Widget _sunRow(
+      BuildContext context, IconData icon, Color color, DateTime time) {
     final theme = Theme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -87,6 +89,25 @@ class DateHeaderRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  children: [
+                    Text(
+                        '${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear} AH',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        )),
+                    if (onHijriTap != null) ...[
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: onHijriTap,
+                        child: const Icon(Icons.link_outlined,
+                            size: 18, color: Colors.black54),
+                      ),
+                    ]
+                  ],
+                ),
+                const SizedBox(height: 2),
                 Text(
                   _formatGregorian(now),
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -94,13 +115,6 @@ class DateHeaderRow extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                    '${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear} AH',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    )),
               ],
             ),
           ),
@@ -108,11 +122,11 @@ class DateHeaderRow extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _sunRow(context, Icons.wb_sunny_outlined, Colors.amber,
-                    sunrise!),
+                _sunRow(
+                    context, Icons.wb_sunny_outlined, Colors.amber, sunrise!),
                 const SizedBox(height: 4),
-                _sunRow(context, Icons.nightlight_round,
-                    Colors.deepOrange, sunset!),
+                _sunRow(context, Icons.nightlight_round, Colors.deepOrange,
+                    sunset!),
               ],
             ),
         ],

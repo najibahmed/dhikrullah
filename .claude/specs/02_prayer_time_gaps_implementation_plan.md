@@ -2,6 +2,8 @@
 
 Companion to `01_prayer_time_module.md` (spec + implementation-status annotations). This plan closes the approved subset of the ❌/⚠ gaps identified there, and adds a single-developer "About Us" page. Decisions below were confirmed with the user before writing this plan.
 
+**Status: all 6 phases below implemented and merged** (see git log — "Phase 2" through "Phase 6" commits). Several follow-on changes landed after Phase 6 that were not part of this original plan; see "Post-Phase-6 additions" at the end of this file for what they are and why.
+
 ## Decisions locked in
 
 - **Madhab**: add a user-facing setting (Hanafi/Shafi), default **Hanafi** (spec default), replacing the hardcoded `Madhab.shafi` in `PrayerTimeProvider._prayerTimesFor`.
@@ -120,3 +122,17 @@ Entry point — `lib/features/dhikir/screens/home_screen.dart`:
 4a. Enable the Tahajjud notification toggle, confirm a reminder fires at the computed middle-of-night time (or by temporarily setting device clock near it); confirm it stays off by default and off-state persists across restart.
 5. Tap the new info icon on home → About screen opens, shows app name/version/description + placeholder developer fields.
 6. Confirm no other feature screen (dhikir grid, counter, favorites, analytics, my dhikir) changed behavior or files.
+
+---
+
+## Post-Phase-6 additions (not part of this original plan)
+
+Built in follow-on sessions after all 6 phases above were merged, driven by direct user requests rather than this plan's original scope:
+
+- **Home dashboard: Next Prayer card + Sehri/Iftar card** (`widgets/prayer_schedule_cards.dart`, new file) — separate from the current-prayer card, shown only in `PrayerStatus.normal`. Sehri/Iftar card flips between today's/tomorrow's schedule around Maghrib with an `HH:MM:SS` live countdown.
+- **Home dashboard: sunrise/sunset in the date row** (`core/widgets/date_header_row.dart`) — optional `sunrise`/`sunset` params, icon + time, trailing side of the row.
+- **Home dashboard: "Today's Forbidden Times" card** (`widgets/forbidden_times_card.dart`, new file) — always visible whenever location is resolved (not gated to `normal` status, unlike the other two cards above), generic "Forbidden Time (Morning/Noon/Evening)" labels distinct from the detail screen's Sunrise/Zawal/Sunset names.
+- **Current Prayer card fill color** — switched from `theme.colorScheme.surface` to `theme.colorScheme.secondary` (normal status only), with matching `onSecondary` text/icon/progress-bar colors.
+- **Unified 8-prayer cycle** (`_buildWindows`/`_prayerWindows` in `prayer_time_provider.dart`) — replaced ad-hoc `adhan_dart` `Prayer`-enum branching (`currentPrayer`, `nextPrayer`, `nextPrayerPeriod`, the old `_afterNextTime`/`_currentNightMiddle` helpers) with one shared, ordered window-list builder covering Tahajjud→Fajr→Ishraq→Chasht→Dhuhr→Asr→Maghrib→Isha. Added **Ishraq** and **Chasht** as new prayer concepts (not in the original spec): Ishraq starts 15 minutes after sunrise (reusing the existing Sunrise-forbidden window's own end time), Chasht starts at the sunrise↔Dhuhr midpoint and runs to Dhuhr. Both got optional (off-by-default) notification toggles alongside Tahajjud. `PrayerStatus.tahajjud` was removed — Tahajjud now renders through the exact same current-prayer card as every other prayer, per an explicit "treat every prayer the same" decision. The detail screen's prayer list now shows a `start – end` range per row (not a single time) and kept Sunrise/Sunset as separate non-highlightable marker rows.
+- **Hijri Date Settings page** (`screens/hijri_settings_screen.dart`, new file; route `RouteNames.hijriSettings`) — reached via a chevron on the dashboard's Hijri date line. Live day-offset adjuster (-/+ buttons, reuses `setHijriOffset`) plus a new **Hijri day-start setting** (`HijriDayStart` enum: Midnight vs Sunset/Maghrib, persisted). When "Sunset" is selected and today's Maghrib has passed, the Hijri date shown everywhere advances a day early (`displayHijriOffsetDays` getter). The old inline `_HijriOffsetSection` on the detail screen was removed in favor of this dedicated page.
+- **Tahajjud-start bug fix** — Tahajjud's start was initially wired to `SunnahTimes.middleOfTheNight`; corrected to `SunnahTimes.lastThirdOfTheNight` (the fiqh-correct value), per explicit user instruction. Isha's own window deliberately still ends at middle-of-night (not moved to match), leaving an intentional gap between middle-of-night and last-third-of-night where no prayer is "current" — the current-prayer card hides itself during that gap instead of crashing on a null current-prayer value, while the Next Prayer card still correctly shows "Tahajjud" as upcoming throughout (see the "Known limitation" note in `01_prayer_time_module.md`).

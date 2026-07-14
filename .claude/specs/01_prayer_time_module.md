@@ -10,7 +10,7 @@ The feature should provide both quick access information on the home dashboard a
 
 ---
 
-# Implementation Status (as of 2026-07-13)
+# Implementation Status (as of 2026-07-14)
 
 Legend: ✅ Implemented · ⚠ Partial · ❌ Missing
 
@@ -19,35 +19,43 @@ Legend: ✅ Implemented · ⚠ Partial · ❌ Missing
 | Prayer time calc (adhan_dart, offline) | ✅ | `providers/prayer_time_provider.dart` |
 | GPS location + permission | ✅ | `services/location_service.dart` — GPS only, no manual city fallback |
 | Hijri date (offset ±1) | ✅ | `core/widgets/date_header_row.dart` |
+| Hijri day-start setting (Midnight vs Sunset/Maghrib) | ✅ | `HijriDayStart` enum + `displayHijriOffsetDays` getter in `prayer_time_provider.dart`; dedicated `screens/hijri_settings_screen.dart`, reached via a chevron on the dashboard's Hijri date line |
 | Gregorian date on dashboard | ✅ | `core/widgets/date_header_row.dart` |
-| Home dashboard: next-prayer card | ⚠ | `widgets/prayer_time_card.dart` — shows next prayer + countdown only |
-| Home dashboard: current-prayer info, progress %, location name | ❌ | not built |
-| Forbidden-time state (dashboard + details) | ❌ | no forbidden-period logic at all |
-| Before-Fajr / Ramadan card states | ❌ | not built |
-| Prayer details screen: daily schedule | ⚠ | `screens/prayer_time_screen.dart` — times shown; only highlights *next* prayer, no completed/current/upcoming 3-state indicator |
-| Sunrise/Sunset/Sehri/Iftar/middle-of-night/last-third/Tahajjud/Qiyam | ❌ | not computed (adhan_dart's `SunnahTimes` class covers middle/last-third but isn't wired in) |
-| Forbidden period list (5 periods) | ❌ | not built |
+| Sunrise/Sunset on dashboard date row | ✅ | `core/widgets/date_header_row.dart` (icon + time, optional params) |
+| Home dashboard: current-prayer card | ✅ | `widgets/prayer_time_card.dart` — name, start/end range, countdown, progress bar, secondary-theme-color fill; hides itself during the Isha→Tahajjud gap (see Known limitation below) instead of showing stale data |
+| Home dashboard: next-prayer card | ✅ | `widgets/prayer_schedule_cards.dart` (`PrayerScheduleSection`) — separate outlined card below the current-prayer card |
+| Home dashboard: Sehri/Iftar card | ✅ | `widgets/prayer_schedule_cards.dart` — flips between "Today's Schedule"/"Iftar starts in" and "Tomorrow's Schedule"/"Sehri ends in" around Maghrib, `HH:MM:SS` live countdown |
+| Home dashboard: forbidden times reference card | ✅ | `widgets/forbidden_times_card.dart` — always visible (not gated to normal status), highlights the currently-active window |
+| Forbidden-time state (dashboard + details) | ✅ | `activeForbiddenPeriod`/`forbiddenPeriods` in the provider; dashboard forbidden card + detail-screen inline warning cards + `_ForbiddenTimesSection` |
+| Before-Fajr / Ramadan card states | ✅ | Ramadan Sehri/Iftar wording via `HijriCalendar` month check; before-Fajr folds into the unified prayer cycle below rather than a separate card state |
+| Unified prayer cycle (Tahajjud→Fajr→Ishraq→Chasht→Dhuhr→Asr→Maghrib→Isha) | ✅ | `_buildWindows`/`_prayerWindows` in `prayer_time_provider.dart` — replaces raw `adhan_dart` `Prayer`-enum branching everywhere (dashboard cards, detail list, notifications) with one shared window list. Ishraq starts 15min after sunrise (reuses the Sunrise-forbidden window's own end); Chasht starts at the sunrise↔Dhuhr midpoint; both are new, not in the original spec |
+| Prayer details screen: daily schedule | ✅ | `screens/prayer_time_screen.dart` — 3-state (✓/●/○) indicator, each row shows a `start – end` range (not just a single time); Sunrise/Sunset kept as extra non-highlightable marker rows |
+| Sunrise/Sunset/Sehri/Iftar/middle-of-night/last-third/Tahajjud/Qiyam | ✅ | `_AdditionalInfoSection` in `prayer_time_screen.dart`, via `SunnahTimes` |
+| Forbidden period list (5 periods) | ⚠ | 3 implemented (Sunrise, Zawal, Sunset) — `Fajr→Sunrise` and `Asr→Sunset` from the original 5-period spec were not built as separate forbidden windows; the equivalent guidance is covered by the current-prayer card's own Fajr/Asr window display instead |
 | Location info panel (city/country/coords/method/madhab) | ❌ | no reverse geocoding; coordinates exist but aren't surfaced |
 | Calculation method setting | ❌ | hardcoded to Muslim World League, not user-selectable |
-| Madhab setting | ❌ | hardcoded to **Shafi** — conflicts with this spec's default of **Hanafi** |
+| Madhab setting | ✅ | `Madhab` field + `setMadhab`, default Hanafi, `_MadhabSection` (`SegmentedButton`) in `prayer_time_screen.dart` |
 | Time format (12h/24h) setting | ❌ | uses `TimeOfDay.format(context)` (follows device locale, not a user toggle) |
 | Location mode (GPS vs manual city) | ❌ | GPS-only |
-| Notification on/off per prayer | ✅ | `screens/prayer_time_screen.dart` settings section |
+| Notification on/off per prayer | ✅ | `screens/prayer_time_screen.dart` settings section, `prayerLabels` (5 obligatory) |
+| Notification on/off per optional prayer (Tahajjud/Ishraq/Chasht) | ✅ | `optionalNotificationLabels`, default off; `prayer_notification_service.dart`'s generalized optional-label loop (ids 10-15) |
 | Notification custom offset (5/10/15/30 min before) | ❌ | only exact-time notification exists |
 | Mosque manual time adjustment (+/- min per prayer) | ❌ | not built |
-| Current-prayer detection exposed to UI | ⚠ | `adhan_dart`'s `currentPrayer()` is available on the package object but the provider never calls it — only `nextPrayer` is exposed |
-| Current-prayer remaining time / progress % | ❌ | not computed |
-| Forbidden-time detection (`isForbiddenTime`) | ❌ | not built |
+| Current-prayer detection exposed to UI | ✅ | `currentPrayer` getter, driven by the unified window list, not raw `adhan_dart` |
+| Current-prayer remaining time / progress % | ✅ | `currentPrayerRemaining`, `currentPrayer.progress` |
+| Forbidden-time detection (`isForbiddenTime`) | ✅ | `isForbiddenTime`/`activeForbiddenPeriod` |
 | Daily refresh (midnight rollover) | ✅ | `PrayerTimeProvider.today` getter recomputes on date change |
 | Daily refresh (location/timezone/settings change) | ⚠ | only re-renders via Provider; no explicit change-triggered recompute for timezone shifts |
-| Explicit state machine (Loading/PermissionRequired/GPSDisabled/LocationUnavailable/Error/Normal/Forbidden) | ❌ | only a single `locationGranted` bool + null-checks, no GPS-disabled-vs-denied distinction, no explicit error state |
-| Domain model entities (CurrentPrayerEntity, NextPrayerEntity, ForbiddenPeriodEntity, DailyPrayerSummaryEntity, LocationEntity) | ❌ | raw `adhan_dart` `PrayerTimes`/`Prayer` types used directly; per this repo's [[CLAUDE.md]] simplicity rule, formal entity/DTO layers are intentionally avoided — if these are wanted as plain data classes (not a Clean Architecture layer) that's a smaller, compatible addition |
+| Explicit state machine (Loading/PermissionRequired/GPSDisabled/LocationUnavailable/Error/Normal/Forbidden) | ✅ | `PrayerStatus` enum — note: the originally-planned separate `tahajjud` status case was removed; Tahajjud is now just another name inside `normal`, rendered identically to every other prayer (per explicit user decision to "treat every prayer the same") |
+| Domain model entities (CurrentPrayerEntity, NextPrayerEntity, ForbiddenPeriodEntity, DailyPrayerSummaryEntity, LocationEntity) | ❌ | raw `adhan_dart` `PrayerTimes`/`Prayer` types + plain Dart records used directly; per this repo's [[CLAUDE.md]] simplicity rule, formal entity/DTO layers are intentionally avoided |
 | Packages: `geocoding` | ❌ | not added — needed for city/country name display |
 | Packages: `permission_handler` | ❌ | not added — permission requests instead go through `geolocator`'s and `flutter_local_notifications`' own built-in permission APIs, which cover the same need without an extra dependency |
-| Countdown tick rate | ⚠ | spec asks for per-second updates; `prayer_time_card.dart` ticks every **minute** (`Timer.periodic(Duration(minutes: 1))`) |
-| Accessibility (large fonts / screen readers) | ❌ | not explicitly reviewed; relies on default Flutter widget semantics only |
+| Countdown tick rate | ✅ | every second (`Timer.periodic(Duration(seconds: 1))`) in `prayer_time_card.dart` and `prayer_schedule_cards.dart` |
+| Accessibility (large fonts / screen readers) | ⚠ | `Semantics` labels added to the dashboard card; no dedicated large-text-scale audit |
 
-**Biggest open decision:** this spec's Settings section (configurable calculation method, Hanafi-default madhab, manual mosque offsets, notification pre-offsets, manual city location) is materially larger than what was scoped and approved for the first pass (see prior AskUserQuestion answers: fixed Muslim World League + Shafi, GPS-only, on/off-only notifications). Building the items marked ❌ above is a distinct follow-up scope, not a bug in the current build.
+**Biggest open decision:** this spec's Settings section (configurable calculation method, manual mosque offsets, notification pre-offsets, manual city location) remains out of scope, as previously agreed. Building the items still marked ❌ above is a distinct follow-up scope, not a bug in the current build.
+
+**Known limitation (by design):** Tahajjud's recommended start is the last third of the night, but Isha's own window still ends at middle-of-night (kept as-is per explicit user instruction) — this leaves an intentional gap between middle-of-night and last-third-of-night where no prayer is "current." The dashboard's current-prayer card hides itself during that gap (rather than crash or show stale data); the Next Prayer card keeps showing "Tahajjud" throughout, since `nextPrayerPeriod` looks for the next upcoming window regardless of whether one is currently active.
 
 ---
 
@@ -55,12 +63,12 @@ Legend: ✅ Implemented · ⚠ Partial · ❌ Missing
 
 The module should allow users to:
 
-* Know the current prayer and remaining time. ❌
+* Know the current prayer and remaining time. ✅
 * Know the next prayer and countdown. ✅
-* Know whether prayer is currently forbidden. ❌
+* Know whether prayer is currently forbidden. ✅
 * View complete daily prayer times. ✅
-* View sunrise and sunset times. ⚠ sunrise only
-* View Sehri and Iftar times. ❌
+* View sunrise and sunset times. ✅
+* View Sehri and Iftar times. ✅
 * View prayer-related information without opening another app. ✅
 * Continue using prayer times offline after initial location retrieval. ✅
 
@@ -68,11 +76,11 @@ The module should allow users to:
 
 # Core Features
 
-## Home Dashboard Prayer Card ⚠ Partial
+## Home Dashboard Prayer Card ✅ Implemented (location name not shown — no reverse geocoding, out of scope)
 
 The home screen should contain a compact prayer status card.
 
-### During Prayer Time ❌ Missing (only next-prayer name/time/countdown shown; no current-prayer/progress/location)
+### During Prayer Time ✅ Implemented (location name not shown)
 
 Display:
 
@@ -103,7 +111,7 @@ Maghrib in 01:12:32
 
 ---
 
-### During Forbidden Time ❌ Missing
+### During Forbidden Time ✅ Implemented
 
 When prayer is forbidden the card changes state.
 
@@ -130,7 +138,7 @@ Dhuhr in 04:22:10
 
 ---
 
-### Before Fajr State ❌ Missing
+### Before Fajr State ✅ Implemented (folds into the unified Tahajjud→Fajr window rather than a separate card state — see the unified-cycle row in the status table)
 
 Display:
 
@@ -147,7 +155,7 @@ Sehri ends at 04:18 AM
 
 ---
 
-### Ramadan State ❌ Missing
+### Ramadan State ✅ Implemented (Sehri/Iftar card + label swap; a dedicated Ramadan visual theme was not built, just the data/wording)
 
 Additional information:
 
@@ -164,13 +172,13 @@ Maghrib at 06:37 PM
 
 ---
 
-# Prayer Details Screen ⚠ Partial
+# Prayer Details Screen ✅ Implemented
 
 The details screen provides complete information for the current day.
 
 ---
 
-## Daily Prayer Schedule ⚠ Partial (times shown; 3-state ✓/●/○ indicator not implemented — only highlights the next prayer)
+## Daily Prayer Schedule ✅ Implemented (3-state ✓/●/○ indicator; rows show a start–end range, and include Ishraq/Chasht/Tahajjud beyond the spec's original 6)
 
 Display all prayer times:
 
@@ -203,7 +211,7 @@ Example:
 
 ---
 
-## Additional Daily Information ❌ Missing
+## Additional Daily Information ✅ Implemented
 
 Display:
 
@@ -218,7 +226,7 @@ Display:
 
 ---
 
-## Forbidden Prayer Times ❌ Missing
+## Forbidden Prayer Times ⚠ Partial (3 of the 5 listed periods below — Sunrise, Zawal, Sunset; see the status-table note)
 
 Display all forbidden periods.
 
@@ -292,7 +300,7 @@ Display:
 
 ---
 
-# Settings Requirements ❌ Largely missing (only Hijri offset ± 1 day and per-prayer notification on/off exist today)
+# Settings Requirements ⚠ Partial (Hijri offset ±1 day + day-start Midnight/Sunset, Madhab Hanafi/Shafi, per-prayer + optional-prayer notification on/off exist; calc method/time format/location mode/mosque offset/notification pre-offset remain out of scope)
 
 ---
 
@@ -318,7 +326,7 @@ Muslim World League
 
 ---
 
-## Madhab Selection ❌ Missing — hardcoded to Shafi (this spec's default is Hanafi; conflicts with current build, needs a decision)
+## Madhab Selection ✅ Implemented — Hanafi default, matches this spec
 
 Supported values:
 
@@ -386,7 +394,7 @@ Maghrib -1 min
 
 ---
 
-## Current Prayer Detection ⚠ Partial — `adhan_dart`'s `currentPrayer()` exists on the package object but `PrayerTimeProvider` never calls it; only `nextPrayer` is exposed to the UI
+## Current Prayer Detection ✅ Implemented — `PrayerTimeProvider.currentPrayer`, driven by the unified window list (not raw `adhan_dart` calls)
 
 The module must determine:
 
@@ -420,7 +428,7 @@ Next: Maghrib
 
 ---
 
-## Current Prayer Remaining Time ❌ Missing
+## Current Prayer Remaining Time ✅ Implemented — `currentPrayerRemaining`
 
 Formula:
 
@@ -430,7 +438,7 @@ nextPrayerTime - currentTime
 
 ---
 
-## Next Prayer Countdown ⚠ Partial — shown on the home card (ticks every **minute**, not every second as required below); not shown on the details screen
+## Next Prayer Countdown ✅ Implemented — home card ticks every second; not separately shown on the details screen (not required there)
 
 Formula:
 
@@ -440,7 +448,7 @@ nextPrayerStartTime - currentTime
 
 ---
 
-## Forbidden Time Detection ❌ Missing
+## Forbidden Time Detection ✅ Implemented — `isForbiddenTime`/`activeForbiddenPeriod`
 
 The module must determine:
 
@@ -456,7 +464,7 @@ If true:
 
 ---
 
-## Prayer Progress Calculation ❌ Missing
+## Prayer Progress Calculation ✅ Implemented — `currentPrayer.progress`
 
 Formula:
 
@@ -483,7 +491,7 @@ Prayer times should refresh:
 
 ---
 
-# State Management Requirements ❌ Missing — only a single `locationGranted` bool + null-checks on `today`/`nextPrayer`; no distinct GPS-disabled/permanently-denied/error states
+# State Management Requirements ✅ Implemented — `PrayerStatus` enum (loading/permissionRequired/gpsDisabled/locationUnavailable/error/forbidden/normal); Tahajjud no longer gets its own status case, it's just another name within `normal` (see status-table note)
 
 The module should expose:
 
@@ -684,7 +692,7 @@ timezone
 # Performance Requirements ⚠ Partial
 
 * Prayer calculations should happen only once per day. ✅ (`PrayerTimeProvider._recompute` is lazy, triggered only on date rollover)
-* Countdown updates should happen every second. ❌ (home card ticks every minute — `Timer.periodic(Duration(minutes: 1))` in `prayer_time_card.dart`)
+* Countdown updates should happen every second. ✅ (`Timer.periodic(Duration(seconds: 1))` in both `prayer_time_card.dart` and `prayer_schedule_cards.dart`)
 * Location updates should not occur continuously. ✅ (GPS fetched once in `init()`, not polled)
 * Battery usage should remain minimal. ✅ (follows from the above)
 * UI updates should rebuild only required widgets. ✅ (`context.watch<PrayerTimeProvider>()` scoped to the card/screen, not the whole tree)
@@ -706,17 +714,17 @@ Support:
 
 The feature is complete when:
 
-* User can view current prayer. ❌ not shown in UI
+* User can view current prayer. ✅
 * User can view next prayer. ✅
-* User can view remaining time. ⚠ next-prayer countdown only, no current-prayer remaining time
-* User can view all daily prayer times. ✅ (fajr/sunrise/dhuhr/asr/maghrib/isha listed)
-* User can view forbidden periods. ❌
-* User can view sunrise and sunset. ⚠ sunrise is in the list; sunset is not shown separately
-* User can view Sehri and Iftar. ❌
-* Prayer information updates automatically. ⚠ recomputes on date rollover; countdown ticks every minute, not live-second
+* User can view remaining time. ✅ both current-prayer remaining and next-prayer countdown
+* User can view all daily prayer times. ✅ (Tahajjud/Fajr/Ishraq/Chasht/Dhuhr/Asr/Maghrib/Isha + Sunrise/Sunset markers)
+* User can view forbidden periods. ✅ (3 of the 5 originally listed — see Forbidden Prayer Times note)
+* User can view sunrise and sunset. ✅ (dashboard date row + detail-screen list + Additional Info)
+* User can view Sehri and Iftar. ✅
+* Prayer information updates automatically. ✅ recomputes on date rollover; countdown ticks every second
 * App works offline after location retrieval. ✅ (adhan_dart calc is fully offline once coordinates are known)
-* Notifications work correctly. ⚠ on/off per prayer works; no custom pre-offset, not device-tested end-to-end yet
-* Settings persist after app restart. ✅ for the settings that exist (Hijri offset, per-prayer toggle) via SharedPreferences
+* Notifications work correctly. ⚠ on/off per prayer (obligatory + optional) works; no custom pre-offset, not device-tested end-to-end yet
+* Settings persist after app restart. ✅ Hijri offset, Hijri day-start, Madhab, per-prayer toggles — all via SharedPreferences
 * Time calculations remain correct across date changes and timezone changes. ⚠ date-change handled; timezone-change behavior unverified
 
 ---

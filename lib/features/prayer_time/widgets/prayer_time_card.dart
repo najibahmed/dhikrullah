@@ -44,13 +44,18 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
     final hours = positive.inHours;
     final minutes = positive.inMinutes % 60;
     if (hours > 0) return 'Time Remaining: ${hours} Hour ${minutes} Minutes';
-    return 'Time Remaining: ${minutes}Minutes';
+    return 'Time Remaining: ${minutes} Minutes';
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final provider = context.watch<PrayerTimeProvider>();
+
+    if (provider.status == PrayerStatus.normal &&
+        provider.currentPrayer == null) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -222,9 +227,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
           now.add(Duration(days: provider.hijriOffsetDays)),
         ).hMonth ==
         9;
-    final nextLabel =
-        (isRamadan && next?.name == 'Maghrib') ? 'Iftar' : next?.name;
-
+   
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

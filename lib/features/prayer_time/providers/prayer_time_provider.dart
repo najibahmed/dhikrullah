@@ -17,6 +17,10 @@ import 'package:dhikir_app/features/prayer_time/services/prayer_notification_ser
 const _kHijriOffsetKey = 'prayer_hijri_offset_days';
 const _kNotifyPrefixKey = 'prayer_notify_';
 const _kMadhabKey = 'prayer_madhab';
+const _kHijriDayStartKey = 'prayer_hijri_day_start';
+
+/// When the Hijri calendar day is considered to roll over.
+enum HijriDayStart { midnight, sunset }
 
 const prayerLabels = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
@@ -46,6 +50,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   Coordinates? coordinates;
 
   int hijriOffsetDays = 0;
+  HijriDayStart hijriDayStart = HijriDayStart.midnight;
   Madhab madhab = Madhab.hanafi;
   final Map<String, bool> prayerNotificationsEnabled = {
     for (final label in prayerLabels) label: true,
@@ -102,6 +107,9 @@ class PrayerTimeProvider extends ChangeNotifier {
     hijriOffsetDays = prefs.getInt(_kHijriOffsetKey) ?? 0;
     madhab =
         prefs.getString(_kMadhabKey) == 'shafi' ? Madhab.shafi : Madhab.hanafi;
+    hijriDayStart = prefs.getString(_kHijriDayStartKey) == 'sunset'
+        ? HijriDayStart.sunset
+        : HijriDayStart.midnight;
     for (final label in prayerLabels) {
       prayerNotificationsEnabled[label] =
           prefs.getBool('$_kNotifyPrefixKey$label') ?? true;
@@ -127,6 +135,20 @@ class PrayerTimeProvider extends ChangeNotifier {
     return _today;
   }
 
+  /// hijriOffsetDays plus an automatic +1 when "day starts at Sunset" is
+  /// selected and today's Maghrib has already passed — the value every
+  /// Hijri-date display should use instead of the raw manual offset.
+  int get displayHijriOffsetDays {
+    var offset = hijriOffsetDays;
+    final maghrib = today?.maghrib.toLocal();
+    if (hijriDayStart == HijriDayStart.sunset &&
+        maghrib != null &&
+        DateTime.now().isAfter(maghrib)) {
+      offset += 1;
+    }
+    return offset;
+  }
+
   PrayerTimes? _prayerTimesFor(DateTime date) {
     if (coordinates == null) return null;
     final params = CalculationMethodParameters.muslimWorldLeague()
@@ -146,13 +168,19 @@ class PrayerTimeProvider extends ChangeNotifier {
 
   /// Builds the unified Tahajjud/Fajr/Ishraq/Chasht/Dhuhr/Asr/Maghrib/Isha
   /// cycle for [times]'s calendar date. [yesterday] (if available) supplies
-  /// the leading Tahajjud window (last night's middle-of-night -> this
-  /// Fajr); the trailing Tahajjud window (tonight's middle-of-night ->
+  /// the leading Tahajjud window (last night's last-third-of-night -> this
+  /// Fajr); the trailing Tahajjud window (tonight's last-third-of-night ->
   /// tomorrow's Fajr) is always derived from [times] itself. Fajr's window
   /// runs through to Ishraq's start (sunrise + 15min, matching the
   /// existing Sunrise-forbidden window's end) rather than stopping at
   /// sunrise, so there's never a "no current prayer" gap during that
   /// forbidden window.
+  ///
+  /// Isha's own window still ends at middle-of-night (unchanged), while
+  /// Tahajjud doesn't start until last-third-of-night — there is an
+  /// intentional gap between the two with no covering window. Callers of
+  /// [currentPrayer]/[nextPrayerPeriod] must handle a `null` result during
+  /// that gap; the dashboard card hides itself then rather than crashing.
   List<({String name, DateTime start, DateTime end})> _buildWindows(
       PrayerTimes times, PrayerTimes? yesterday) {
     final sunrise = times.sunrise.toLocal();
@@ -160,13 +188,14 @@ class PrayerTimeProvider extends ChangeNotifier {
     final ishraqStart = sunrise.add(const Duration(minutes: 15));
     final chashtStart = sunrise.add(Duration(
         microseconds: dhuhr.difference(sunrise).inMicroseconds ~/ 2));
-    final tonightMiddle = SunnahTimes(times).middleOfTheNight.toLocal();
+    final ishaEnd = SunnahTimes(times).middleOfTheNight.toLocal();
+    final tahajjudStart = SunnahTimes(times).lastThirdOfTheNight.toLocal();
 
     return [
       if (yesterday != null)
         (
           name: 'Tahajjud',
-          start: SunnahTimes(yesterday).middleOfTheNight.toLocal(),
+          start: SunnahTimes(yesterday).lastThirdOfTheNight.toLocal(),
           end: times.fajr.toLocal(),
         ),
       (name: 'Fajr', start: times.fajr.toLocal(), end: ishraqStart),
@@ -183,8 +212,8 @@ class PrayerTimeProvider extends ChangeNotifier {
         start: times.maghrib.toLocal(),
         end: times.isha.toLocal()
       ),
-      (name: 'Isha', start: times.isha.toLocal(), end: tonightMiddle),
-      (name: 'Tahajjud', start: tonightMiddle, end: times.fajrAfter.toLocal()),
+      (name: 'Isha', start: times.isha.toLocal(), end: ishaEnd),
+      (name: 'Tahajjud', start: tahajjudStart, end: times.fajrAfter.toLocal()),
     ];
   }
 
@@ -292,15 +321,13 @@ class PrayerTimeProvider extends ChangeNotifier {
       get nextPrayerPeriod {
     final windows = _prayerWindows;
     final now = DateTime.now();
-    for (var i = 0; i < windows.length; i++) {
-      if (!now.isBefore(windows[i].start) && now.isBefore(windows[i].end)) {
-        if (i + 1 >= windows.length) return null;
-        final next = windows[i + 1];
+    for (final w in windows) {
+      if (now.isBefore(w.start)) {
         return (
-          name: next.name,
-          start: next.start,
-          end: next.end,
-          startsIn: next.start.difference(now),
+          name: w.name,
+          start: w.start,
+          end: w.end,
+          startsIn: w.start.difference(now),
         );
       }
     }
@@ -366,6 +393,14 @@ class PrayerTimeProvider extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_kHijriOffsetKey, hijriOffsetDays);
+  }
+
+  Future<void> setHijriDayStart(HijriDayStart value) async {
+    hijriDayStart = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        _kHijriDayStartKey, value == HijriDayStart.sunset ? 'sunset' : 'midnight');
   }
 
   Future<void> setMadhab(Madhab value) async {

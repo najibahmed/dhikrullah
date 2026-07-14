@@ -26,6 +26,7 @@ import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart'
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_time_card.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_schedule_cards.dart';
+import 'package:dhikir_app/features/prayer_time/widgets/forbidden_times_card.dart';
 
 // ─── HomeScreen ───────────────────────────────────────────────────────────────
 
@@ -212,9 +213,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                   onPressed: () =>
                       Navigator.pushNamed(context, RouteNames.about),
                 ),
-                SizedBox(
-                  width: 8,
-                )
+                const SizedBox(width: 8)
               ],
             ),
           ),
@@ -225,16 +224,19 @@ class _HomeWidgetState extends State<HomeWidget> {
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: DateHeaderRow(
               hijriOffsetDays:
-                  context.watch<PrayerTimeProvider>().hijriOffsetDays,
+                  context.watch<PrayerTimeProvider>().displayHijriOffsetDays,
               sunrise:
                   context.watch<PrayerTimeProvider>().today?.sunrise.toLocal(),
               sunset:
                   context.watch<PrayerTimeProvider>().today?.sunset.toLocal(),
+              onHijriTap: () =>
+                  Navigator.pushNamed(context, RouteNames.hijriSettings),
             ),
           ),
         ),
         const SliverToBoxAdapter(child: PrayerTimeCard()),
         const SliverToBoxAdapter(child: PrayerScheduleSection()),
+        const SliverToBoxAdapter(child: ForbiddenTimesCard()),
 
         // ── Dhikir grid ───────────────────────────────────────────────────
         SliverPadding(
