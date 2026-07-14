@@ -64,7 +64,9 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
+              color: provider.status == PrayerStatus.normal
+                  ? theme.colorScheme.secondary
+                  : theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(18),
               border:
                   Border.all(color: theme.dividerColor.withValues(alpha: 0.3)),
@@ -273,6 +275,8 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
     final times = provider.today!;
     final now = DateTime.now();
 
+    final onSecondary = theme.colorScheme.onSecondary;
+
     final isBeforeFajr = now.isBefore(times.fajr.toLocal());
     if (isBeforeFajr) {
       final fajrRemaining = times.fajr.toLocal().difference(now);
@@ -285,18 +289,18 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
               children: [
                 Text(
                   'Fajr starts ${_formatCountdown(fajrRemaining)}',
-                  style: theme.textTheme.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700, color: onSecondary),
                 ),
                 Text(
                   'Sehri ends at ${TimeOfDay.fromDateTime(times.fajr.toLocal()).format(context)}',
-                  style: theme.textTheme.bodySmall,
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: onSecondary.withValues(alpha: 0.8)),
                 ),
               ],
             ),
           ),
-          Icon(Icons.chevron_right,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+          Icon(Icons.chevron_right, color: onSecondary.withValues(alpha: 0.6)),
         ],
       );
     }
@@ -313,8 +317,8 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
       children: [
         Text(
           "Current Prayer",
-          style:
-              theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          style: theme.textTheme.titleSmall
+              ?.copyWith(fontWeight: FontWeight.w700, color: onSecondary),
         ),
         const SizedBox(height: 10),
         Row(
@@ -322,19 +326,19 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
           children: [
             Row(
               children: [
-                Icon(Icons.mosque_outlined, color: theme.colorScheme.primary),
+                Icon(Icons.mosque_outlined, color: onSecondary),
                 const SizedBox(width: 12),
                 Text(
                   current.name,
-                  style: theme.textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700, color: onSecondary),
                 ),
               ],
             ),
             Text(
               '${TimeOfDay.fromDateTime(current.start).format(context)} – '
               '${TimeOfDay.fromDateTime(current.end).format(context)}',
-              style: theme.textTheme.bodyMedium,
+              style: theme.textTheme.bodyMedium?.copyWith(color: onSecondary),
             ),
             // Icon(Icons.chevron_right,
             //     color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
@@ -343,12 +347,18 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         const SizedBox(height: 10),
         Text(
           _formatCountdown(current.end.difference(now)),
-          style: theme.textTheme.bodyMedium,
+          style: theme.textTheme.bodyMedium
+              ?.copyWith(color: onSecondary.withValues(alpha: 0.8)),
         ),
         const SizedBox(height: 10),
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(value: current.progress, minHeight: 4),
+          child: LinearProgressIndicator(
+            value: current.progress,
+            minHeight: 4,
+            backgroundColor: onSecondary.withValues(alpha: 0.3),
+            valueColor: AlwaysStoppedAnimation<Color>(onSecondary),
+          ),
         ),
         // if (next != null) ...[
         //   const SizedBox(height: 10),

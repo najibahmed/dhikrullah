@@ -25,6 +25,7 @@ import 'package:dhikir_app/features/favorites/screens/favorite_screen.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_time_card.dart';
+import 'package:dhikir_app/features/prayer_time/widgets/prayer_schedule_cards.dart';
 
 // ─── HomeScreen ───────────────────────────────────────────────────────────────
 
@@ -188,17 +189,11 @@ class _HomeWidgetState extends State<HomeWidget> {
         //   ),
         // ),
         // ),
-
-        // ── Date + prayer time ───────────────────────────────────────────
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: Row(
               children: [
-                DateHeaderRow(
-                  hijriOffsetDays:
-                      context.watch<PrayerTimeProvider>().hijriOffsetDays,
-                ),
                 Spacer(),
                 _NavButton(
                   label: 'My Dhikir',
@@ -224,7 +219,22 @@ class _HomeWidgetState extends State<HomeWidget> {
             ),
           ),
         ),
+        // ── Date + prayer time ───────────────────────────────────────────
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: DateHeaderRow(
+              hijriOffsetDays:
+                  context.watch<PrayerTimeProvider>().hijriOffsetDays,
+              sunrise:
+                  context.watch<PrayerTimeProvider>().today?.sunrise.toLocal(),
+              sunset:
+                  context.watch<PrayerTimeProvider>().today?.sunset.toLocal(),
+            ),
+          ),
+        ),
         const SliverToBoxAdapter(child: PrayerTimeCard()),
+        const SliverToBoxAdapter(child: PrayerScheduleSection()),
 
         // ── Dhikir grid ───────────────────────────────────────────────────
         SliverPadding(

@@ -41,8 +41,34 @@ String _formatGregorian(DateTime date) {
 
 class DateHeaderRow extends StatelessWidget {
   final int hijriOffsetDays;
+  final DateTime? sunrise;
+  final DateTime? sunset;
 
-  const DateHeaderRow({super.key, required this.hijriOffsetDays});
+  const DateHeaderRow({
+    super.key,
+    required this.hijriOffsetDays,
+    this.sunrise,
+    this.sunset,
+  });
+
+  Widget _sunRow(BuildContext context, IconData icon, Color color,
+      DateTime time) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 4),
+        Text(
+          TimeOfDay.fromDateTime(time).format(context),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: Colors.black,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,22 +80,41 @@ class DateHeaderRow extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            _formatGregorian(now),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.black,
-              fontWeight: FontWeight.w600,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _formatGregorian(now),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                    '${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear} AH',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    )),
+              ],
             ),
           ),
-          const SizedBox(height: 2),
-          Text('${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear} AH',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-              )),
+          if (sunrise != null && sunset != null)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                _sunRow(context, Icons.wb_sunny_outlined, Colors.amber,
+                    sunrise!),
+                const SizedBox(height: 4),
+                _sunRow(context, Icons.nightlight_round,
+                    Colors.deepOrange, sunset!),
+              ],
+            ),
         ],
       ),
     );

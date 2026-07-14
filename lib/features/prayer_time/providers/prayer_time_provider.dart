@@ -260,6 +260,81 @@ class PrayerTimeProvider extends ChangeNotifier {
     return (start: middle, end: times.fajr.toLocal());
   }
 
+  DateTime? _afterNextTime(PrayerTimes times, Prayer next) {
+    switch (next) {
+      case Prayer.fajr:
+        return times.sunrise;
+      case Prayer.sunrise:
+        return times.dhuhr;
+      case Prayer.dhuhr:
+        return times.asr;
+      case Prayer.asr:
+        return times.maghrib;
+      case Prayer.maghrib:
+        return times.isha;
+      case Prayer.isha:
+        return times.fajrAfter;
+      case Prayer.fajrAfter:
+        return _prayerTimesFor(DateTime.now().add(const Duration(days: 1)))
+            ?.sunrise;
+      case Prayer.ishaBefore:
+        return times.fajr;
+    }
+  }
+
+  /// Next prayer's own start/end window and time remaining until it
+  /// starts, or null if location hasn't been resolved yet.
+  ({String name, DateTime start, DateTime end, Duration startsIn})?
+      get nextPrayerPeriod {
+    final times = today;
+    if (times == null) return null;
+    final next = times.nextPrayer();
+    final start = times.timeForPrayer(next).toLocal();
+    final endUtc = _afterNextTime(times, next);
+    if (endUtc == null) return null;
+    return (
+      name: next.displayName,
+      start: start,
+      end: endUtc.toLocal(),
+      startsIn: start.difference(DateTime.now()),
+    );
+  }
+
+  /// Today's Sehri-end (Fajr) / Iftar (Maghrib) with a countdown that
+  /// flips to tomorrow's schedule once today's Iftar has passed, or null
+  /// if location hasn't been resolved yet.
+  ({
+    String title,
+    DateTime sehriEnd,
+    DateTime iftar,
+    String countdownLabel,
+    Duration countdown
+  })? get sehriIftarInfo {
+    final times = today;
+    if (times == null) return null;
+    final now = DateTime.now();
+    final iftarToday = times.maghrib.toLocal();
+    if (now.isBefore(iftarToday)) {
+      return (
+        title: "Today's Schedule",
+        sehriEnd: times.fajr.toLocal(),
+        iftar: iftarToday,
+        countdownLabel: 'Iftar starts in',
+        countdown: iftarToday.difference(now),
+      );
+    }
+    final tomorrow = _prayerTimesFor(now.add(const Duration(days: 1)));
+    if (tomorrow == null) return null;
+    final sehriEndTomorrow = times.fajrAfter.toLocal();
+    return (
+      title: "Tomorrow's Schedule",
+      sehriEnd: sehriEndTomorrow,
+      iftar: tomorrow.maghrib.toLocal(),
+      countdownLabel: 'Sehri ends in',
+      countdown: sehriEndTomorrow.difference(now),
+    );
+  }
+
   bool get isTahajjudTime {
     final period = tahajjudPeriod;
     final now = DateTime.now();
