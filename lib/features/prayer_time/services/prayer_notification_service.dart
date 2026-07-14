@@ -67,6 +67,10 @@ class PrayerNotificationService {
     required Map<String, bool> enabled,
     DateTime? tahajjudToday,
     DateTime? tahajjudTomorrow,
+    DateTime? ishraqToday,
+    DateTime? ishraqTomorrow,
+    DateTime? chashtToday,
+    DateTime? chashtTomorrow,
   }) async {
     if (!_initialized) return;
     await _plugin.cancelAll();
@@ -105,16 +109,22 @@ class PrayerNotificationService {
       }
     }
 
-    if (enabled[_kTahajjudLabel] == true) {
-      var tahajjudId = 10;
-      for (final time in [tahajjudToday, tahajjudTomorrow]) {
+    final optional = <(String, DateTime?, DateTime?, int)>[
+      (_kTahajjudLabel, tahajjudToday, tahajjudTomorrow, 10),
+      ('Ishraq', ishraqToday, ishraqTomorrow, 12),
+      ('Chasht', chashtToday, chashtTomorrow, 14),
+    ];
+    for (final (label, todayTime, tomorrowTime, idBase) in optional) {
+      if (enabled[label] != true) continue;
+      var optionalId = idBase;
+      for (final time in [todayTime, tomorrowTime]) {
         if (time != null) {
           final scheduled = tz.TZDateTime.from(time, tz.local);
           if (!scheduled.isBefore(tz.TZDateTime.now(tz.local))) {
             await _plugin.zonedSchedule(
-              id: tahajjudId,
-              title: _kTahajjudLabel,
-              body: 'Time for Tahajjud.',
+              id: optionalId,
+              title: label,
+              body: 'Time for $label.',
               scheduledDate: scheduled,
               notificationDetails: const NotificationDetails(
                 android: AndroidNotificationDetails(
@@ -127,7 +137,7 @@ class PrayerNotificationService {
             );
           }
         }
-        tahajjudId++;
+        optionalId++;
       }
     }
   }

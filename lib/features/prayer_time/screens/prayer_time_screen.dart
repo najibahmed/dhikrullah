@@ -14,15 +14,6 @@ import 'package:dhikir_app/core/widgets/date_header_row.dart';
 import 'package:dhikir_app/features/prayer_time/models/forbidden_period.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 
-const _prayerOrder = [
-  Prayer.fajr,
-  Prayer.sunrise,
-  Prayer.dhuhr,
-  Prayer.asr,
-  Prayer.maghrib,
-  Prayer.isha,
-];
-
 class PrayerTimeScreen extends StatelessWidget {
   const PrayerTimeScreen({super.key});
 
@@ -92,67 +83,78 @@ class _PrayerListSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final now = DateTime.now();
-    final current = provider.isTahajjudTime ? null : times.currentPrayer();
-
+    final windows = provider.displayPrayerWindows;
+    final currentName = provider.currentPrayer?.name;
     final active = provider.activeForbiddenPeriod;
 
     return Column(
       children: [
-        for (var i = 0; i < _prayerOrder.length; i++)
-          Builder(builder: (context) {
-            final prayer = _prayerOrder[i];
-            final isCurrent = prayer == current;
-            final isCompleted = !isCurrent &&
-                now.isAfter(times.timeForPrayer(prayer).toLocal());
-
-            final IconData icon;
-            final Color? color;
-            if (isCurrent) {
-              icon = Icons.mosque;
-              color = theme.colorScheme.primary;
-            } else if (isCompleted) {
-              icon = Icons.check_circle;
-              color = theme.colorScheme.onSurface.withValues(alpha: 0.4);
-            } else {
-              icon = Icons.circle_outlined;
-              color = theme.colorScheme.onSurface.withValues(alpha: 0.4);
-            }
-
-            Widget? warning;
-            if (active != null && i < _prayerOrder.length - 1) {
-              final gapStart = times.timeForPrayer(prayer).toLocal();
-              final gapEnd = times.timeForPrayer(_prayerOrder[i + 1]).toLocal();
-              if (!active.start.isBefore(gapStart) &&
-                  active.start.isBefore(gapEnd)) {
-                warning = _ForbiddenWarningCard(period: active);
-              }
-            }
-
-            return Column(
-              children: [
-                ListTile(
-                  leading: Icon(icon, color: color),
-                  title: Text(
-                    prayer.displayName,
-                    style: isCurrent
-                        ? theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.primary,
-                          )
-                        : theme.textTheme.titleMedium,
-                  ),
-                  trailing: Text(
-                    TimeOfDay.fromDateTime(
-                            times.timeForPrayer(prayer).toLocal())
-                        .format(context),
-                    style: theme.textTheme.titleMedium,
-                  ),
-                ),
-                if (warning != null) warning,
-              ],
-            );
-          }),
+        for (final w in windows) ...[
+          _prayerRow(context, theme, now, w, isCurrent: w.name == currentName),
+          if (w.name == 'Fajr')
+            _markerRow(context, theme, 'Sunrise', Icons.wb_sunny_outlined,
+                times.sunrise.toLocal()),
+          if (w.name == 'Asr')
+            _markerRow(context, theme, 'Sunset', Icons.nightlight_round,
+                times.sunset.toLocal()),
+          if (active != null &&
+              !active.start.isBefore(w.start) &&
+              active.start.isBefore(w.end))
+            _ForbiddenWarningCard(period: active),
+        ],
       ],
+    );
+  }
+
+  Widget _prayerRow(BuildContext context, ThemeData theme, DateTime now,
+      ({String name, DateTime start, DateTime end}) w,
+      {required bool isCurrent}) {
+    final isCompleted = !isCurrent && now.isAfter(w.end);
+
+    final IconData icon;
+    final Color? color;
+    if (isCurrent) {
+      icon = Icons.mosque;
+      color = theme.colorScheme.primary;
+    } else if (isCompleted) {
+      icon = Icons.check_circle;
+      color = theme.colorScheme.onSurface.withValues(alpha: 0.4);
+    } else {
+      icon = Icons.circle_outlined;
+      color = theme.colorScheme.onSurface.withValues(alpha: 0.4);
+    }
+
+    return ListTile(
+      leading: Icon(icon, color: color),
+      title: Text(
+        w.name,
+        style: isCurrent
+            ? theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.primary,
+              )
+            : theme.textTheme.titleMedium,
+      ),
+      trailing: Text(
+        '${TimeOfDay.fromDateTime(w.start).format(context)} – '
+        '${TimeOfDay.fromDateTime(w.end).format(context)}',
+        style: theme.textTheme.titleMedium,
+      ),
+    );
+  }
+
+  Widget _markerRow(BuildContext context, ThemeData theme, String label,
+      IconData icon, DateTime time) {
+    return ListTile(
+      leading:
+          Icon(icon, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+      title: Text(label,
+          style: theme.textTheme.bodyMedium
+              ?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
+      trailing: Text(
+        TimeOfDay.fromDateTime(time).format(context),
+        style: theme.textTheme.bodyMedium,
+      ),
     );
   }
 }

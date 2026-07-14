@@ -98,11 +98,6 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         final next = provider.nextPrayer;
         return 'Forbidden prayer time: ${period?.name ?? ''}.'
             '${next != null ? ' Next prayer ${next.name}.' : ''}';
-      case PrayerStatus.tahajjud:
-        final period = provider.tahajjudPeriod;
-        if (period == null) return 'Tahajjud time.';
-        return 'Tahajjud time, ends at '
-            '${TimeOfDay.fromDateTime(period.end).format(context)}.';
       case PrayerStatus.normal:
         final current = provider.currentPrayer;
         if (current == null) return 'Prayer times.';
@@ -152,8 +147,6 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         );
       case PrayerStatus.forbidden:
         return _forbiddenRow(context, theme, provider);
-      case PrayerStatus.tahajjud:
-        return _tahajjudRow(context, theme, provider);
       case PrayerStatus.normal:
         return _normalRow(context, theme, provider);
     }
@@ -217,93 +210,13 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
     );
   }
 
-  Widget _tahajjudRow(
-      BuildContext context, ThemeData theme, PrayerTimeProvider provider) {
-    final period = provider.tahajjudPeriod!;
-    final now = DateTime.now();
-    final totalSeconds = period.end.difference(period.start).inSeconds;
-    final elapsedSeconds = now.difference(period.start).inSeconds;
-    final progress = totalSeconds > 0
-        ? (elapsedSeconds / totalSeconds).clamp(0.0, 1.0)
-        : 0.0;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.nights_stay, color: theme.colorScheme.primary),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Tahajjud',
-                      style: theme.textTheme.titleSmall
-                          ?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    Text(
-                      '${TimeOfDay.fromDateTime(period.start).format(context)} – '
-                      '${TimeOfDay.fromDateTime(period.end).format(context)} · '
-                      '${_formatCountdown(period.end.difference(now))} left',
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Icon(Icons.chevron_right,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
-          ],
-        ),
-        const SizedBox(height: 10),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(value: progress, minHeight: 4),
-        ),
-      ],
-    );
-  }
-
   Widget _normalRow(
       BuildContext context, ThemeData theme, PrayerTimeProvider provider) {
     final current = provider.currentPrayer!;
     final next = provider.nextPrayer;
-    final times = provider.today!;
     final now = DateTime.now();
 
     final onSecondary = theme.colorScheme.onSecondary;
-
-    final isBeforeFajr = now.isBefore(times.fajr.toLocal());
-    if (isBeforeFajr) {
-      final fajrRemaining = times.fajr.toLocal().difference(now);
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Fajr starts ${_formatCountdown(fajrRemaining)}',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700, color: onSecondary),
-                ),
-                Text(
-                  'Sehri ends at ${TimeOfDay.fromDateTime(times.fajr.toLocal()).format(context)}',
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: onSecondary.withValues(alpha: 0.8)),
-                ),
-              ],
-            ),
-          ),
-          Icon(Icons.chevron_right, color: onSecondary.withValues(alpha: 0.6)),
-        ],
-      );
-    }
 
     final isRamadan = HijriCalendar.fromDate(
           now.add(Duration(days: provider.hijriOffsetDays)),
