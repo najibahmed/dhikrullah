@@ -34,6 +34,7 @@ enum PrayerStatus {
   locationUnavailable,
   error,
   forbidden,
+  tahajjud,
   normal,
 }
 
@@ -100,7 +101,8 @@ class PrayerTimeProvider extends ChangeNotifier {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     hijriOffsetDays = prefs.getInt(_kHijriOffsetKey) ?? 0;
-    madhab = prefs.getString(_kMadhabKey) == 'shafi' ? Madhab.shafi : Madhab.hanafi;
+    madhab =
+        prefs.getString(_kMadhabKey) == 'shafi' ? Madhab.shafi : Madhab.hanafi;
     for (final label in prayerLabels) {
       prayerNotificationsEnabled[label] =
           prefs.getBool('$_kNotifyPrefixKey$label') ?? true;
@@ -149,7 +151,10 @@ class PrayerTimeProvider extends ChangeNotifier {
     final times = today;
     if (times == null) return null;
     final prayer = times.nextPrayer();
-    return (name: prayer.displayName, time: times.timeForPrayer(prayer).toLocal());
+    return (
+      name: prayer.displayName,
+      time: times.timeForPrayer(prayer).toLocal()
+    );
   }
 
   /// The prayer period we're currently inside — name, its start/end time,
@@ -157,18 +162,27 @@ class PrayerTimeProvider extends ChangeNotifier {
   /// consecutive prayer boundaries (adhan_dart's currentPrayer()/
   /// nextPrayer() pairing), including the pre-Fajr (ishaBefore -> fajr)
   /// and post-Isha (isha -> fajrAfter) wraparound cases.
-  ({String name, DateTime start, DateTime end, double progress})? get currentPrayer {
+  ({String name, DateTime start, DateTime end, double progress})?
+      get currentPrayer {
     final times = today;
     if (times == null) return null;
     final current = times.currentPrayer();
     final next = times.nextPrayer();
     final start = times.timeForPrayer(current).toLocal();
-    final end = times.timeForPrayer(next).toLocal();
+    final end = current == Prayer.isha
+        ? (_currentNightMiddle ?? times.timeForPrayer(next).toLocal())
+        : times.timeForPrayer(next).toLocal();
     final totalSeconds = end.difference(start).inSeconds;
     final elapsedSeconds = DateTime.now().difference(start).inSeconds;
-    final progress =
-        totalSeconds > 0 ? (elapsedSeconds / totalSeconds).clamp(0.0, 1.0) : 0.0;
-    return (name: current.displayName, start: start, end: end, progress: progress);
+    final progress = totalSeconds > 0
+        ? (elapsedSeconds / totalSeconds).clamp(0.0, 1.0)
+        : 0.0;
+    return (
+      name: current.displayName,
+      start: start,
+      end: end,
+      progress: progress
+    );
   }
 
   /// Time remaining until the current prayer period ends, or null if
@@ -186,11 +200,6 @@ class PrayerTimeProvider extends ChangeNotifier {
     if (times == null) return const [];
     return [
       ForbiddenPeriod(
-        name: 'After Fajr',
-        start: times.fajr.toLocal(),
-        end: times.sunrise.toLocal(),
-      ),
-      ForbiddenPeriod(
         name: 'Sunrise',
         start: times.sunrise.toLocal(),
         end: times.sunrise.toLocal().add(const Duration(minutes: 15)),
@@ -199,11 +208,6 @@ class PrayerTimeProvider extends ChangeNotifier {
         name: 'Zawal',
         start: times.dhuhr.toLocal().subtract(const Duration(minutes: 10)),
         end: times.dhuhr.toLocal(),
-      ),
-      ForbiddenPeriod(
-        name: 'After Asr',
-        start: times.asr.toLocal(),
-        end: times.sunset.toLocal(),
       ),
       ForbiddenPeriod(
         name: 'Sunset',
@@ -225,16 +229,59 @@ class PrayerTimeProvider extends ChangeNotifier {
 
   bool get isForbiddenTime => activeForbiddenPeriod != null;
 
+  /// Middle of the current Isha->Fajr night. Sourced from yesterday's
+  /// PrayerTimes (last night's Maghrib) when we're in the post-midnight tail
+  /// of that night (now < today's Fajr, i.e. `today` has already rolled over
+  /// to a new date), or from today's PrayerTimes (tonight's Maghrib) when
+  /// we're in the pre-midnight evening portion of Isha. Null if location
+  /// isn't resolved.
+  DateTime? get _currentNightMiddle {
+    final times = today;
+    if (times == null) return null;
+    final now = DateTime.now();
+    if (now.isBefore(times.fajr.toLocal())) {
+      final yesterday = _prayerTimesFor(now.subtract(const Duration(days: 1)));
+      if (yesterday == null) return null;
+      return SunnahTimes(yesterday).middleOfTheNight.toLocal();
+    }
+    return SunnahTimes(times).middleOfTheNight.toLocal();
+  }
+
+  /// Tonight's Tahajjud window (middle of the night -> Fajr), or null if
+  /// we're not currently in the pre-Fajr portion of the night, or location
+  /// isn't resolved yet.
+  ({DateTime start, DateTime end})? get tahajjudPeriod {
+    final times = today;
+    if (times == null) return null;
+    final now = DateTime.now();
+    if (!now.isBefore(times.fajr.toLocal())) return null;
+    final middle = _currentNightMiddle;
+    if (middle == null) return null;
+    return (start: middle, end: times.fajr.toLocal());
+  }
+
+  bool get isTahajjudTime {
+    final period = tahajjudPeriod;
+    final now = DateTime.now();
+    return period != null &&
+        now.isAfter(period.start) &&
+        now.isBefore(period.end);
+  }
+
   /// Coarse UI status, purely derived from the fields above.
   PrayerStatus get status {
     if (_loading) return PrayerStatus.loading;
     if (!gpsServiceEnabled) return PrayerStatus.gpsDisabled;
     if (!locationGranted) return PrayerStatus.permissionRequired;
     if (coordinates == null) {
-      return locationError ? PrayerStatus.locationUnavailable : PrayerStatus.loading;
+      return locationError
+          ? PrayerStatus.locationUnavailable
+          : PrayerStatus.loading;
     }
     if (today == null) return PrayerStatus.error;
-    return isForbiddenTime ? PrayerStatus.forbidden : PrayerStatus.normal;
+    if (isForbiddenTime) return PrayerStatus.forbidden;
+    if (isTahajjudTime) return PrayerStatus.tahajjud;
+    return PrayerStatus.normal;
   }
 
   // ── Mutators ─────────────────────────────────────────────────────────────
@@ -251,7 +298,8 @@ class PrayerTimeProvider extends ChangeNotifier {
     _recompute();
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kMadhabKey, value == Madhab.shafi ? 'shafi' : 'hanafi');
+    await prefs.setString(
+        _kMadhabKey, value == Madhab.shafi ? 'shafi' : 'hanafi');
     await _rescheduleNotifications();
   }
 
@@ -265,7 +313,8 @@ class PrayerTimeProvider extends ChangeNotifier {
 
   Future<void> _rescheduleNotifications() async {
     final todayTimes = today;
-    final tomorrowTimes = _prayerTimesFor(DateTime.now().add(const Duration(days: 1)));
+    final tomorrowTimes =
+        _prayerTimesFor(DateTime.now().add(const Duration(days: 1)));
     if (todayTimes == null || tomorrowTimes == null) return;
     await PrayerNotificationService.scheduleForDay(
       today: todayTimes,

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/widgets/date_header_row.dart';
+import 'package:dhikir_app/features/prayer_time/models/forbidden_period.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 
 const _prayerOrder = [
@@ -36,8 +37,8 @@ class PrayerTimeScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
-          DateHeaderRow(hijriOffsetDays: provider.hijriOffsetDays),
-          const SizedBox(height: 8),
+          // DateHeaderRow(hijriOffsetDays: provider.hijriOffsetDays),
+          // const SizedBox(height: 8),
 
           if (!provider.locationGranted)
             Padding(
@@ -91,15 +92,18 @@ class _PrayerListSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final now = DateTime.now();
-    final current = times.currentPrayer();
+    final current = provider.isTahajjudTime ? null : times.currentPrayer();
+
+    final active = provider.activeForbiddenPeriod;
 
     return Column(
       children: [
-        for (final prayer in _prayerOrder)
+        for (var i = 0; i < _prayerOrder.length; i++)
           Builder(builder: (context) {
+            final prayer = _prayerOrder[i];
             final isCurrent = prayer == current;
-            final isCompleted =
-                !isCurrent && now.isAfter(times.timeForPrayer(prayer).toLocal());
+            final isCompleted = !isCurrent &&
+                now.isAfter(times.timeForPrayer(prayer).toLocal());
 
             final IconData icon;
             final Color? color;
@@ -114,25 +118,87 @@ class _PrayerListSection extends StatelessWidget {
               color = theme.colorScheme.onSurface.withValues(alpha: 0.4);
             }
 
-            return ListTile(
-              leading: Icon(icon, color: color),
-              title: Text(
-                prayer.displayName,
-                style: isCurrent
-                    ? theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.primary,
-                      )
-                    : theme.textTheme.titleMedium,
-              ),
-              trailing: Text(
-                TimeOfDay.fromDateTime(times.timeForPrayer(prayer).toLocal())
-                    .format(context),
-                style: theme.textTheme.titleMedium,
-              ),
+            Widget? warning;
+            if (active != null && i < _prayerOrder.length - 1) {
+              final gapStart = times.timeForPrayer(prayer).toLocal();
+              final gapEnd = times.timeForPrayer(_prayerOrder[i + 1]).toLocal();
+              if (!active.start.isBefore(gapStart) &&
+                  active.start.isBefore(gapEnd)) {
+                warning = _ForbiddenWarningCard(period: active);
+              }
+            }
+
+            return Column(
+              children: [
+                ListTile(
+                  leading: Icon(icon, color: color),
+                  title: Text(
+                    prayer.displayName,
+                    style: isCurrent
+                        ? theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.primary,
+                          )
+                        : theme.textTheme.titleMedium,
+                  ),
+                  trailing: Text(
+                    TimeOfDay.fromDateTime(
+                            times.timeForPrayer(prayer).toLocal())
+                        .format(context),
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+                if (warning != null) warning,
+              ],
             );
           }),
       ],
+    );
+  }
+}
+
+class _ForbiddenWarningCard extends StatelessWidget {
+  final ForbiddenPeriod period;
+
+  const _ForbiddenWarningCard({required this.period});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          border: Border.all(color: theme.colorScheme.error, width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.block, color: theme.colorScheme.error),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Forbidden time · ${period.name}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                  Text(
+                    'Until ${TimeOfDay.fromDateTime(period.end).format(context)}',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -152,7 +218,8 @@ class _AdditionalInfoSection extends StatelessWidget {
           title: Text(label, style: theme.textTheme.bodyMedium),
           trailing: Text(
             TimeOfDay.fromDateTime(time.toLocal()).format(context),
-            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(fontWeight: FontWeight.w600),
           ),
         );
 
@@ -161,7 +228,8 @@ class _AdditionalInfoSection extends StatelessWidget {
       children: [
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text('Additional Info', style: TextStyle(fontWeight: FontWeight.w700)),
+          child: Text('Additional Info',
+              style: TextStyle(fontWeight: FontWeight.w700)),
         ),
         row('Sunrise', times.sunrise),
         row('Sunset', times.sunset),
@@ -191,7 +259,8 @@ class _ForbiddenTimesSection extends StatelessWidget {
       children: [
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text('Forbidden Times', style: TextStyle(fontWeight: FontWeight.w700)),
+          child: Text('Forbidden Times',
+              style: TextStyle(fontWeight: FontWeight.w700)),
         ),
         for (final period in provider.forbiddenPeriods)
           ListTile(
@@ -234,7 +303,8 @@ class _NotificationSettingsSection extends StatelessWidget {
       children: [
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text('Notifications', style: TextStyle(fontWeight: FontWeight.w700)),
+          child: Text('Notifications',
+              style: TextStyle(fontWeight: FontWeight.w700)),
         ),
         for (final label in prayerLabels)
           SwitchListTile(
@@ -266,7 +336,8 @@ class _MadhabSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Madhab (Asr calculation)', style: TextStyle(fontWeight: FontWeight.w700)),
+          const Text('Madhab (Asr calculation)',
+              style: TextStyle(fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           SegmentedButton<Madhab>(
             segments: const [
@@ -274,7 +345,8 @@ class _MadhabSection extends StatelessWidget {
               ButtonSegment(value: Madhab.shafi, label: Text('Shafi')),
             ],
             selected: {provider.madhab},
-            onSelectionChanged: (selection) => provider.setMadhab(selection.first),
+            onSelectionChanged: (selection) =>
+                provider.setMadhab(selection.first),
           ),
           const SizedBox(height: 24),
         ],
@@ -295,7 +367,8 @@ class _HijriOffsetSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Hijri date adjustment', style: TextStyle(fontWeight: FontWeight.w700)),
+          const Text('Hijri date adjustment',
+              style: TextStyle(fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           Text(
             'Shift by a day if it doesn\'t match your local moon-sighting announcement.',

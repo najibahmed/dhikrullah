@@ -58,7 +58,7 @@ class DhikirApp extends StatelessWidget {
     return MaterialApp(
       title: 'Daily Dhikir',
       debugShowCheckedModeBanner: false,
-      themeMode: themeProvider.themeMode,
+      themeMode: ThemeMode.light,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       home: const HomeScreen(),

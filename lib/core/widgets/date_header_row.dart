@@ -60,16 +60,16 @@ class DateHeaderRow extends StatelessWidget {
           Text(
             _formatGregorian(now),
             style: theme.textTheme.bodyMedium?.copyWith(
+              color: Colors.black,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 2),
-          Text(
-            '${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear} AH',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
-            ),
-          ),
+          Text('${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear} AH',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              )),
         ],
       ),
     );

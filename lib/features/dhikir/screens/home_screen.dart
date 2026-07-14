@@ -130,97 +130,124 @@ class _HomeWidgetState extends State<HomeWidget> {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final builtIn = built_in.dhikirList.map(SessionDhikir.fromItem).toList();
-    final custom = CustomDhikirService.getAll().map(SessionDhikir.fromCustom).toList();
+    final custom =
+        CustomDhikirService.getAll().map(SessionDhikir.fromCustom).toList();
     final allDhikir = [...builtIn, ...custom];
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          // ── App bar ───────────────────────────────────────────────────────
-          SliverAppBar(
-            expandedHeight: 130,
-            pinned: true,
-            floating: false,
-            backgroundColor: AppColors.background,
-            surfaceTintColor: Colors.transparent,
-            elevation: 0,
-            actions: [
-              // _ThemeToggleButton(),
-              IconButton(
-                tooltip: 'About',
-                icon: const Icon(Icons.info_outline, color: AppColors.dark),
-                onPressed: () => Navigator.pushNamed(context, RouteNames.about),
-              ),
-              const SizedBox(width: 8),
-              _NavButton(
-                label: 'My Dhikir',
-                icon: Icons.add_rounded,
-                backgroundColor: AppColors.accentMint,
-                foregroundColor: AppColors.medium,
-                border: Border.all(color: AppColors.mintBorder),
-                onTap: () async {
-                  await Navigator.pushNamed(context, RouteNames.myDhikir);
-                  setState(() {});
-                },
-              ),
-              const SizedBox(width: 8),
-              _NavButton(
-                label: 'Analytics',
-                icon: Icons.bar_chart_rounded,
-                backgroundColor: AppColors.dark,
-                foregroundColor: Colors.white,
-                onTap: () async {
-                  await Navigator.pushNamed(context, RouteNames.analytics);
-                  setState(() {});
-                },
-              ),
-              const SizedBox(width: 16),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 24, bottom: 16),
-              title: Text(
-                'Daily Dhikir',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.dark,
-                ),
-              ),
-            ),
-          ),
+    return CustomScrollView(
+      slivers: [
+        // ── App bar ───────────────────────────────────────────────────────
+        // SliverAppBar(
+        //   // expandedHeight: 130,
+        //   pinned: true,
+        //   floating: false,
+        //   backgroundColor: AppColors.background,
+        //   surfaceTintColor: Colors.transparent,
+        //   elevation: 0,
+        //   actions: [
+        // _ThemeToggleButton(),
+        // IconButton(
+        //   tooltip: 'About',
+        //   icon: const Icon(Icons.info_outline, color: AppColors.dark),
+        //   onPressed: () => Navigator.pushNamed(context, RouteNames.about),
+        // ),
+        // const SizedBox(width: 8),
+        // _NavButton(
+        //   label: 'My Dhikir',
+        //   icon: Icons.add_rounded,
+        //   backgroundColor: AppColors.accentMint,
+        //   foregroundColor: AppColors.medium,
+        //   border: Border.all(color: AppColors.mintBorder),
+        //   onTap: () async {
+        //     await Navigator.pushNamed(context, RouteNames.myDhikir);
+        //     setState(() {});
+        //   },
+        // ),
+        // const SizedBox(width: 8),
+        // _NavButton(
+        //   label: 'Analytics',
+        //   icon: Icons.bar_chart_rounded,
+        //   backgroundColor: AppColors.dark,
+        //   foregroundColor: Colors.white,
+        //   onTap: () async {
+        //     await Navigator.pushNamed(context, RouteNames.analytics);
+        //     setState(() {});
+        //   },
+        // ),
+        // const SizedBox(width: 16),
+        // ],
+        // flexibleSpace: FlexibleSpaceBar(
+        //   titlePadding: const EdgeInsets.only(left: 24, bottom: 16),
+        //   title: Text(
+        //     'Daily Dhikir',
+        //     style: GoogleFonts.playfairDisplay(
+        //       fontSize: 26,
+        //       fontWeight: FontWeight.w700,
+        //       color: AppColors.dark,
+        //     ),
+        //   ),
+        // ),
+        // ),
 
-          // ── Date + prayer time ───────────────────────────────────────────
-          SliverToBoxAdapter(
-            child: DateHeaderRow(
-              hijriOffsetDays: context.watch<PrayerTimeProvider>().hijriOffsetDays,
-            ),
-          ),
-          const SliverToBoxAdapter(child: PrayerTimeCard()),
-
-          // ── Dhikir grid ───────────────────────────────────────────────────
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.2,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (_, i) => _DhikirGridCard(
-                  item: allDhikir[i],
-                  year: now.year,
-                  month: now.month,
-                  onReturn: () => setState(() {}),
+        // ── Date + prayer time ───────────────────────────────────────────
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: Row(
+              children: [
+                DateHeaderRow(
+                  hijriOffsetDays:
+                      context.watch<PrayerTimeProvider>().hijriOffsetDays,
                 ),
-                childCount: allDhikir.length,
-              ),
+                Spacer(),
+                _NavButton(
+                  label: 'My Dhikir',
+                  icon: Icons.add_rounded,
+                  backgroundColor: AppColors.accentMint,
+                  foregroundColor: AppColors.medium,
+                  border: Border.all(color: AppColors.mintBorder),
+                  onTap: () async {
+                    await Navigator.pushNamed(context, RouteNames.myDhikir);
+                    setState(() {});
+                  },
+                ),
+                IconButton(
+                  tooltip: 'About',
+                  icon: const Icon(Icons.info_outline, color: AppColors.dark),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, RouteNames.about),
+                ),
+                SizedBox(
+                  width: 8,
+                )
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+        const SliverToBoxAdapter(child: PrayerTimeCard()),
+
+        // ── Dhikir grid ───────────────────────────────────────────────────
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.2,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (_, i) => _DhikirGridCard(
+                item: allDhikir[i],
+                year: now.year,
+                month: now.month,
+                onReturn: () => setState(() {}),
+              ),
+              childCount: allDhikir.length,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -318,7 +345,8 @@ class _DhikirGridCard extends StatelessWidget {
                 value: ratio,
                 minHeight: 5,
                 backgroundColor: Colors.white.withValues(alpha: 0.6),
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.medium.withValues(alpha: 0.6)),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.medium.withValues(alpha: 0.6)),
               ),
             ),
           ],
@@ -352,7 +380,8 @@ class _Badge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: textColor),
+        style: GoogleFonts.inter(
+            fontSize: 10, fontWeight: FontWeight.w600, color: textColor),
       ),
     );
   }
@@ -393,7 +422,10 @@ class _NavButton extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: foregroundColor),
+              style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: foregroundColor),
             ),
           ],
         ),

@@ -29,7 +29,8 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
   @override
   void initState() {
     super.initState();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+    _ticker =
+        Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
   }
 
   @override
@@ -42,8 +43,8 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
     final positive = d.isNegative ? Duration.zero : d;
     final hours = positive.inHours;
     final minutes = positive.inMinutes % 60;
-    if (hours > 0) return 'in ${hours}h ${minutes}m';
-    return 'in ${minutes}m';
+    if (hours > 0) return 'Time Remaining: ${hours} Hour ${minutes} Minutes';
+    return 'Time Remaining: ${minutes}Minutes';
   }
 
   @override
@@ -65,9 +66,11 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: theme.dividerColor.withValues(alpha: 0.3)),
+              border:
+                  Border.all(color: theme.dividerColor.withValues(alpha: 0.3)),
             ),
-            child: ExcludeSemantics(child: _buildContent(context, theme, provider)),
+            child: ExcludeSemantics(
+                child: _buildContent(context, theme, provider)),
           ),
         ),
       ),
@@ -93,6 +96,11 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         final next = provider.nextPrayer;
         return 'Forbidden prayer time: ${period?.name ?? ''}.'
             '${next != null ? ' Next prayer ${next.name}.' : ''}';
+      case PrayerStatus.tahajjud:
+        final period = provider.tahajjudPeriod;
+        if (period == null) return 'Tahajjud time.';
+        return 'Tahajjud time, ends at '
+            '${TimeOfDay.fromDateTime(period.end).format(context)}.';
       case PrayerStatus.normal:
         final current = provider.currentPrayer;
         if (current == null) return 'Prayer times.';
@@ -101,7 +109,8 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
     }
   }
 
-  Widget _buildContent(BuildContext context, ThemeData theme, PrayerTimeProvider provider) {
+  Widget _buildContent(
+      BuildContext context, ThemeData theme, PrayerTimeProvider provider) {
     switch (provider.status) {
       case PrayerStatus.gpsDisabled:
         return _messageRow(
@@ -141,56 +150,124 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         );
       case PrayerStatus.forbidden:
         return _forbiddenRow(context, theme, provider);
+      case PrayerStatus.tahajjud:
+        return _tahajjudRow(context, theme, provider);
       case PrayerStatus.normal:
         return _normalRow(context, theme, provider);
     }
   }
 
-  Widget _messageRow(ThemeData theme, {required IconData icon, required String text}) {
+  Widget _messageRow(ThemeData theme,
+      {required IconData icon, required String text}) {
     return Row(
       children: [
         Icon(icon, color: theme.colorScheme.primary),
         const SizedBox(width: 12),
         Expanded(child: Text(text, style: theme.textTheme.bodyMedium)),
-        Icon(Icons.chevron_right, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+        Icon(Icons.chevron_right,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
       ],
     );
   }
 
-  Widget _forbiddenRow(BuildContext context, ThemeData theme, PrayerTimeProvider provider) {
+  Widget _forbiddenRow(
+      BuildContext context, ThemeData theme, PrayerTimeProvider provider) {
     final period = provider.activeForbiddenPeriod!;
     final next = provider.nextPrayer;
     final remaining = period.end.difference(DateTime.now());
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Forbidden time · ${period.name}',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.error,
-                ),
-              ),
-              Text('Ends ${_formatCountdown(remaining)}', style: theme.textTheme.bodySmall),
-              if (next != null)
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: theme.colorScheme.error, width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Icon(Icons.block, color: theme.colorScheme.error),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  'Next: ${next.name} ${_formatCountdown(next.time.difference(DateTime.now()))}',
-                  style: theme.textTheme.bodySmall,
+                  'Forbidden time · ${period.name}',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.error,
+                  ),
                 ),
-            ],
+                Text('Ends ${_formatCountdown(remaining)}',
+                    style: theme.textTheme.bodySmall),
+                if (next != null)
+                  Text(
+                    'Next: ${next.name} ${_formatCountdown(next.time.difference(DateTime.now()))}',
+                    style: theme.textTheme.bodySmall,
+                  ),
+              ],
+            ),
           ),
+          Icon(Icons.chevron_right,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+        ],
+      ),
+    );
+  }
+
+  Widget _tahajjudRow(
+      BuildContext context, ThemeData theme, PrayerTimeProvider provider) {
+    final period = provider.tahajjudPeriod!;
+    final now = DateTime.now();
+    final totalSeconds = period.end.difference(period.start).inSeconds;
+    final elapsedSeconds = now.difference(period.start).inSeconds;
+    final progress = totalSeconds > 0
+        ? (elapsedSeconds / totalSeconds).clamp(0.0, 1.0)
+        : 0.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.nights_stay, color: theme.colorScheme.primary),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tahajjud',
+                      style: theme.textTheme.titleSmall
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    Text(
+                      '${TimeOfDay.fromDateTime(period.start).format(context)} – '
+                      '${TimeOfDay.fromDateTime(period.end).format(context)} · '
+                      '${_formatCountdown(period.end.difference(now))} left',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Icon(Icons.chevron_right,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+          ],
         ),
-        Icon(Icons.chevron_right, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+        const SizedBox(height: 10),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(value: progress, minHeight: 4),
+        ),
       ],
     );
   }
 
-  Widget _normalRow(BuildContext context, ThemeData theme, PrayerTimeProvider provider) {
+  Widget _normalRow(
+      BuildContext context, ThemeData theme, PrayerTimeProvider provider) {
     final current = provider.currentPrayer!;
     final next = provider.nextPrayer;
     final times = provider.today!;
@@ -208,7 +285,8 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
               children: [
                 Text(
                   'Fajr starts ${_formatCountdown(fajrRemaining)}',
-                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                  style: theme.textTheme.titleSmall
+                      ?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 Text(
                   'Sehri ends at ${TimeOfDay.fromDateTime(times.fajr.toLocal()).format(context)}',
@@ -217,7 +295,8 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
               ],
             ),
           ),
-          Icon(Icons.chevron_right, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+          Icon(Icons.chevron_right,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
         ],
       );
     }
@@ -226,11 +305,18 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
           now.add(Duration(days: provider.hijriOffsetDays)),
         ).hMonth ==
         9;
-    final nextLabel = (isRamadan && next?.name == 'Maghrib') ? 'Iftar' : next?.name;
+    final nextLabel =
+        (isRamadan && next?.name == 'Maghrib') ? 'Iftar' : next?.name;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(
+          "Current Prayer",
+          style:
+              theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -238,38 +324,39 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
               children: [
                 Icon(Icons.mosque_outlined, color: theme.colorScheme.primary),
                 const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      current.name,
-                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    Text(
-                      '${TimeOfDay.fromDateTime(current.start).format(context)} – '
-                      '${TimeOfDay.fromDateTime(current.end).format(context)} · '
-                      '${_formatCountdown(current.end.difference(now))} left',
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ],
+                Text(
+                  current.name,
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
             ),
-            Icon(Icons.chevron_right, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+            Text(
+              '${TimeOfDay.fromDateTime(current.start).format(context)} – '
+              '${TimeOfDay.fromDateTime(current.end).format(context)}',
+              style: theme.textTheme.bodyMedium,
+            ),
+            // Icon(Icons.chevron_right,
+            //     color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
           ],
+        ),
+        const SizedBox(height: 10),
+        Text(
+          _formatCountdown(current.end.difference(now)),
+          style: theme.textTheme.bodyMedium,
         ),
         const SizedBox(height: 10),
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(value: current.progress, minHeight: 4),
         ),
-        if (next != null) ...[
-          const SizedBox(height: 8),
-          Text(
-            '$nextLabel ${_formatCountdown(next.time.difference(now))}',
-            style: theme.textTheme.bodySmall,
-          ),
-        ],
+        // if (next != null) ...[
+        //   const SizedBox(height: 10),
+        //   Text(
+        //     '$nextLabel ${_formatCountdown(next.time.difference(now))}',
+        //     style: theme.textTheme.bodySmall,
+        //   ),
+        // ],
       ],
     );
   }
