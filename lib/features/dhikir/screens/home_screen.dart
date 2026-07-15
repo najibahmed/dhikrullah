@@ -236,7 +236,21 @@ class _HomeWidgetState extends State<HomeWidget> {
         ),
         const SliverToBoxAdapter(child: PrayerTimeCard()),
         const SliverToBoxAdapter(child: PrayerScheduleSection()),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: _QuickActionsSection(onReturn: () => setState(() {})),
+          ),
+        ),
+
         const SliverToBoxAdapter(child: ForbiddenTimesCard()),
+
+        const SliverToBoxAdapter(
+            child: Padding(
+          padding: EdgeInsets.fromLTRB(16, 8, 16, 24),
+          child: Text('Daily Dhikir',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        )),
 
         // ── Dhikir grid ───────────────────────────────────────────────────
         SliverPadding(
@@ -441,6 +455,100 @@ class _NavButton extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// "Quick Actions" row shown between the prayer cards and the dhikir grid.
+class _QuickActionsSection extends StatelessWidget {
+  final VoidCallback onReturn;
+
+  const _QuickActionsSection({required this.onReturn});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Quick Actions',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            _QuickActionTile(
+              icon: Icons.schedule,
+              label: 'Prayer Time',
+              backgroundColor: AppColors.dark,
+              foregroundColor: Colors.white,
+              onTap: () async {
+                await Navigator.pushNamed(context, RouteNames.prayerTime);
+                onReturn();
+              },
+            ),
+            const SizedBox(width: 16),
+            _QuickActionTile(
+              icon: Icons.explore,
+              label: 'Qibla',
+              backgroundColor: AppColors.accentMint,
+              foregroundColor: AppColors.medium,
+              border: Border.all(color: AppColors.mintBorder),
+              onTap: () => Navigator.pushNamed(context, RouteNames.qibla),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Square icon-filled tile with its title below — single item in
+/// [_QuickActionsSection].
+class _QuickActionTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final BoxBorder? border;
+  final VoidCallback onTap;
+
+  const _QuickActionTile({
+    required this.icon,
+    required this.label,
+    required this.backgroundColor,
+    required this.foregroundColor,
+    required this.onTap,
+    this.border,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(16),
+              border: border,
+            ),
+            child: Icon(icon, color: foregroundColor, size: 26),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.dark,
+            ),
+          ),
+        ],
       ),
     );
   }

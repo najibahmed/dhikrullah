@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dhikir_app/core/routing/route_names.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 
 class PrayerTimeCard extends StatefulWidget {
@@ -63,9 +62,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         button: true,
         label: _semanticLabel(provider),
         child: GestureDetector(
-          onTap: provider.locationGranted
-              ? () => Navigator.pushNamed(context, RouteNames.prayerTime)
-              : () => provider.init(),
+          onTap: provider.locationGranted ? null : () => provider.init(),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
