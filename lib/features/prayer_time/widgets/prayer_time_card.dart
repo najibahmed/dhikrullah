@@ -62,7 +62,15 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         button: true,
         label: _semanticLabel(provider),
         child: GestureDetector(
-          onTap: provider.locationGranted ? null : () => provider.init(),
+          onTap: provider.locationGranted
+              ? null
+              : () {
+                  if (provider.permissionPermanentlyDenied) {
+                    provider.openLocationSettings();
+                  } else {
+                    provider.init();
+                  }
+                },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
@@ -121,7 +129,9 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         return _messageRow(
           theme,
           icon: Icons.location_on_outlined,
-          text: 'Enable location to see prayer times',
+          text: provider.permissionPermanentlyDenied
+              ? 'Location permission denied. Tap to open Settings.'
+              : 'Enable location to see prayer times',
         );
       case PrayerStatus.locationUnavailable:
         return _messageRow(
@@ -224,7 +234,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
           now.add(Duration(days: provider.hijriOffsetDays)),
         ).hMonth ==
         9;
-   
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

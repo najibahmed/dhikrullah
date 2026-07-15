@@ -16,8 +16,14 @@ import 'package:dhikir_app/features/prayer_time/services/prayer_notification_ser
 
 const _kHijriOffsetKey = 'prayer_hijri_offset_days';
 const _kNotifyPrefixKey = 'prayer_notify_';
+const _kSoundPrefixKey = 'prayer_sound_';
 const _kMadhabKey = 'prayer_madhab';
 const _kHijriDayStartKey = 'prayer_hijri_day_start';
+
+/// Max number of non-today dates kept in [PrayerTimeProvider._dateCache],
+/// evicted oldest-first once exceeded — bounds memory while keeping
+/// prev/next navigation around the selected date instant.
+const _kMaxDateCacheEntries = 14;
 
 /// When the Hijri calendar day is considered to roll over.
 enum HijriDayStart { midnight, sunset }
@@ -47,27 +53,44 @@ class PrayerTimeProvider extends ChangeNotifier {
   bool locationGranted = false;
   bool gpsServiceEnabled = true;
   bool locationError = false;
+  bool permissionPermanentlyDenied = false;
   Coordinates? coordinates;
 
   int hijriOffsetDays = 0;
   HijriDayStart hijriDayStart = HijriDayStart.midnight;
   Madhab madhab = Madhab.hanafi;
   final Map<String, bool> prayerNotificationsEnabled = {
-    for (final label in prayerLabels) label: true,
+    for (final label in prayerLabels) label: false,
     for (final label in optionalNotificationLabels) label: false,
+  };
+
+  /// Per-prayer notification sound choice: `'default'` or `'silent'`.
+  final Map<String, String> prayerSoundChoice = {
+    for (final label in [...prayerLabels, ...optionalNotificationLabels])
+      label: 'default',
   };
 
   PrayerTimes? _today;
   DateTime? _cachedForDate;
 
+  /// Cache of computed [PrayerTimes] for dates other than today, keyed by
+  /// `yyyy-MM-dd`. Insertion order doubles as recency order (Dart's `Map`
+  /// is a `LinkedHashMap`), so the oldest entry is always `keys.first`.
+  final Map<String, PrayerTimes> _dateCache = {};
+
   // ── Init ─────────────────────────────────────────────────────────────────
 
-  /// Idempotent — safe to call from multiple screens/initStates.
+  /// Idempotent for the one-time settings load, but the location
+  /// acquisition below retries on every call while `locationGranted` is
+  /// still false — safe to call from multiple screens/initStates, and
+  /// also as a "retry" from a permission-denied prompt.
   Future<void> init() async {
-    if (_initialized) return;
-    _initialized = true;
+    if (!_initialized) {
+      _initialized = true;
+      await _loadSettings();
+    }
 
-    await _loadSettings();
+    if (locationGranted) return;
 
     // Show a cached location immediately if we have one, then refresh.
     final cached = await LocationService.getCachedCoordinates();
@@ -80,13 +103,17 @@ class PrayerTimeProvider extends ChangeNotifier {
     }
 
     gpsServiceEnabled = await LocationService.isServiceEnabled();
+
     final granted = await LocationService.checkAndRequestPermission();
     locationGranted = granted;
     if (!granted) {
+      permissionPermanentlyDenied =
+          await LocationService.isPermissionDeniedForever();
       _loading = false;
       notifyListeners();
       return;
     }
+    permissionPermanentlyDenied = false;
 
     try {
       coordinates = await LocationService.getCurrentCoordinates();
@@ -97,9 +124,6 @@ class PrayerTimeProvider extends ChangeNotifier {
     _recompute();
     _loading = false;
     notifyListeners();
-
-    await PrayerNotificationService.init();
-    await _rescheduleNotifications();
   }
 
   Future<void> _loadSettings() async {
@@ -112,11 +136,15 @@ class PrayerTimeProvider extends ChangeNotifier {
         : HijriDayStart.midnight;
     for (final label in prayerLabels) {
       prayerNotificationsEnabled[label] =
-          prefs.getBool('$_kNotifyPrefixKey$label') ?? true;
+          prefs.getBool('$_kNotifyPrefixKey$label') ?? false;
     }
     for (final label in optionalNotificationLabels) {
       prayerNotificationsEnabled[label] =
           prefs.getBool('$_kNotifyPrefixKey$label') ?? false;
+    }
+    for (final label in [...prayerLabels, ...optionalNotificationLabels]) {
+      prayerSoundChoice[label] =
+          prefs.getString('$_kSoundPrefixKey$label') ?? 'default';
     }
   }
 
@@ -166,6 +194,104 @@ class PrayerTimeProvider extends ChangeNotifier {
     _cachedForDate = now;
   }
 
+  bool _isSameDate(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
+  String _dateKey(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  /// Prayer times for an arbitrary date (past, today, or future), backed
+  /// by a small bounded cache so repeated prev/next taps around the
+  /// selected date don't recompute. Today always goes through [today]'s
+  /// own freshness-checked slot instead of the date cache.
+  PrayerTimes? prayerTimesForDate(DateTime date) {
+    final now = DateTime.now();
+    if (_isSameDate(date, now)) return today;
+
+    final key = _dateKey(date);
+    final cached = _dateCache.remove(key);
+    if (cached != null) {
+      _dateCache[key] = cached; // re-insert = mark most-recently-used
+      return cached;
+    }
+
+    final computed = _prayerTimesFor(date);
+    if (computed == null) return null;
+    _dateCache[key] = computed;
+    if (_dateCache.length > _kMaxDateCacheEntries) {
+      _dateCache.remove(_dateCache.keys.first);
+    }
+    return computed;
+  }
+
+  /// [displayHijriOffsetDays]'s sunset-rollover rule, generalized to any
+  /// date: for a past date "now" is always after its Maghrib (so the
+  /// sunset-start Hijri day has fully elapsed → +1); for a future date
+  /// it never is (no rollover yet); for today this matches the original
+  /// today-only check exactly.
+  int hijriOffsetForDate(DateTime date) {
+    var offset = hijriOffsetDays;
+    if (hijriDayStart == HijriDayStart.sunset) {
+      final maghrib = prayerTimesForDate(date)?.maghrib.toLocal();
+      if (maghrib != null && DateTime.now().isAfter(maghrib)) offset += 1;
+    }
+    return offset;
+  }
+
+  /// [displayPrayerWindows], generalized to any date.
+  List<({String name, DateTime start, DateTime end})> windowsForDate(
+      DateTime date) {
+    final times = prayerTimesForDate(date);
+    if (times == null) return const [];
+    final yesterday =
+        prayerTimesForDate(date.subtract(const Duration(days: 1)));
+    return _buildWindows(times, yesterday);
+  }
+
+  /// [displayPrayerWindows], generalized to any date — Tahajjud appears
+  /// once (that date's morning instance), no trailing duplicate.
+  List<({String name, DateTime start, DateTime end})>
+      displayPrayerWindowsForDate(DateTime date) {
+    final windows = windowsForDate(date);
+    if (windows.isEmpty) return windows;
+    return windows.sublist(0, windows.length - 1);
+  }
+
+  /// [forbiddenPeriods], generalized to any date.
+  List<ForbiddenPeriod> forbiddenPeriodsForDate(DateTime date) {
+    final times = prayerTimesForDate(date);
+    if (times == null) return const [];
+    return [
+      ForbiddenPeriod(
+        name: 'Sunrise',
+        start: times.sunrise.toLocal(),
+        end: times.sunrise.toLocal().add(const Duration(minutes: 15)),
+      ),
+      ForbiddenPeriod(
+        name: 'Zawal',
+        start: times.dhuhr.toLocal().subtract(const Duration(minutes: 10)),
+        end: times.dhuhr.toLocal(),
+      ),
+      ForbiddenPeriod(
+        name: 'Sunset',
+        start: times.sunset.toLocal().subtract(const Duration(minutes: 15)),
+        end: times.sunset.toLocal(),
+      ),
+    ];
+  }
+
+  /// The forbidden period active *right now*, if [date] is today and the
+  /// current moment falls inside one of that date's windows — "active"
+  /// only ever means "now", so non-today dates never return one.
+  ForbiddenPeriod? activeForbiddenPeriodForDate(DateTime date) {
+    final now = DateTime.now();
+    if (!_isSameDate(date, now)) return null;
+    for (final period in forbiddenPeriodsForDate(date)) {
+      if (period.contains(now)) return period;
+    }
+    return null;
+  }
+
   /// Builds the unified Tahajjud/Fajr/Ishraq/Chasht/Dhuhr/Asr/Maghrib/Isha
   /// cycle for [times]'s calendar date. [yesterday] (if available) supplies
   /// the leading Tahajjud window (last night's last-third-of-night -> this
@@ -186,8 +312,8 @@ class PrayerTimeProvider extends ChangeNotifier {
     final sunrise = times.sunrise.toLocal();
     final dhuhr = times.dhuhr.toLocal();
     final ishraqStart = sunrise.add(const Duration(minutes: 15));
-    final chashtStart = sunrise.add(Duration(
-        microseconds: dhuhr.difference(sunrise).inMicroseconds ~/ 2));
+    final chashtStart = sunrise.add(
+        Duration(microseconds: dhuhr.difference(sunrise).inMicroseconds ~/ 2));
     final ishaEnd = SunnahTimes(times).middleOfTheNight.toLocal();
     final tahajjudStart = SunnahTimes(times).lastThirdOfTheNight.toLocal();
 
@@ -202,11 +328,7 @@ class PrayerTimeProvider extends ChangeNotifier {
       (name: 'Ishraq', start: ishraqStart, end: chashtStart),
       (name: 'Chasht', start: chashtStart, end: dhuhr),
       (name: 'Dhuhr', start: dhuhr, end: times.asr.toLocal()),
-      (
-        name: 'Asr',
-        start: times.asr.toLocal(),
-        end: times.maghrib.toLocal()
-      ),
+      (name: 'Asr', start: times.asr.toLocal(), end: times.maghrib.toLocal()),
       (
         name: 'Maghrib',
         start: times.maghrib.toLocal(),
@@ -228,8 +350,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   /// Today's prayer windows for display — Tahajjud appears once (this
   /// morning's instance), with no trailing tonight's-Tahajjud duplicate.
   /// Used by the detail screen's prayer list.
-  List<({String name, DateTime start, DateTime end})>
-      get displayPrayerWindows {
+  List<({String name, DateTime start, DateTime end})> get displayPrayerWindows {
     final windows = _prayerWindows;
     if (windows.isEmpty) return windows;
     return windows.sublist(0, windows.length - 1);
@@ -388,6 +509,11 @@ class PrayerTimeProvider extends ChangeNotifier {
 
   // ── Mutators ─────────────────────────────────────────────────────────────
 
+  /// Opens the app's system Settings page — the only way out once
+  /// [permissionPermanentlyDenied] is true, since the OS won't show the
+  /// permission dialog again.
+  Future<void> openLocationSettings() => LocationService.openAppSettings();
+
   Future<void> setHijriOffset(int offset) async {
     hijriOffsetDays = offset.clamp(-1, 1);
     notifyListeners();
@@ -399,8 +525,8 @@ class PrayerTimeProvider extends ChangeNotifier {
     hijriDayStart = value;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-        _kHijriDayStartKey, value == HijriDayStart.sunset ? 'sunset' : 'midnight');
+    await prefs.setString(_kHijriDayStartKey,
+        value == HijriDayStart.sunset ? 'sunset' : 'midnight');
   }
 
   Future<void> setMadhab(Madhab value) async {
@@ -418,6 +544,14 @@ class PrayerTimeProvider extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('$_kNotifyPrefixKey$label', enabled);
+    await _rescheduleNotifications();
+  }
+
+  Future<void> setPrayerSound(String label, String value) async {
+    prayerSoundChoice[label] = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('$_kSoundPrefixKey$label', value);
     await _rescheduleNotifications();
   }
 
@@ -441,6 +575,7 @@ class PrayerTimeProvider extends ChangeNotifier {
       today: todayTimes,
       tomorrow: tomorrowTimes,
       enabled: prayerNotificationsEnabled,
+      soundChoice: prayerSoundChoice,
       tahajjudToday: find(todayWindows, 'Tahajjud'),
       tahajjudTomorrow: find(tomorrowWindows, 'Tahajjud'),
       ishraqToday: find(todayWindows, 'Ishraq'),

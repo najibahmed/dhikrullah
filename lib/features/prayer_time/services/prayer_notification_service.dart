@@ -16,6 +16,11 @@ const _kChannelId = 'prayer_times';
 const _kChannelName = 'Prayer time reminders';
 const _kChannelDescription = 'Notifies you at the start of each prayer time';
 
+const _kSilentChannelId = 'prayer_times_silent';
+const _kSilentChannelName = 'Prayer time reminders (silent)';
+const _kSilentChannelDescription =
+    'Notifies you at the start of each prayer time, without sound';
+
 /// Fixed notification IDs: one slot per prayer for today (0-4) and
 /// tomorrow (5-9), so rescheduling just overwrites the same IDs.
 /// Tahajjud (not a `Prayer` enum value — derived via SunnahTimes) gets
@@ -50,12 +55,49 @@ class PrayerNotificationService {
       settings: const InitializationSettings(android: androidInit),
     );
 
+    _initialized = true;
+  }
+
+  /// Whether this app currently has permission to post notifications.
+  static Future<bool> hasPermission() async {
     final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
-    await androidPlugin?.requestNotificationsPermission();
-    await androidPlugin?.requestExactAlarmsPermission();
+    return await androidPlugin?.areNotificationsEnabled() ?? false;
+  }
 
-    _initialized = true;
+  /// Prompts for notification permission if not already granted. Returns
+  /// whether permission ended up granted.
+  static Future<bool> requestPermission() async {
+    if (!_initialized) await init();
+    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    final granted = await androidPlugin?.requestNotificationsPermission();
+    if (granted != null && granted) {
+      await androidPlugin?.requestExactAlarmsPermission();
+    }
+    return granted ?? await hasPermission();
+  }
+
+  static Future<bool> requestAlarmPermission() async {
+    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    final granted = await androidPlugin?.requestExactAlarmsPermission();
+
+    return granted ?? await hasPermission();
+  }
+
+  static NotificationDetails _detailsFor(
+      String label, Map<String, String> soundChoice) {
+    final silent = soundChoice[label] == 'silent';
+    return NotificationDetails(
+      android: AndroidNotificationDetails(
+        silent ? _kSilentChannelId : _kChannelId,
+        silent ? _kSilentChannelName : _kChannelName,
+        channelDescription:
+            silent ? _kSilentChannelDescription : _kChannelDescription,
+        playSound: !silent,
+      ),
+    );
   }
 
   /// Cancels previously-scheduled prayer notifications and schedules fresh
@@ -65,6 +107,7 @@ class PrayerNotificationService {
     required adhan.PrayerTimes today,
     required adhan.PrayerTimes tomorrow,
     required Map<String, bool> enabled,
+    Map<String, String> soundChoice = const {},
     DateTime? tahajjudToday,
     DateTime? tahajjudTomorrow,
     DateTime? ishraqToday,
@@ -72,7 +115,7 @@ class PrayerNotificationService {
     DateTime? chashtToday,
     DateTime? chashtTomorrow,
   }) async {
-    if (!_initialized) return;
+    if (!_initialized) await init();
     await _plugin.cancelAll();
 
     var id = 0;
@@ -96,13 +139,7 @@ class PrayerNotificationService {
           title: '$label prayer time',
           body: "It's time for $label.",
           scheduledDate: scheduled,
-          notificationDetails: const NotificationDetails(
-            android: AndroidNotificationDetails(
-              _kChannelId,
-              _kChannelName,
-              channelDescription: _kChannelDescription,
-            ),
-          ),
+          notificationDetails: _detailsFor(label, soundChoice),
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         );
         id++;
@@ -126,13 +163,7 @@ class PrayerNotificationService {
               title: label,
               body: 'Time for $label.',
               scheduledDate: scheduled,
-              notificationDetails: const NotificationDetails(
-                android: AndroidNotificationDetails(
-                  _kChannelId,
-                  _kChannelName,
-                  channelDescription: _kChannelDescription,
-                ),
-              ),
+              notificationDetails: _detailsFor(label, soundChoice),
               androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
             );
           }

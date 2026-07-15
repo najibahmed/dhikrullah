@@ -32,6 +32,15 @@ class LocationService {
         permission == LocationPermission.whileInUse;
   }
 
+  /// Whether the OS has permanently denied the permission request (Android
+  /// "Don't ask again", or after repeated denials) — [checkAndRequestPermission]
+  /// won't show a request dialog in this state, so the caller must send the
+  /// user to system Settings instead of retrying.
+  static Future<bool> isPermissionDeniedForever() async =>
+      await Geolocator.checkPermission() == LocationPermission.deniedForever;
+
+  static Future<void> openAppSettings() => Geolocator.openAppSettings();
+
   /// Fetches a fresh GPS fix and persists it as the last-known location.
   static Future<Coordinates> getCurrentCoordinates() async {
     final position = await Geolocator.getCurrentPosition(

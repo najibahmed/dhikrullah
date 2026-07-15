@@ -41,6 +41,7 @@ String _formatGregorian(DateTime date) {
 
 class DateHeaderRow extends StatelessWidget {
   final int hijriOffsetDays;
+  final DateTime? date;
   final DateTime? sunrise;
   final DateTime? sunset;
   final VoidCallback? onHijriTap;
@@ -48,6 +49,7 @@ class DateHeaderRow extends StatelessWidget {
   const DateHeaderRow({
     super.key,
     required this.hijriOffsetDays,
+    this.date,
     this.sunrise,
     this.sunset,
     this.onHijriTap,
@@ -75,7 +77,7 @@ class DateHeaderRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final now = DateTime.now();
+    final now = date ?? DateTime.now();
     final hijri = HijriCalendar.fromDate(
       now.add(Duration(days: hijriOffsetDays)),
     );
