@@ -10,6 +10,7 @@ import 'package:hijri/hijri_calendar.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 
 class HijriSettingsScreen extends StatelessWidget {
   const HijriSettingsScreen({super.key});
@@ -17,19 +18,20 @@ class HijriSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final provider = context.watch<PrayerTimeProvider>();
     final hijri = HijriCalendar.fromDate(
       DateTime.now().add(Duration(days: provider.displayHijriOffsetDays)),
     );
 
     final offsetLabel = switch (provider.hijriOffsetDays) {
-      0 => 'Today',
-      < 0 => '${provider.hijriOffsetDays} Day',
-      _ => '+${provider.hijriOffsetDays} Day',
+      0 => l10n.commonToday,
+      < 0 => l10n.hijriOffsetDayLabel(provider.hijriOffsetDays),
+      _ => l10n.hijriOffsetDayLabelPlus(provider.hijriOffsetDays),
     };
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Hijri Date Settings')),
+      appBar: AppBar(title: Text(l10n.hijriSettingsTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -46,10 +48,7 @@ class HijriSettingsScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Since the Hijri date depends on moonsighting, the '
-                    'calculated date may differ by a day. You may need to '
-                    'check and correct this each month to match your local '
-                    'community.',
+                    l10n.hijriInfoBanner,
                     style: theme.textTheme.bodyMedium
                         ?.copyWith(color: Colors.amber.shade900),
                   ),
@@ -58,7 +57,7 @@ class HijriSettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          Text('Hijri Date Adjustment',
+          Text(l10n.hijriAdjustmentSection,
               style: theme.textTheme.bodyMedium
                   ?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
@@ -108,7 +107,7 @@ class HijriSettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          Text('New Hijri Day Starts At',
+          Text(l10n.hijriDayStartSection,
               style: theme.textTheme.bodyMedium
                   ?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
@@ -116,7 +115,7 @@ class HijriSettingsScreen extends StatelessWidget {
             context,
             theme,
             provider,
-            label: 'Midnight (12:00 AM)',
+            label: l10n.hijriDayStartMidnight,
             value: HijriDayStart.midnight,
           ),
           const SizedBox(height: 8),
@@ -124,7 +123,7 @@ class HijriSettingsScreen extends StatelessWidget {
             context,
             theme,
             provider,
-            label: 'Sunset (Maghrib)',
+            label: l10n.hijriDayStartSunset,
             value: HijriDayStart.sunset,
           ),
         ],

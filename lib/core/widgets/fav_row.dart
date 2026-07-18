@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/persistence/hive_service.dart';
+import 'package:dhikir_app/core/data/dhikir_localizations.dart';
 
 class FavRow extends StatelessWidget {
   final String id;
@@ -61,8 +62,9 @@ class FavRow extends StatelessWidget {
                   //     style: GoogleFonts.amiri(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748)),
                   //     textDirection: TextDirection.rtl,
                   //     overflow: TextOverflow.ellipsis),
-                  Text(title, style: GoogleFonts.playfairDisplay(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF4A5568))),
-                  Text(transliteration,
+                  Text(localizedDhikirTitle(context, id) ?? title,
+                      style: GoogleFonts.playfairDisplay(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF4A5568))),
+                  Text(localizedDhikirTransliteration(context, id) ?? transliteration,
                       style: GoogleFonts.inter(fontSize: 10, fontStyle: FontStyle.italic, color: const Color(0xFF718096)),
                       overflow: TextOverflow.ellipsis),
                 ],

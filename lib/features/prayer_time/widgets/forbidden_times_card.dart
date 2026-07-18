@@ -9,19 +9,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
-
-const _kLabels = [
-  'Forbidden Time (Morning)',
-  'Forbidden Time (Noon)',
-  'Forbidden Time (Evening)',
-];
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/utils/time_format.dart';
+import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
 class ForbiddenTimesCard extends StatelessWidget {
   const ForbiddenTimesCard({super.key});
 
+  List<String> _labels(AppLocalizations l10n) =>
+      [l10n.forbiddenMorning, l10n.forbiddenNoon, l10n.forbiddenEvening];
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final labels = _labels(l10n);
     final provider = context.watch<PrayerTimeProvider>();
     if (provider.today == null) return const SizedBox.shrink();
 
@@ -42,7 +44,7 @@ class ForbiddenTimesCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Today's Forbidden Times",
+              l10n.todaysForbiddenTimesSection,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: theme.colorScheme.onErrorContainer,
@@ -51,14 +53,14 @@ class ForbiddenTimesCard extends StatelessWidget {
             const SizedBox(height: 8),
             Divider(color: theme.colorScheme.error.withValues(alpha: 0.3)),
             const SizedBox(height: 4),
-            for (var i = 0; i < periods.length && i < _kLabels.length; i++)
+            for (var i = 0; i < periods.length && i < labels.length; i++)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 3),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      _kLabels[i],
+                      labels[i],
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: periods[i] == active
                             ? theme.colorScheme.error
@@ -69,8 +71,8 @@ class ForbiddenTimesCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${TimeOfDay.fromDateTime(periods[i].start).format(context)} - '
-                      '${TimeOfDay.fromDateTime(periods[i].end).format(context)}',
+                      '${formatClockTime(periods[i].start)} - '
+                      '${formatClockTime(periods[i].end)}',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: periods[i] == active
                             ? theme.colorScheme.error

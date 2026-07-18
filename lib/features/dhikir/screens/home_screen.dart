@@ -27,6 +27,8 @@ import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.d
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_time_card.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_schedule_cards.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/forbidden_times_card.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/data/dhikir_localizations.dart';
 
 // ─── HomeScreen ───────────────────────────────────────────────────────────────
 
@@ -81,27 +83,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(child: _pages[_selectedIndex]),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (i) => setState(() => _selectedIndex = i),
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
+            icon: const Icon(Icons.home_outlined),
+            activeIcon: const Icon(Icons.home),
+            label: l10n.navHome,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.play_arrow_outlined),
-            activeIcon: Icon(Icons.play_arrow_rounded),
-            label: 'Counter',
+            icon: const Icon(Icons.play_arrow_outlined),
+            activeIcon: const Icon(Icons.play_arrow_rounded),
+            label: l10n.navCounter,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_outline),
-            activeIcon: Icon(Icons.favorite),
-            label: 'Favorites',
+            icon: const Icon(Icons.favorite_outline),
+            activeIcon: const Icon(Icons.favorite),
+            label: l10n.navFavorites,
           ),
         ],
       ),
@@ -130,6 +133,7 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final now = DateTime.now();
     final builtIn = built_in.dhikirList.map(SessionDhikir.fromItem).toList();
     final custom =
@@ -197,7 +201,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               children: [
                 Spacer(),
                 _NavButton(
-                  label: 'My Dhikir',
+                  label: l10n.navMyDhikir,
                   icon: Icons.add_rounded,
                   backgroundColor: AppColors.accentMint,
                   foregroundColor: AppColors.medium,
@@ -208,7 +212,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                   },
                 ),
                 IconButton(
-                  tooltip: 'About',
+                  tooltip: l10n.aboutTitle,
                   icon: const Icon(Icons.info_outline, color: AppColors.dark),
                   onPressed: () =>
                       Navigator.pushNamed(context, RouteNames.about),
@@ -245,11 +249,11 @@ class _HomeWidgetState extends State<HomeWidget> {
 
         const SliverToBoxAdapter(child: ForbiddenTimesCard()),
 
-        const SliverToBoxAdapter(
+        SliverToBoxAdapter(
             child: Padding(
-          padding: EdgeInsets.fromLTRB(16, 8, 16, 24),
-          child: Text('Daily Dhikir',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          child: Text(l10n.homeSectionTitle,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         )),
 
         // ── Dhikir grid ───────────────────────────────────────────────────
@@ -296,6 +300,7 @@ class _DhikirGridCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final progress = HiveService.getProgress(item.id);
     final daysInMonth = DateTime(year, month + 1, 0).day;
     final completed = progress.completedCountInMonth(year, month);
@@ -345,7 +350,7 @@ class _DhikirGridCard extends StatelessWidget {
                     if (todayCount > 0) ...[
                       const SizedBox(height: 3),
                       _Badge(
-                        label: '$todayCount× today',
+                        label: l10n.todayCountBadge(todayCount),
                         bgColor: AppColors.dark,
                         textColor: Colors.white,
                       ),
@@ -356,7 +361,7 @@ class _DhikirGridCard extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              item.title,
+              localizedDhikirTitle(context, item.id) ?? item.title,
               style: GoogleFonts.playfairDisplay(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
@@ -468,19 +473,20 @@ class _QuickActionsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Quick Actions',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        Text(
+          l10n.quickActionsTitle,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
         Row(
           children: [
             _QuickActionTile(
               icon: Icons.schedule,
-              label: 'Prayer Time',
+              label: l10n.quickActionPrayerTime,
               backgroundColor: AppColors.dark,
               foregroundColor: Colors.white,
               onTap: () async {
@@ -491,7 +497,7 @@ class _QuickActionsSection extends StatelessWidget {
             const SizedBox(width: 16),
             _QuickActionTile(
               icon: Icons.explore,
-              label: 'Qibla',
+              label: l10n.quickActionQibla,
               backgroundColor: AppColors.accentMint,
               foregroundColor: AppColors.medium,
               border: Border.all(color: AppColors.mintBorder),
@@ -559,8 +565,11 @@ class _ThemeToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<ThemeProvider>();
+    final l10n = context.l10n;
     return IconButton(
-      tooltip: theme.isDark ? 'Switch to light mode' : 'Switch to dark mode',
+      tooltip: theme.isDark
+          ? l10n.themeToggleSwitchToLight
+          : l10n.themeToggleSwitchToDark,
       icon: Icon(
         theme.isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
         color: AppColors.dark,

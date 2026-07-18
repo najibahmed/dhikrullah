@@ -13,6 +13,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/l10n/prayer_localization.dart';
+import 'package:dhikir_app/core/utils/time_format.dart';
 
 class PrayerScheduleSection extends StatefulWidget {
   const PrayerScheduleSection({super.key});
@@ -37,12 +40,13 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
     super.dispose();
   }
 
-  String _formatDuration(Duration d) {
+  String _formatDuration(BuildContext context, Duration d) {
+    final l10n = context.l10n;
     final positive = d.isNegative ? Duration.zero : d;
     final hours = positive.inHours;
     final minutes = positive.inMinutes % 60;
-    if (hours > 0) return '$hours Hour $minutes Minutes';
-    return '$minutes Minutes';
+    if (hours > 0) return l10n.durationHoursMinutes(hours, minutes);
+    return l10n.durationMinutes(minutes);
   }
 
   String _formatClock(Duration d) {
@@ -89,7 +93,7 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Next Prayer',
+            context.l10n.nextPrayerSection,
             style: theme.textTheme.bodyMedium
                 ?.copyWith(color: theme.colorScheme.primary),
           ),
@@ -98,13 +102,13 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                next.name,
+                prayerDisplayName(context, next.name),
                 style: theme.textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.w700),
               ),
               Text(
-                '${TimeOfDay.fromDateTime(next.start).format(context)} – '
-                '${TimeOfDay.fromDateTime(next.end).format(context)}',
+                '${formatClockTime(next.start)} – '
+                '${formatClockTime(next.end)}',
                 style: theme.textTheme.bodyMedium,
               ),
             ],
@@ -123,12 +127,12 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
       BuildContext context,
       ThemeData theme,
       ({
-        String title,
+        bool isToday,
         DateTime sehriEnd,
         DateTime iftar,
-        String countdownLabel,
         Duration countdown
       }) info) {
+    final l10n = context.l10n;
     final fg = theme.colorScheme.onInverseSurface;
     return Container(
       width: double.infinity,
@@ -141,7 +145,7 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            info.title,
+            info.isToday ? l10n.todaysScheduleTitle : l10n.tomorrowsScheduleTitle,
             style: theme.textTheme.bodyMedium
                 ?.copyWith(color: fg.withValues(alpha: 0.8)),
           ),
@@ -154,9 +158,9 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _scheduleRow(
-                        theme, fg, 'Sehri End', info.sehriEnd, context),
+                        theme, fg, l10n.sehriEndLabel, info.sehriEnd, context),
                     const SizedBox(height: 8),
-                    _scheduleRow(theme, fg, 'Iftar', info.iftar, context),
+                    _scheduleRow(theme, fg, l10n.iftarLabel, info.iftar, context),
                   ],
                 ),
               ),
@@ -165,7 +169,7 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      info.countdownLabel,
+                      info.isToday ? l10n.iftarStartsIn : l10n.sehriEndsIn,
                       style: theme.textTheme.bodySmall
                           ?.copyWith(color: fg.withValues(alpha: 0.8)),
                     ),
@@ -192,7 +196,7 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
         Text(label, style: theme.textTheme.bodyMedium?.copyWith(color: fg)),
         const SizedBox(width: 12),
         Text(
-          TimeOfDay.fromDateTime(time).format(context),
+          formatClockTime(time),
           style: theme.textTheme.bodyMedium
               ?.copyWith(color: fg, fontWeight: FontWeight.w700),
         ),

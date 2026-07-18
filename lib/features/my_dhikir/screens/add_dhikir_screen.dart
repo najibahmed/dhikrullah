@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
 import 'package:dhikir_app/features/my_dhikir/providers/my_dhikir_provider.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
 class AddDhikirScreen extends StatelessWidget {
   final CustomDhikirItem? existing; // non-null = edit mode
@@ -82,22 +84,22 @@ class _AddDhikirViewState extends State<_AddDhikirView>
     '🙏',
   ];
 
-  static const List<String> _colorLabels = [
-    'Mint',
-    'Sky',
-    'Sand',
-    'Lavender',
-    'Aqua',
-    'Cream',
-    'Rose',
-    'Periwinkle',
-    'Lime',
-    'Teal',
-    'Coral',
-    'Violet',
-  ];
-
   bool get _isEdit => widget.existing != null;
+
+  String _colorLabel(AppLocalizations l10n, int i) => [
+        l10n.colorMint,
+        l10n.colorSky,
+        l10n.colorSand,
+        l10n.colorLavender,
+        l10n.colorAqua,
+        l10n.colorCream,
+        l10n.colorRose,
+        l10n.colorPeriwinkle,
+        l10n.colorLime,
+        l10n.colorTeal,
+        l10n.colorCoral,
+        l10n.colorViolet,
+      ][i];
 
   @override
   void initState() {
@@ -156,6 +158,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: const Color(0xFFF6F4F1),
       body: CustomScrollView(
@@ -194,7 +197,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      _isEdit ? 'Update' : 'Save',
+                      _isEdit ? l10n.addDhikirAppBarUpdate : l10n.commonSave,
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -222,7 +225,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _isEdit ? 'Edit Dhikir' : 'Add New Dhikir',
+                              _isEdit ? l10n.addDhikirEditTitle : l10n.addDhikirNewTitle,
                               style: GoogleFonts.playfairDisplay(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
@@ -231,8 +234,8 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                             ),
                             Text(
                               _isEdit
-                                  ? 'Update your dhikir'
-                                  : 'Create a personal dhikir',
+                                  ? l10n.addDhikirEditSubtitle
+                                  : l10n.addDhikirNewSubtitle,
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 color: const Color(0xFF4A5568),
@@ -257,7 +260,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // ── Icon picker ────────────────────────────────
-                    const _SectionLabel('Choose Icon'),
+                    _SectionLabel(l10n.chooseIconLabel),
                     const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -313,7 +316,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                     const SizedBox(height: 20),
 
                     // ── Color picker ───────────────────────────────
-                    const _SectionLabel('Choose Color'),
+                    _SectionLabel(l10n.chooseColorLabel),
                     const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -374,7 +377,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                                         size: 12, color: Color(0xFF2D3748)),
                                   if (selected) const SizedBox(width: 4),
                                   Text(
-                                    _colorLabels[i],
+                                    _colorLabel(l10n, i),
                                     style: GoogleFonts.inter(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w600,
@@ -392,7 +395,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                     const SizedBox(height: 20),
 
                     // ── Form fields ────────────────────────────────
-                    const _SectionLabel('Dhikir Details'),
+                    _SectionLabel(l10n.dhikirDetailsSection),
                     const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.all(20),
@@ -410,20 +413,20 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                         children: [
                           _FormField(
                             controller: _titleCtrl,
-                            label: 'Title',
+                            label: l10n.titleFieldLabel,
                             maxLines: 2,
-                            hint: 'e.g. SubhanAllah',
+                            hint: l10n.titleFieldHint,
                             icon: Icons.title_rounded,
                             accentColor: _accentColor,
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
-                                return 'Title is required';
+                                return l10n.titleRequiredError;
                               }
                               if (v.trim().length < 2) {
-                                return 'Title must be at least 2 characters';
+                                return l10n.titleTooShortError;
                               }
                               if (v.trim().length > 60) {
-                                return 'Title too long (max 60 characters)';
+                                return l10n.titleTooLongError;
                               }
                               return null;
                             },
@@ -431,8 +434,8 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                           const SizedBox(height: 16),
                           _FormField(
                             controller: _arabicCtrl,
-                            label: 'Arabic Text',
-                            hint: 'سُبْحَانَ اللَّهِ',
+                            label: l10n.arabicTextFieldLabel,
+                            hint: l10n.arabicTextFieldHint,
                             icon: Icons.text_fields_rounded,
                             accentColor: _accentColor,
                             textAlign: TextAlign.right,
@@ -442,7 +445,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                             fontSize: 20,
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
-                                return 'Arabic text is required';
+                                return l10n.arabicTextRequiredError;
                               }
                               return null;
                             },
@@ -450,14 +453,14 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                           const SizedBox(height: 16),
                           _FormField(
                             controller: _translitCtrl,
-                            label: 'Transliteration (English)',
-                            hint: 'e.g. Subḥān Allāh',
+                            label: l10n.transliterationFieldLabel,
+                            hint: l10n.transliterationFieldHint,
                             icon: Icons.translate_rounded,
                             accentColor: _accentColor,
                             maxLines: 4,
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
-                                return 'Transliteration is required';
+                                return l10n.transliterationRequiredError;
                               }
                               return null;
                             },
@@ -465,17 +468,17 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                           const SizedBox(height: 16),
                           _FormField(
                             controller: _meaningCtrl,
-                            label: 'Meaning / Description',
-                            hint: 'Explain the significance of this dhikir...',
+                            label: l10n.meaningFieldLabel,
+                            hint: l10n.meaningFieldHint,
                             icon: Icons.menu_book_rounded,
                             accentColor: _accentColor,
                             maxLines: 4,
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
-                                return 'Meaning is required';
+                                return l10n.meaningRequiredError;
                               }
                               if (v.trim().length < 10) {
-                                return 'Please provide a more detailed meaning';
+                                return l10n.meaningTooShortError;
                               }
                               return null;
                             },
@@ -487,17 +490,17 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                     const SizedBox(height: 20),
 
                     // ── Preview card ───────────────────────────────
-                    const _SectionLabel('Preview'),
+                    _SectionLabel(l10n.previewSection),
                     const SizedBox(height: 10),
                     _PreviewCard(
                       title: _titleCtrl.text.isEmpty
-                          ? 'Your Dhikir'
+                          ? l10n.previewDefaultTitle
                           : _titleCtrl.text,
                       arabicText: _arabicCtrl.text.isEmpty
-                          ? 'النص العربي'
+                          ? l10n.previewDefaultArabic
                           : _arabicCtrl.text,
                       transliteration: _translitCtrl.text.isEmpty
-                          ? 'transliteration'
+                          ? l10n.previewDefaultTransliteration
                           : _translitCtrl.text,
                       icon: _selectedIcon,
                       color: _accentColor,
@@ -543,7 +546,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                                         style: const TextStyle(fontSize: 18)),
                                     const SizedBox(width: 10),
                                     Text(
-                                      _isEdit ? 'Update Dhikir' : 'Save Dhikir',
+                                      _isEdit ? l10n.addDhikirUpdateButton : l10n.addDhikirSaveButton,
                                       style: GoogleFonts.inter(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,

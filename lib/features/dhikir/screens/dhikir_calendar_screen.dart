@@ -11,10 +11,29 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/data/dhikir_localizations.dart';
 import 'package:dhikir_app/features/dhikir/providers/dhikir_calendar_provider.dart';
+
+String _fullMonthName(BuildContext context, int year, int month) => DateFormat(
+        'MMMM', Localizations.localeOf(context).toString())
+    .format(DateTime(year, month));
+
+String _shortMonthName(BuildContext context, int year, int month) =>
+    DateFormat('MMM', Localizations.localeOf(context).toString())
+        .format(DateTime(year, month));
+
+/// [weekdayIndexSunFirst]: 0=Sun .. 6=Sat. Jan 1 2023 was a Sunday, used
+/// purely as a reference date to format a locale-aware weekday label.
+String _shortWeekday(BuildContext context, int weekdayIndexSunFirst) {
+  final date = DateTime(2023, 1, 1).add(Duration(days: weekdayIndexSunFirst));
+  return DateFormat('E', Localizations.localeOf(context).toString())
+      .format(date);
+}
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
@@ -27,6 +46,8 @@ class DhikirCalendarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final localizedTitle = localizedDhikirTitle(context, dhikir.id) ?? dhikir.title;
     return ChangeNotifierProvider(
       // Scoped to this screen; auto-disposed when screen is popped.
       create: (_) => DhikirCalendarProvider(dhikir.id),
@@ -66,7 +87,7 @@ class DhikirCalendarScreen extends StatelessWidget {
                 title: Column(
                   children: [
                     Text(
-                      dhikir.title,
+                      localizedTitle,
                       style: GoogleFonts.playfairDisplay(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -74,7 +95,7 @@ class DhikirCalendarScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'History Calendar',
+                      l10n.calendarTitle,
                       style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF718096)),
                     ),
                   ],
@@ -129,7 +150,7 @@ class DhikirCalendarScreen extends StatelessWidget {
                       // Reset button — only needs the month name label.
                       Consumer<DhikirCalendarProvider>(
                         builder: (_, cal, __) => _ResetButton(
-                          monthName: _kMonthNames[cal.month],
+                          monthName: _fullMonthName(context, cal.year, cal.month),
                           onReset: () => _confirmReset(context, cal),
                         ),
                       ),
@@ -146,19 +167,21 @@ class DhikirCalendarScreen extends StatelessWidget {
 
   /// Shows a confirmation dialog then delegates the reset to the provider.
   Future<void> _confirmReset(BuildContext context, DhikirCalendarProvider cal) async {
+    final l10n = context.l10n;
+    final monthName = _fullMonthName(context, cal.year, cal.month);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Reset ${_kMonthNames[cal.month]}?',
+          l10n.resetMonthDialogTitle(monthName),
           style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700),
         ),
-        content: const Text('This clears all checkmarks for this month only.'),
+        content: Text(l10n.resetMonthDialogBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -166,7 +189,7 @@ class DhikirCalendarScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Reset Month'),
+            child: Text(l10n.resetMonthButton),
           ),
         ],
       ),
@@ -185,6 +208,7 @@ class _CalendarCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -201,7 +225,7 @@ class _CalendarCard extends StatelessWidget {
         children: [
           // Month navigator row
           _MonthNavigator(
-            monthName: _kMonthNames[cal.month],
+            monthName: _fullMonthName(context, cal.year, cal.month),
             year: cal.year,
             onPrev: cal.prevMonth,
             onNext: cal.canGoNext ? cal.nextMonth : null,
@@ -211,15 +235,15 @@ class _CalendarCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
-              children: _kWeekdays
-                  .map((w) => Expanded(
+              children: List.generate(7, (i) => i)
+                  .map((i) => Expanded(
                         child: Center(
                           child: Text(
-                            w,
+                            _shortWeekday(context, i),
                             style: GoogleFonts.inter(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: w == 'Fri' ? const Color(0xFF48BB78) : const Color(0xFFA0AEC0),
+                              color: i == 5 ? const Color(0xFF48BB78) : const Color(0xFFA0AEC0),
                             ),
                           ),
                         ),
@@ -249,11 +273,11 @@ class _CalendarCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const _Legend(color: Color(0xFF4A5568), label: 'Completed'),
+                _Legend(color: const Color(0xFF4A5568), label: l10n.legendCompleted),
                 const SizedBox(width: 20),
-                _Legend(color: accentColor, label: 'Today'),
+                _Legend(color: accentColor, label: l10n.commonToday),
                 const SizedBox(width: 20),
-                const _Legend(color: Color(0xFFF0EEEb), label: 'Missed', bordered: true),
+                _Legend(color: const Color(0xFFF0EEEb), label: l10n.legendMissed, bordered: true),
               ],
             ),
           ),
@@ -351,6 +375,7 @@ class _StatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -384,7 +409,7 @@ class _StatsCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'This month: $completedCount / $daysInMonth days ($pct%)',
+                    l10n.monthSummary(completedCount, daysInMonth, pct),
                     style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF4A5568)),
                   ),
                 ],
@@ -405,11 +430,11 @@ class _StatsCard extends StatelessWidget {
           const SizedBox(height: 14),
           Row(
             children: [
-              _StatPill(label: 'This Month', value: '$completedCount days'),
+              _StatPill(label: l10n.thisMonthLabel, value: l10n.daysCountLabel(completedCount)),
               const SizedBox(width: 8),
-              _StatPill(label: '🔥 Streak', value: '$currentStreak days'),
+              _StatPill(label: l10n.statStreak, value: l10n.daysCountLabel(currentStreak)),
               const SizedBox(width: 8),
-              _StatPill(label: 'Best', value: '$longestStreak days'),
+              _StatPill(label: l10n.statBest, value: l10n.daysCountLabel(longestStreak)),
             ],
           ),
         ],
@@ -435,6 +460,7 @@ class _YearHeatmap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final year = focusedMonth.year;
     final today = DateTime.now();
 
@@ -458,7 +484,7 @@ class _YearHeatmap extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Year Overview',
+                l10n.yearOverviewTitle,
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -513,7 +539,7 @@ class _YearHeatmap extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        _kMonthShort[i],
+                        _shortMonthName(context, year, m),
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -527,7 +553,7 @@ class _YearHeatmap extends StatelessWidget {
                       if (!isFuture) ...[
                         const SizedBox(height: 2),
                         Text(
-                          done > 0 ? '$done d' : '–',
+                          done > 0 ? l10n.daysCountShort(done) : '–',
                           style: GoogleFonts.inter(
                             fontSize: 10,
                             color: isFocused ? Colors.white70 : const Color(0xFF718096),
@@ -543,7 +569,7 @@ class _YearHeatmap extends StatelessWidget {
           const SizedBox(height: 12),
           Center(
             child: Text(
-              'Tap a month to navigate  •  Total: ${progress.totalCompleted} days',
+              l10n.calendarFooter(progress.totalCompleted),
               style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF718096)),
             ),
           ),
@@ -575,7 +601,7 @@ class _ResetButton extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            'Reset $monthName Progress',
+            context.l10n.resetMonthProgressButton(monthName),
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -759,46 +785,3 @@ class _StatPill extends StatelessWidget {
   }
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const List<String> _kWeekdays = [
-  'Sun',
-  'Mon',
-  'Tue',
-  'Wed',
-  'Thu',
-  'Fri',
-  'Sat',
-];
-
-/// Index 0 intentionally empty — months are 1-based.
-const List<String> _kMonthNames = [
-  '',
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-const List<String> _kMonthShort = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];

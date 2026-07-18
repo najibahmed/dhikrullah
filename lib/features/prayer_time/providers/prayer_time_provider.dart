@@ -458,11 +458,13 @@ class PrayerTimeProvider extends ChangeNotifier {
   /// Today's Sehri-end (Fajr) / Iftar (Maghrib) with a countdown that
   /// flips to tomorrow's schedule once today's Iftar has passed, or null
   /// if location hasn't been resolved yet.
+  /// `isToday` distinguishes "Today's Schedule" (countdown to Iftar) from
+  /// "Tomorrow's Schedule" (countdown to Sehri end) — display strings are
+  /// resolved by the widget via l10n, this getter stays locale-agnostic.
   ({
-    String title,
+    bool isToday,
     DateTime sehriEnd,
     DateTime iftar,
-    String countdownLabel,
     Duration countdown
   })? get sehriIftarInfo {
     final times = today;
@@ -471,10 +473,9 @@ class PrayerTimeProvider extends ChangeNotifier {
     final iftarToday = times.maghrib.toLocal();
     if (now.isBefore(iftarToday)) {
       return (
-        title: "Today's Schedule",
+        isToday: true,
         sehriEnd: times.fajr.toLocal(),
         iftar: iftarToday,
-        countdownLabel: 'Iftar starts in',
         countdown: iftarToday.difference(now),
       );
     }
@@ -482,10 +483,9 @@ class PrayerTimeProvider extends ChangeNotifier {
     if (tomorrow == null) return null;
     final sehriEndTomorrow = times.fajrAfter.toLocal();
     return (
-      title: "Tomorrow's Schedule",
+      isToday: false,
       sehriEnd: sehriEndTomorrow,
       iftar: tomorrow.maghrib.toLocal(),
-      countdownLabel: 'Sehri ends in',
       countdown: sehriEndTomorrow.difference(now),
     );
   }
@@ -529,33 +529,35 @@ class PrayerTimeProvider extends ChangeNotifier {
         value == HijriDayStart.sunset ? 'sunset' : 'midnight');
   }
 
-  Future<void> setMadhab(Madhab value) async {
+  Future<void> setMadhab(Madhab value, {required Locale locale}) async {
     madhab = value;
     _recompute();
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
         _kMadhabKey, value == Madhab.shafi ? 'shafi' : 'hanafi');
-    await _rescheduleNotifications();
+    await _rescheduleNotifications(locale);
   }
 
-  Future<void> setPrayerNotification(String label, bool enabled) async {
+  Future<void> setPrayerNotification(String label, bool enabled,
+      {required Locale locale}) async {
     prayerNotificationsEnabled[label] = enabled;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('$_kNotifyPrefixKey$label', enabled);
-    await _rescheduleNotifications();
+    await _rescheduleNotifications(locale);
   }
 
-  Future<void> setPrayerSound(String label, String value) async {
+  Future<void> setPrayerSound(String label, String value,
+      {required Locale locale}) async {
     prayerSoundChoice[label] = value;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('$_kSoundPrefixKey$label', value);
-    await _rescheduleNotifications();
+    await _rescheduleNotifications(locale);
   }
 
-  Future<void> _rescheduleNotifications() async {
+  Future<void> _rescheduleNotifications(Locale locale) async {
     final todayTimes = today;
     final tomorrowTimes =
         _prayerTimesFor(DateTime.now().add(const Duration(days: 1)));
@@ -575,6 +577,7 @@ class PrayerTimeProvider extends ChangeNotifier {
       today: todayTimes,
       tomorrow: tomorrowTimes,
       enabled: prayerNotificationsEnabled,
+      locale: locale,
       soundChoice: prayerSoundChoice,
       tahajjudToday: find(todayWindows, 'Tahajjud'),
       tahajjudTomorrow: find(tomorrowWindows, 'Tahajjud'),

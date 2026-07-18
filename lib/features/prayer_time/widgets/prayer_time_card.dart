@@ -14,6 +14,9 @@ import 'package:hijri/hijri_calendar.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/l10n/prayer_localization.dart';
+import 'package:dhikir_app/core/utils/time_format.dart';
 
 class PrayerTimeCard extends StatefulWidget {
   const PrayerTimeCard({super.key});
@@ -38,12 +41,13 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
     super.dispose();
   }
 
-  String _formatCountdown(Duration d) {
+  String _formatCountdown(BuildContext context, Duration d) {
+    final l10n = context.l10n;
     final positive = d.isNegative ? Duration.zero : d;
     final hours = positive.inHours;
     final minutes = positive.inMinutes % 60;
-    if (hours > 0) return 'Time Remaining: ${hours} Hour ${minutes} Minutes';
-    return 'Time Remaining: ${minutes} Minutes';
+    if (hours > 0) return l10n.countdownRemaining(hours, minutes);
+    return l10n.countdownRemainingMinutes(minutes);
   }
 
   @override
@@ -60,7 +64,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Semantics(
         button: true,
-        label: _semanticLabel(provider),
+        label: _semanticLabel(context, provider),
         child: GestureDetector(
           onTap: provider.locationGranted
               ? null
@@ -91,28 +95,33 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
 
   /// Screen-reader summary for the whole card, since [ExcludeSemantics]
   /// hides the individual Text/Icon children behind this single label.
-  String _semanticLabel(PrayerTimeProvider provider) {
+  String _semanticLabel(BuildContext context, PrayerTimeProvider provider) {
+    final l10n = context.l10n;
     switch (provider.status) {
       case PrayerStatus.gpsDisabled:
-        return 'Prayer times unavailable. Enable device location.';
+        return l10n.semanticsLocationDeviceOff;
       case PrayerStatus.permissionRequired:
-        return 'Prayer times unavailable. Enable location permission.';
+        return l10n.semanticsLocationPermOff;
       case PrayerStatus.locationUnavailable:
-        return 'Prayer times unavailable. Unable to determine location.';
+        return l10n.semanticsLocationUnavailable;
       case PrayerStatus.error:
-        return 'Unable to calculate prayer times.';
+        return l10n.semanticsCalcUnavailable;
       case PrayerStatus.loading:
-        return 'Finding prayer times.';
+        return l10n.semanticsFinding;
       case PrayerStatus.forbidden:
         final period = provider.activeForbiddenPeriod;
         final next = provider.nextPrayer;
-        return 'Forbidden prayer time: ${period?.name ?? ''}.'
-            '${next != null ? ' Next prayer ${next.name}.' : ''}';
+        return l10n.semanticsForbidden(
+                period != null ? prayerDisplayName(context, period.name) : '') +
+            (next != null
+                ? l10n.semanticsNextPrayer(prayerDisplayName(context, next.name))
+                : '');
       case PrayerStatus.normal:
         final current = provider.currentPrayer;
-        if (current == null) return 'Prayer times.';
+        if (current == null) return l10n.semanticsPrayerTimes;
         final percent = (current.progress * 100).round();
-        return 'Current prayer ${current.name}, $percent percent through.';
+        return l10n.semanticsCurrentPrayer(
+            prayerDisplayName(context, current.name), percent);
     }
   }
 
@@ -123,27 +132,27 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         return _messageRow(
           theme,
           icon: Icons.location_disabled,
-          text: 'Enable device location to see prayer times',
+          text: context.l10n.enableLocationMessage,
         );
       case PrayerStatus.permissionRequired:
         return _messageRow(
           theme,
           icon: Icons.location_on_outlined,
           text: provider.permissionPermanentlyDenied
-              ? 'Location permission denied. Tap to open Settings.'
-              : 'Enable location to see prayer times',
+              ? context.l10n.locationDeniedTapSettings
+              : context.l10n.enableLocationShort,
         );
       case PrayerStatus.locationUnavailable:
         return _messageRow(
           theme,
           icon: Icons.location_off_outlined,
-          text: 'Unable to determine location',
+          text: context.l10n.unableToDetermineLocation,
         );
       case PrayerStatus.error:
         return _messageRow(
           theme,
           icon: Icons.error_outline,
-          text: 'Unable to calculate prayer times',
+          text: context.l10n.unableToCalculate,
         );
       case PrayerStatus.loading:
         return Row(
@@ -154,7 +163,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
             const SizedBox(width: 12),
-            Text('Finding prayer times…', style: theme.textTheme.bodyMedium),
+            Text(context.l10n.findingPrayerTimes, style: theme.textTheme.bodyMedium),
           ],
         );
       case PrayerStatus.forbidden:
@@ -199,17 +208,18 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Forbidden time · ${period.name}',
+                  context.l10n.forbiddenTimeLabel(prayerDisplayName(context, period.name)),
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: theme.colorScheme.error,
                   ),
                 ),
-                Text('Ends ${_formatCountdown(remaining)}',
+                Text(context.l10n.endsInLabel(_formatCountdown(context, remaining)),
                     style: theme.textTheme.bodySmall),
                 if (next != null)
                   Text(
-                    'Next: ${next.name} ${_formatCountdown(next.time.difference(DateTime.now()))}',
+                    context.l10n.nextPrayerInline(prayerDisplayName(context, next.name),
+                        _formatCountdown(context, next.time.difference(DateTime.now()))),
                     style: theme.textTheme.bodySmall,
                   ),
               ],
@@ -239,7 +249,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Current Prayer",
+          context.l10n.currentPrayerSection,
           style: theme.textTheme.titleSmall
               ?.copyWith(fontWeight: FontWeight.w700, color: onSecondary),
         ),
@@ -252,15 +262,15 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
                 Icon(Icons.mosque_outlined, color: onSecondary),
                 const SizedBox(width: 12),
                 Text(
-                  current.name,
+                  prayerDisplayName(context, current.name),
                   style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700, color: onSecondary),
                 ),
               ],
             ),
             Text(
-              '${TimeOfDay.fromDateTime(current.start).format(context)} – '
-              '${TimeOfDay.fromDateTime(current.end).format(context)}',
+              '${formatClockTime(current.start)} – '
+              '${formatClockTime(current.end)}',
               style: theme.textTheme.bodyMedium?.copyWith(color: onSecondary),
             ),
             // Icon(Icons.chevron_right,
@@ -269,7 +279,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         ),
         const SizedBox(height: 10),
         Text(
-          _formatCountdown(current.end.difference(now)),
+          _formatCountdown(context, current.end.difference(now)),
           style: theme.textTheme.bodyMedium
               ?.copyWith(color: onSecondary.withValues(alpha: 0.8)),
         ),

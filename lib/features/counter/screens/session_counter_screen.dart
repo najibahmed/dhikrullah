@@ -8,6 +8,9 @@ import 'package:dhikir_app/core/models/dhikir_model.dart';
 import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
 import 'package:dhikir_app/core/widgets/counter_button.dart';
 import 'package:dhikir_app/features/counter/providers/session_counter_provider.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/data/dhikir_localizations.dart';
+import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
 // ─── Unified dhikir wrapper ───────────────────────────────────────────────────
 
@@ -183,19 +186,21 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
 
   Future<void> _resetCurrent() async {
     final provider = context.read<SessionCounterProvider>();
+    final l10n = context.l10n;
+    final currentTitle = localizedDhikirTitle(context, provider.current.id) ?? provider.current.title;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text("Reset Today's Count?", style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700)),
-        content: Text("Reset counter for ${provider.current.title}?"),
+        title: Text(l10n.resetTodayCountTitle, style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700)),
+        content: Text(l10n.counterResetBody(currentTitle)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.commonCancel)),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFF4A5568), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Reset'),
+            child: Text(l10n.commonReset),
           ),
         ],
       ),
@@ -226,6 +231,7 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SessionCounterProvider>();
+    final l10n = context.l10n;
     final dhikirList = provider.dhikirList;
     final dhikir = provider.current;
     final currentIndex = provider.currentIndex;
@@ -257,7 +263,7 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
                   Column(
                     children: [
                       Text(
-                        '${currentIndex + 1} of $total dhikir',
+                        l10n.counterProgressLabel(currentIndex + 1, total),
                         style: GoogleFonts.inter(fontSize: 12, color: Colors.white54),
                       ),
                     ],
@@ -392,7 +398,7 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
                             Icon(Icons.refresh_rounded, size: 16, color: Colors.white.withValues(alpha: 0.6)),
                             const SizedBox(width: 6),
                             Text(
-                              'Reset  •  $count counted',
+                              l10n.counterResetHint(count),
                               style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.6)),
                             ),
                           ],
@@ -462,6 +468,10 @@ class _DhikirPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final localizedTitle = localizedDhikirTitle(context, dhikir.id) ?? dhikir.title;
+    final localizedTransliteration =
+        localizedDhikirTransliteration(context, dhikir.id) ?? dhikir.transliteration;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -489,7 +499,7 @@ class _DhikirPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            dhikir.title,
+                            localizedTitle,
                             style: GoogleFonts.playfairDisplay(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
@@ -497,7 +507,7 @@ class _DhikirPage extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            dhikir.transliteration,
+                            localizedTransliteration,
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontStyle: FontStyle.italic,
@@ -542,7 +552,7 @@ class _DhikirPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  isUnlimited ? '$count counted' : '$count / $goal',
+                  isUnlimited ? l10n.counterCountedUnlimited(count) : '$count / $goal',
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     color: const Color(0xFF4A5568),
@@ -587,7 +597,7 @@ class _DhikirPage extends StatelessWidget {
                         const Icon(Icons.auto_awesome_rounded, size: 14, color: Color(0xFF2D3748)),
                         const SizedBox(width: 6),
                         Text(
-                          'MāshāAllah! Goal reached',
+                          l10n.counterGoalReachedBanner,
                           style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF2D3748)),
                         ),
                       ],
@@ -595,7 +605,7 @@ class _DhikirPage extends StatelessWidget {
                   )
                 : Text(
                     key: const ValueKey('remaining'),
-                    isUnlimited ? 'Tap to count — no limit' : '${goal - count} remaining',
+                    isUnlimited ? l10n.tapNoLimit : l10n.remainingCount(goal - count),
                     style: GoogleFonts.inter(fontSize: 13, color: Colors.white54),
                   ),
           ),
@@ -709,13 +719,15 @@ class _GoalSheetState extends State<_GoalSheet> {
 
   static const _options = [33, 34, 99, 100, -1];
   static const _labels = {33: '33', 34: '34', 99: '99', 100: '100', -1: '∞'};
-  static const _subtitles = {
-    33: 'Tasbih — SubhanAllah',
-    34: 'Tasbih — Alhamdulillah',
-    99: 'Names of Allah',
-    100: 'Daily century goal',
-    -1: 'No limit — count freely',
-  };
+
+  String _subtitleFor(AppLocalizations l10n, int goal) => switch (goal) {
+        33 => l10n.goalSubtitleTasbihSubhanallah,
+        34 => l10n.goalSubtitleTasbihAlhamdulillah,
+        99 => l10n.goalSubtitleNamesOfAllah,
+        100 => l10n.goalSubtitleDailyCentury,
+        -1 => l10n.goalSubtitleNoLimit,
+        _ => '',
+      };
 
   @override
   void initState() {
@@ -725,6 +737,7 @@ class _GoalSheetState extends State<_GoalSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -754,9 +767,9 @@ class _GoalSheetState extends State<_GoalSheet> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Set Session Goal',
+                      Text(l10n.sessionGoalSheetTitle,
                           style: GoogleFonts.playfairDisplay(fontSize: 17, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
-                      Text('Applies to all dhikir in this session', style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096))),
+                      Text(l10n.sessionGoalSheetSubtitle, style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096))),
                     ],
                   ),
                 ],
@@ -802,7 +815,7 @@ class _GoalSheetState extends State<_GoalSheet> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                goal == -1 ? 'Unlimited' : '$goal times',
+                                goal == -1 ? l10n.goalLabelUnlimited : l10n.goalLabelTimes(goal),
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -810,7 +823,7 @@ class _GoalSheetState extends State<_GoalSheet> {
                                 ),
                               ),
                               Text(
-                                _subtitles[goal]!,
+                                _subtitleFor(l10n, goal),
                                 style: GoogleFonts.inter(
                                   fontSize: 11,
                                   color: isSelected ? Colors.white60 : const Color(0xFF718096),
@@ -848,7 +861,7 @@ class _GoalSheetState extends State<_GoalSheet> {
                           border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
                         ),
                         child: Center(
-                          child: Text('Cancel', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
+                          child: Text(l10n.commonCancel, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
                         ),
                       ),
                     ),
@@ -866,7 +879,9 @@ class _GoalSheetState extends State<_GoalSheet> {
                         ),
                         child: Center(
                           child: Text(
-                            _selected == -1 ? 'Set Unlimited' : 'Set Goal: ${_labels[_selected]}',
+                            _selected == -1
+                                ? l10n.setUnlimitedButton
+                                : l10n.setGoalButton(_labels[_selected]!),
                             style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
                           ),
                         ),

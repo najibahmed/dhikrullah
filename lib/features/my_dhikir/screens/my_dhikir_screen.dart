@@ -9,6 +9,7 @@ import 'package:dhikir_app/core/providers/favorites_provider.dart';
 import 'package:dhikir_app/core/widgets/session_setup_sheet.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'package:dhikir_app/features/my_dhikir/providers/my_dhikir_provider.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 
 class MyDhikirScreen extends StatelessWidget {
   const MyDhikirScreen({super.key});
@@ -48,19 +49,20 @@ class _MyDhikirViewState extends State<_MyDhikirView> with SingleTickerProviderS
 
   Future<void> _delete(CustomDhikirItem item) async {
     final provider = context.read<MyDhikirProvider>();
+    final l10n = context.l10n;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Delete "${item.title}"?', style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700)),
-        content: const Text('This will permanently delete this dhikir. Progress data will remain.'),
+        title: Text(l10n.deleteDhikirTitle(item.title), style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700)),
+        content: Text(l10n.deleteDhikirBody),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.commonCancel)),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFFE53E3E), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete'),
+            child: Text(l10n.commonDelete),
           ),
         ],
       ),
@@ -100,6 +102,7 @@ class _MyDhikirViewState extends State<_MyDhikirView> with SingleTickerProviderS
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final customItems = context.watch<MyDhikirProvider>().items;
 
     return Scaffold(
@@ -139,7 +142,7 @@ class _MyDhikirViewState extends State<_MyDhikirView> with SingleTickerProviderS
                       children: [
                         const Icon(Icons.add_rounded, size: 16, color: Colors.white),
                         const SizedBox(width: 5),
-                        Text('Add', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
+                        Text(l10n.commonAdd, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
                       ],
                     ),
                   ),
@@ -153,7 +156,7 @@ class _MyDhikirViewState extends State<_MyDhikirView> with SingleTickerProviderS
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'My Dhikir',
+                    l10n.navMyDhikir,
                     style: GoogleFonts.playfairDisplay(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -166,7 +169,7 @@ class _MyDhikirViewState extends State<_MyDhikirView> with SingleTickerProviderS
                 alignment: Alignment.bottomLeft,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 24, bottom: 18),
-                  child: Text('${customItems.length} custom dhikir', style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096))),
+                  child: Text(l10n.myDhikirCountSubtitle(customItems.length), style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096))),
                 ),
               ),
             ),
@@ -207,6 +210,7 @@ class _CustomDhikirTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (items.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(40),
@@ -216,10 +220,10 @@ class _CustomDhikirTab extends StatelessWidget {
             const SizedBox(height: 60),
             const Text('📿', style: TextStyle(fontSize: 48)),
             const SizedBox(height: 16),
-            Text('No custom dhikir yet',
+            Text(l10n.myDhikirEmptyTitle,
                 style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
             const SizedBox(height: 8),
-            Text('Tap the Add button to create your first dhikir',
+            Text(l10n.myDhikirEmptySubtitle,
                 style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF718096), height: 1.5), textAlign: TextAlign.center),
           ],
         ),
@@ -248,7 +252,7 @@ class _CustomDhikirTab extends StatelessWidget {
                 children: [
                   const Icon(Icons.play_circle_rounded, color: Colors.white, size: 20),
                   const SizedBox(width: 8),
-                  Text('Start Session — All ${items.length} Dhikir',
+                  Text(l10n.myDhikirStartSession(items.length),
                       style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
                 ],
               ),
@@ -341,13 +345,13 @@ class _CustomCard extends StatelessWidget {
               children: [
                 _ActionBtn(
                   icon: isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                  label: isFav ? 'Unfav' : 'Favourite',
+                  label: isFav ? context.l10n.unfavAction : context.l10n.favouriteAction,
                   color: isFav ? const Color(0xFFFC8181) : const Color(0xFF718096),
                   onTap: () => context.read<FavoritesProvider>().toggle(item.id),
                 ),
                 _ActionBtn(
                   icon: Icons.edit_rounded,
-                  label: 'Edit',
+                  label: context.l10n.commonEdit,
                   color: const Color(0xFF718096),
                   onTap: () => Navigator.pushNamed(
                     context,
@@ -357,13 +361,13 @@ class _CustomCard extends StatelessWidget {
                 ),
                 _ActionBtn(
                   icon: Icons.play_arrow_rounded,
-                  label: 'Counter',
+                  label: context.l10n.navCounter,
                   color: const Color(0xFF4A5568),
                   onTap: onSessionSingle,
                 ),
                 _ActionBtn(
                   icon: Icons.delete_outline_rounded,
-                  label: 'Delete',
+                  label: context.l10n.commonDelete,
                   color: const Color(0xFFE53E3E),
                   onTap: onDelete,
                 ),

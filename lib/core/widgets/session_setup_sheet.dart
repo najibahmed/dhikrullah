@@ -7,6 +7,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/data/dhikir_localizations.dart';
+import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
 class SessionSetupSheet extends StatefulWidget {
   final List<SessionDhikir> dhikirList;
@@ -23,16 +26,19 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
 
   static const _goals = [33, 34, 99, 100, -1];
   static const _labels = {33: '33', 34: '34', 99: '99', 100: '100', -1: '∞'};
-  static const _desc = {
-    33: 'SubhanAllah tasbih',
-    34: 'Alhamdulillah tasbih',
-    99: 'Names of Allah',
-    100: 'Century goal',
-    -1: 'No limit',
-  };
+
+  String _descFor(AppLocalizations l10n, int g) => switch (g) {
+        33 => l10n.setupGoalDescSubhanallah,
+        34 => l10n.setupGoalDescAlhamdulillah,
+        99 => l10n.goalSubtitleNamesOfAllah,
+        100 => l10n.setupGoalDescCenturyGoal,
+        -1 => l10n.setupGoalDescNoLimit,
+        _ => '',
+      };
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -65,16 +71,16 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Setup Session',
+                      Text(l10n.setupSheetTitle,
                           style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
-                      Text('${widget.dhikirList.length} dhikir • Choose a shared goal',
+                      Text(l10n.setupSheetSubtitle(widget.dhikirList.length),
                           style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096))),
                     ],
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              Text('Goal per Dhikir', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
+              Text(l10n.setupGoalPerDhikir, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
               const SizedBox(height: 8),
               Row(
                 children: _goals.map((g) {
@@ -102,7 +108,7 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
                               ),
                             ),
                             Text(
-                              _desc[g]!,
+                              _descFor(l10n, g),
                               style: GoogleFonts.inter(
                                 fontSize: 8,
                                 color: isSelected ? Colors.white60 : const Color(0xFF718096),
@@ -119,7 +125,7 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
               ),
               const SizedBox(height: 16),
               // Dhikir preview chips
-              Text('Session includes', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
+              Text(l10n.setupSessionIncludes, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 6,
@@ -134,7 +140,8 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
                       children: [
                         Text(d.icon, style: const TextStyle(fontSize: 12)),
                         const SizedBox(width: 4),
-                        Text(d.title, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF2D3748))),
+                        Text(localizedDhikirTitle(context, d.id) ?? d.title,
+                            style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF2D3748))),
                       ],
                     ),
                   );
@@ -154,7 +161,7 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
                           border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
                         ),
                         child: Center(
-                          child: Text('Cancel', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
+                          child: Text(l10n.commonCancel, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
                         ),
                       ),
                     ),
@@ -177,7 +184,9 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
                             const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18),
                             const SizedBox(width: 6),
                             Text(
-                              _goal == -1 ? 'Start (Unlimited)' : 'Start (Goal: ${_labels[_goal]})',
+                              _goal == -1
+                                  ? l10n.setupStartUnlimited
+                                  : l10n.setupStartGoal(_labels[_goal]!),
                               style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
                             ),
                           ],

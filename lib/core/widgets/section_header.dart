@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+
 class SectionHeader extends StatelessWidget {
   final String title;
   final int count;
@@ -31,7 +33,7 @@ class SectionHeader extends StatelessWidget {
               children: [
                 const Icon(Icons.play_arrow_rounded, size: 12, color: Color(0xFF4A5568)),
                 const SizedBox(width: 3),
-                Text('Session ($count)', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF4A5568))),
+                Text(context.l10n.sessionCountLabel(count), style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF4A5568))),
               ],
             ),
           ),

@@ -8,34 +8,14 @@
 import 'package:flutter/material.dart';
 import 'package:hijri/hijri_calendar.dart';
 
-const _weekdayNames = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-];
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/utils/time_format.dart';
+import 'package:intl/intl.dart';
 
-const _monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-String _formatGregorian(DateTime date) {
-  final weekday = _weekdayNames[date.weekday - 1];
-  final month = _monthNames[date.month - 1];
+String _formatGregorian(BuildContext context, DateTime date) {
+  final localeName = Localizations.localeOf(context).toString();
+  final weekday = DateFormat('EEEE', localeName).format(date);
+  final month = DateFormat('MMMM', localeName).format(date);
   return '$weekday, ${date.day} $month ${date.year}';
 }
 
@@ -64,7 +44,7 @@ class DateHeaderRow extends StatelessWidget {
         Icon(icon, size: 14, color: color),
         const SizedBox(width: 4),
         Text(
-          TimeOfDay.fromDateTime(time).format(context),
+          formatClockTime(time),
           style: theme.textTheme.bodySmall?.copyWith(
             color: Colors.black,
             fontWeight: FontWeight.w600,
@@ -94,7 +74,7 @@ class DateHeaderRow extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                        '${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear} AH',
+                        '${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear}${context.l10n.hijriEraSuffix}',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: Colors.black,
                           fontWeight: FontWeight.w600,
@@ -111,7 +91,7 @@ class DateHeaderRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _formatGregorian(now),
+                  _formatGregorian(context, now),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.black,
                     fontWeight: FontWeight.w600,

@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/l10n/prayer_localization.dart';
 
 class PrayerTimeSettingsScreen extends StatelessWidget {
   const PrayerTimeSettingsScreen({super.key});
@@ -19,7 +21,7 @@ class PrayerTimeSettingsScreen extends StatelessWidget {
     final provider = context.watch<PrayerTimeProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Prayer Settings')),
+      appBar: AppBar(title: Text(context.l10n.prayerSettingsTitle)),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
@@ -39,26 +41,29 @@ class _NotificationSettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text('Notifications',
-              style: TextStyle(fontWeight: FontWeight.w700)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(l10n.notificationsSectionTitle,
+              style: const TextStyle(fontWeight: FontWeight.w700)),
         ),
         for (final label in prayerLabels)
           SwitchListTile(
-            title: Text(label),
+            title: Text(prayerDisplayName(context, label)),
             value: provider.prayerNotificationsEnabled[label] ?? true,
-            onChanged: (value) => provider.setPrayerNotification(label, value),
+            onChanged: (value) => provider.setPrayerNotification(label, value,
+                locale: Localizations.localeOf(context)),
           ),
         for (final label in optionalNotificationLabels)
           SwitchListTile(
-            title: Text(label),
-            subtitle: const Text('Optional — off by default'),
+            title: Text(prayerDisplayName(context, label)),
+            subtitle: Text(l10n.notificationsOptionalSubtitle),
             value: provider.prayerNotificationsEnabled[label] ?? false,
-            onChanged: (value) => provider.setPrayerNotification(label, value),
+            onChanged: (value) => provider.setPrayerNotification(label, value,
+                locale: Localizations.localeOf(context)),
           ),
       ],
     );
@@ -72,22 +77,24 @@ class _MadhabSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Madhab (Asr calculation)',
-              style: TextStyle(fontWeight: FontWeight.w700)),
+          Text(l10n.madhabSection,
+              style: const TextStyle(fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           SegmentedButton<Madhab>(
-            segments: const [
-              ButtonSegment(value: Madhab.hanafi, label: Text('Hanafi')),
-              ButtonSegment(value: Madhab.shafi, label: Text('Shafi')),
+            segments: [
+              ButtonSegment(value: Madhab.hanafi, label: Text(l10n.madhabHanafi)),
+              ButtonSegment(value: Madhab.shafi, label: Text(l10n.madhabShafi)),
             ],
             selected: {provider.madhab},
-            onSelectionChanged: (selection) =>
-                provider.setMadhab(selection.first),
+            onSelectionChanged: (selection) => provider.setMadhab(
+                selection.first,
+                locale: Localizations.localeOf(context)),
           ),
           const SizedBox(height: 24),
         ],

@@ -12,6 +12,8 @@ import 'package:provider/provider.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 import 'package:dhikir_app/features/prayer_time/services/location_service.dart';
 import 'package:dhikir_app/features/prayer_time/services/prayer_notification_service.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/l10n/prayer_localization.dart';
 
 /// Entry point for a bell-icon tap: requests notification permission if
 /// needed, then opens the sheet — or shows guidance if permission was
@@ -30,25 +32,23 @@ Future<void> handlePrayerBellTap(
   if (!context.mounted) return;
 
   if (!granted) {
+    final l10n = context.l10n;
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Notifications are off'),
-        content: const Text(
-          'To get prayer time reminders, allow notifications for this app '
-          'in system settings.',
-        ),
+        title: Text(l10n.notifOffDialogTitle),
+        content: Text(l10n.notifOffDialogBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Not now'),
+            child: Text(l10n.notNowButton),
           ),
           FilledButton(
             onPressed: () async {
               Navigator.pop(dialogContext);
               LocationService.openAppSettings();
             },
-            child: const Text('Open Settings'),
+            child: Text(l10n.openSettingsButton),
           ),
         ],
       ),
@@ -72,6 +72,7 @@ class _PrayerNotificationSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final provider = context.watch<PrayerTimeProvider>();
     final enabled = provider.prayerNotificationsEnabled[label] ?? true;
     final sound = provider.prayerSoundChoice[label] ?? 'default';
@@ -98,29 +99,30 @@ class _PrayerNotificationSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              Text(label,
+              Text(prayerDisplayName(context, label),
                   style: theme.textTheme.titleLarge
                       ?.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Notification'),
+                title: Text(l10n.notificationSwitchTitle),
                 subtitle: Text(
-                    enabled ? 'You will be notified' : 'Notification is off'),
+                    enabled ? l10n.notificationOnSubtitle : l10n.notificationOffSubtitle),
                 value: enabled,
-                onChanged: (value) =>
-                    provider.setPrayerNotification(label, value),
+                onChanged: (value) => provider.setPrayerNotification(
+                    label, value,
+                    locale: Localizations.localeOf(context)),
               ),
               const SizedBox(height: 16),
-              Text('Sound',
+              Text(l10n.soundSection,
                   style: theme.textTheme.bodyMedium
                       ?.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               _soundOption(context, theme, provider,
-                  label: 'Default', value: 'default', selected: sound),
+                  label: l10n.soundDefault, value: 'default', selected: sound),
               const SizedBox(height: 8),
               _soundOption(context, theme, provider,
-                  label: 'Silent', value: 'silent', selected: sound),
+                  label: l10n.soundSilent, value: 'silent', selected: sound),
             ],
           ),
         ),
@@ -138,7 +140,8 @@ class _PrayerNotificationSheet extends StatelessWidget {
   }) {
     final isSelected = selected == value;
     return GestureDetector(
-      onTap: () => provider.setPrayerSound(this.label, value),
+      onTap: () => provider.setPrayerSound(this.label, value,
+          locale: Localizations.localeOf(context)),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

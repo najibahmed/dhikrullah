@@ -11,6 +11,8 @@ import 'package:dhikir_app/features/dhikir/providers/dhikir_detail_provider.dart
 import 'package:dhikir_app/features/dhikir/widgets/goal_pick_sheet.dart';
 import 'package:dhikir_app/features/dhikir/widgets/mile_stone_dot.dart';
 import 'package:dhikir_app/features/dhikir/widgets/pill_widget.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/data/dhikir_localizations.dart';
 
 class DhikirDetailScreen extends StatelessWidget {
   final DhikirItem dhikir;
@@ -119,19 +121,20 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
 
   Future<void> _resetCounter() async {
     final provider = context.read<DhikirDetailProvider>();
+    final l10n = context.l10n;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text("Reset Today's Count?", style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700)),
-        content: const Text("This resets today's tap counter to 0."),
+        title: Text(l10n.resetTodayCountTitle, style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700)),
+        content: Text(l10n.resetTodayCountBody),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.commonCancel)),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFF4A5568), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Reset'),
+            child: Text(l10n.commonReset),
           ),
         ],
       ),
@@ -162,19 +165,20 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
 
   Future<void> _resetMonth() async {
     final provider = context.read<DhikirDetailProvider>();
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Reset This Month?', style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700)),
-        content: const Text('This clears all checkmarks for this month.'),
+        title: Text(l10n.resetMonthTitle, style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700)),
+        content: Text(l10n.resetMonthBody),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.commonCancel)),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFF4A5568), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Reset'),
+            child: Text(l10n.commonReset),
           ),
         ],
       ),
@@ -188,6 +192,11 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DhikirDetailProvider>();
+    final l10n = context.l10n;
+    final localizedTitle = localizedDhikirTitle(context, widget.dhikir.id) ?? widget.dhikir.title;
+    final localizedTransliteration =
+        localizedDhikirTransliteration(context, widget.dhikir.id) ?? widget.dhikir.transliteration;
+    final localizedMeaning = localizedDhikirMeaning(context, widget.dhikir.id) ?? widget.dhikir.englishMeaning;
     final bgColor = _accent;
     final today = provider.today;
     final year = today.year;
@@ -272,12 +281,12 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(widget.dhikir.title,
+                              Text(localizedTitle,
                                   style: GoogleFonts.playfairDisplay(fontSize: 24, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
                               const SizedBox(height: 2),
                               Wrap(
                                 children: [
-                                  Text(widget.dhikir.transliteration,
+                                  Text(localizedTransliteration,
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 4,
                                       style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF718096), fontStyle: FontStyle.italic)),
@@ -316,7 +325,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Text('$completed / $daysInMonth days',
+                      Text(l10n.daysCompletedLabel(completed, daysInMonth),
                           style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF4A5568))),
                     ],
                   ),
@@ -343,7 +352,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                     ),
                     child: Column(
                       children: [
-                        Pill(label: 'Arabic', color: bgColor),
+                        Pill(label: l10n.pillArabic, color: bgColor),
                         const SizedBox(height: 16),
                         Text(
                           widget.dhikir.arabicText,
@@ -352,7 +361,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                           textDirection: TextDirection.rtl,
                         ),
                         const SizedBox(height: 12),
-                        Text(widget.dhikir.transliteration,
+                        Text(localizedTransliteration,
                             style: GoogleFonts.inter(fontSize: 15, fontStyle: FontStyle.italic, color: const Color(0xFF718096)),
                             textAlign: TextAlign.center),
                       ],
@@ -376,9 +385,9 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Pill(label: 'Meaning & Significance', color: bgColor),
+                        Pill(label: l10n.pillMeaning, color: bgColor),
                         const SizedBox(height: 14),
-                        Text(widget.dhikir.englishMeaning, style: GoogleFonts.inter(fontSize: 14.5, color: const Color(0xFF4A5568), height: 1.7)),
+                        Text(localizedMeaning, style: GoogleFonts.inter(fontSize: 14.5, color: const Color(0xFF4A5568), height: 1.7)),
                       ],
                     ),
                   ),
@@ -405,7 +414,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Pill(label: "Today's Counter", color: bgColor),
+                            Pill(label: l10n.pillTodayCounter, color: bgColor),
                             Row(
                               children: [
                                 // Goal setting button
@@ -422,7 +431,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                         const Icon(Icons.flag_rounded, size: 12, color: Colors.white),
                                         const SizedBox(width: 4),
                                         Text(
-                                          isUnlimited ? 'Goal: ∞' : 'Goal: $target',
+                                          isUnlimited ? l10n.goalUnlimited : l10n.goalTarget(target),
                                           style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white),
                                         ),
                                       ],
@@ -443,7 +452,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                       children: [
                                         const Icon(Icons.refresh_rounded, size: 12, color: Color(0xFF718096)),
                                         const SizedBox(width: 4),
-                                        Text('Reset', style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF718096))),
+                                        Text(l10n.commonReset, style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF718096))),
                                       ],
                                     ),
                                   ),
@@ -487,7 +496,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                       const Icon(Icons.auto_awesome_rounded, size: 16, color: Color(0xFF2D3748)),
                                       const SizedBox(width: 8),
                                       Text(
-                                        "MāshāAllah! $target completed today",
+                                        l10n.goalReachedBannerDetail(target),
                                         style: GoogleFonts.inter(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600,
@@ -501,7 +510,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                   key: const ValueKey('remaining'),
                                   padding: const EdgeInsets.only(top: 4),
                                   child: Text(
-                                    isUnlimited ? 'Keep going — no limit set' : '${target - todayCount} remaining',
+                                    isUnlimited ? l10n.tapNoLimit : l10n.remainingCount(target - todayCount),
                                     style: GoogleFonts.inter(
                                       fontSize: 13,
                                       color: const Color(0xFF718096),
@@ -544,7 +553,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Pill(label: 'This Month', color: bgColor),
+                              Pill(label: l10n.thisMonthLabel, color: bgColor),
                               GestureDetector(
                                 onTap: () async {
                                   await Navigator.pushNamed(
@@ -563,7 +572,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                     children: [
                                       const Icon(Icons.calendar_month_rounded, size: 12, color: Colors.white),
                                       const SizedBox(width: 4),
-                                      Text('History', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white)),
+                                      Text(l10n.historyButton, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white)),
                                     ],
                                   ),
                                 ),
@@ -629,11 +638,11 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                           const SizedBox(height: 12),
                           Row(
                             children: [
-                              const LegendDot(color: Color(0xFF4A5568), label: 'Done'),
+                              LegendDot(color: const Color(0xFF4A5568), label: l10n.legendDone),
                               const SizedBox(width: 14),
-                              LegendDot(color: bgColor, label: 'Pending'),
+                              LegendDot(color: bgColor, label: l10n.legendPending),
                               const SizedBox(width: 14),
-                              const LegendDot(color: Color(0xFFF8F8F8), label: 'Future', bordered: true),
+                              LegendDot(color: const Color(0xFFF8F8F8), label: l10n.legendFuture, bordered: true),
                             ],
                           ),
                         ],

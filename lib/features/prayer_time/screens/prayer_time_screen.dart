@@ -17,6 +17,9 @@ import 'package:dhikir_app/core/widgets/date_header_row.dart';
 import 'package:dhikir_app/features/prayer_time/models/forbidden_period.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_notification_bottom_sheet.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/l10n/prayer_localization.dart';
+import 'package:dhikir_app/core/utils/time_format.dart';
 
 class PrayerTimeScreen extends StatefulWidget {
   const PrayerTimeScreen({super.key});
@@ -58,10 +61,10 @@ class _PrayerTimeScreenState extends State<PrayerTimeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Prayer Times'),
+        title: Text(context.l10n.prayerTimesTitle),
         actions: [
           IconButton(
-            tooltip: 'Prayer settings',
+            tooltip: context.l10n.prayerSettingsTooltip,
             icon: const Icon(Icons.settings_outlined),
             onPressed: () =>
                 Navigator.pushNamed(context, RouteNames.prayerTimeSettings),
@@ -113,6 +116,7 @@ class _LocationPrompt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -121,8 +125,8 @@ class _LocationPrompt extends StatelessWidget {
         children: [
           Text(
             provider.permissionPermanentlyDenied
-                ? 'Location permission was denied. Open Settings to enable it.'
-                : 'Location permission is required to calculate prayer times.',
+                ? l10n.locationDeniedMessage
+                : l10n.locationRequiredMessage,
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 12),
@@ -131,8 +135,8 @@ class _LocationPrompt extends StatelessWidget {
                 ? provider.openLocationSettings()
                 : provider.init(),
             child: Text(provider.permissionPermanentlyDenied
-                ? 'Open Settings'
-                : 'Enable location'),
+                ? l10n.openSettingsButton
+                : l10n.enableLocationButton),
           ),
         ],
       ),
@@ -168,7 +172,7 @@ class _DateNavCard extends StatelessWidget {
           child: Row(
             children: [
               IconButton(
-                tooltip: 'Previous day',
+                tooltip: context.l10n.previousDayTooltip,
                 icon: const Icon(Icons.chevron_left),
                 onPressed: onPrev,
               ),
@@ -182,7 +186,7 @@ class _DateNavCard extends StatelessWidget {
                 ),
               ),
               IconButton(
-                tooltip: 'Next day',
+                tooltip: context.l10n.nextDayTooltip,
                 icon: const Icon(Icons.chevron_right),
                 onPressed: onNext,
               ),
@@ -225,22 +229,22 @@ class _DatePrayerList extends StatelessWidget {
         for (final w in windows) ...[
           _prayerRow(context, theme, now, w, isCurrent: w.name == currentName),
           if (w.name == 'Fajr')
-            _markerRow(context, theme, 'Sunrise', Icons.wb_sunny_outlined,
-                times.sunrise.toLocal()),
+            _markerRow(context, theme, context.l10n.prayerNameSunrise,
+                Icons.wb_sunny_outlined, times.sunrise.toLocal()),
           if (w.name == 'Asr')
-            _markerRow(context, theme, 'Sunset', Icons.nightlight_round,
-                times.sunset.toLocal()),
+            _markerRow(context, theme, context.l10n.prayerNameSunset,
+                Icons.nightlight_round, times.sunset.toLocal()),
           if (active != null &&
               !active.start.isBefore(w.start) &&
               active.start.isBefore(w.end))
             _ForbiddenWarningCard(period: active),
         ],
-        _markerRow(context, theme, 'Middle of night', Icons.bedtime_outlined,
-            SunnahTimes(times).middleOfTheNight.toLocal()),
+        _markerRow(context, theme, context.l10n.markerMiddleOfNight,
+            Icons.bedtime_outlined, SunnahTimes(times).middleOfTheNight.toLocal()),
         _markerRow(
             context,
             theme,
-            'Last third of night',
+            context.l10n.markerLastThirdOfNight,
             Icons.nightlight_outlined,
             SunnahTimes(times).lastThirdOfTheNight.toLocal()),
         const SizedBox(height: 20),
@@ -282,7 +286,7 @@ class _DatePrayerList extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
         leading: Icon(icon, color: color),
         title: Text(
-          w.name,
+          prayerDisplayName(context, w.name),
           style: isCurrent
               ? theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
@@ -291,8 +295,8 @@ class _DatePrayerList extends StatelessWidget {
               : theme.textTheme.titleMedium,
         ),
         subtitle: Text(
-          '${TimeOfDay.fromDateTime(w.start).format(context)} – '
-          '${TimeOfDay.fromDateTime(w.end).format(context)}',
+          '${formatClockTime(w.start)} – '
+          '${formatClockTime(w.end)}',
           style: theme.textTheme.labelMedium,
         ),
         trailing: Row(
@@ -300,7 +304,7 @@ class _DatePrayerList extends StatelessWidget {
           children: [
             IconButton(
               visualDensity: VisualDensity.compact,
-              tooltip: '${w.name} notification',
+              tooltip: context.l10n.notificationTooltip(prayerDisplayName(context, w.name)),
               icon: Icon(
                 notifyEnabled
                     ? Icons.notifications_active
@@ -325,7 +329,7 @@ class _DatePrayerList extends StatelessWidget {
           style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
       trailing: Text(
-        TimeOfDay.fromDateTime(time).format(context),
+        formatClockTime(time),
         style: theme.textTheme.bodyMedium,
       ),
     );
@@ -358,14 +362,14 @@ class _ForbiddenWarningCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Forbidden time · ${period.name}',
+                    context.l10n.forbiddenTimeLabel(prayerDisplayName(context, period.name)),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: theme.colorScheme.error,
                     ),
                   ),
                   Text(
-                    'Until ${TimeOfDay.fromDateTime(period.end).format(context)}',
+                    context.l10n.untilTime(formatClockTime(period.end)),
                     style: theme.textTheme.bodySmall,
                   ),
                 ],
