@@ -4,6 +4,8 @@ import 'package:dhikir_app/core/widgets/arc_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+
 class CounterButton extends StatelessWidget {
   final int count;
   final int target;
@@ -109,7 +111,9 @@ class CounterButton extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        isUnlimited ? 'of ∞' : 'of $target',
+                        isUnlimited
+                            ? context.l10n.ofUnlimited
+                            : context.l10n.ofTarget(target),
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           color: const Color(0xFF718096),

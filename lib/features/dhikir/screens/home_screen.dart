@@ -19,9 +19,16 @@ import 'package:dhikir_app/core/providers/theme_provider.dart';
 import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/persistence/hive_service.dart';
 import 'package:dhikir_app/core/widgets/session_setup_sheet.dart';
+import 'package:dhikir_app/core/widgets/date_header_row.dart';
 import 'package:dhikir_app/features/dhikir/widgets/counter_tab.dart';
 import 'package:dhikir_app/features/favorites/screens/favorite_screen.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
+import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/features/prayer_time/widgets/prayer_time_card.dart';
+import 'package:dhikir_app/features/prayer_time/widgets/prayer_schedule_cards.dart';
+import 'package:dhikir_app/features/prayer_time/widgets/forbidden_times_card.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/data/dhikir_localizations.dart';
 
 // ─── HomeScreen ───────────────────────────────────────────────────────────────
 
@@ -76,27 +83,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(child: _pages[_selectedIndex]),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (i) => setState(() => _selectedIndex = i),
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
+            icon: const Icon(Icons.home_outlined),
+            activeIcon: const Icon(Icons.home),
+            label: l10n.navHome,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.play_arrow_outlined),
-            activeIcon: Icon(Icons.play_arrow_rounded),
-            label: 'Counter',
+            icon: const Icon(Icons.play_arrow_outlined),
+            activeIcon: const Icon(Icons.play_arrow_rounded),
+            label: l10n.navCounter,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_outline),
-            activeIcon: Icon(Icons.favorite),
-            label: 'Favorites',
+            icon: const Icon(Icons.favorite_outline),
+            activeIcon: const Icon(Icons.favorite),
+            label: l10n.navFavorites,
           ),
         ],
       ),
@@ -116,87 +124,160 @@ class HomeWidget extends StatefulWidget {
 
 class _HomeWidgetState extends State<HomeWidget> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => context.read<PrayerTimeProvider>().init(),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final now = DateTime.now();
     final builtIn = built_in.dhikirList.map(SessionDhikir.fromItem).toList();
-    final custom = CustomDhikirService.getAll().map(SessionDhikir.fromCustom).toList();
+    final custom =
+        CustomDhikirService.getAll().map(SessionDhikir.fromCustom).toList();
     final allDhikir = [...builtIn, ...custom];
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          // ── App bar ───────────────────────────────────────────────────────
-          SliverAppBar(
-            expandedHeight: 130,
-            pinned: true,
-            floating: false,
-            backgroundColor: AppColors.background,
-            surfaceTintColor: Colors.transparent,
-            elevation: 0,
-            actions: [
-              // _ThemeToggleButton(),
-              const SizedBox(width: 8),
-              _NavButton(
-                label: 'My Dhikir',
-                icon: Icons.add_rounded,
-                backgroundColor: AppColors.accentMint,
-                foregroundColor: AppColors.medium,
-                border: Border.all(color: AppColors.mintBorder),
-                onTap: () async {
-                  await Navigator.pushNamed(context, RouteNames.myDhikir);
-                  setState(() {});
-                },
-              ),
-              const SizedBox(width: 8),
-              _NavButton(
-                label: 'Analytics',
-                icon: Icons.bar_chart_rounded,
-                backgroundColor: AppColors.dark,
-                foregroundColor: Colors.white,
-                onTap: () async {
-                  await Navigator.pushNamed(context, RouteNames.analytics);
-                  setState(() {});
-                },
-              ),
-              const SizedBox(width: 16),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 24, bottom: 16),
-              title: Text(
-                'Daily Dhikir',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.dark,
+    return CustomScrollView(
+      slivers: [
+        // ── App bar ───────────────────────────────────────────────────────
+        // SliverAppBar(
+        //   // expandedHeight: 130,
+        //   pinned: true,
+        //   floating: false,
+        //   backgroundColor: AppColors.background,
+        //   surfaceTintColor: Colors.transparent,
+        //   elevation: 0,
+        //   actions: [
+        // _ThemeToggleButton(),
+        // IconButton(
+        //   tooltip: 'About',
+        //   icon: const Icon(Icons.info_outline, color: AppColors.dark),
+        //   onPressed: () => Navigator.pushNamed(context, RouteNames.about),
+        // ),
+        // const SizedBox(width: 8),
+        // _NavButton(
+        //   label: 'My Dhikir',
+        //   icon: Icons.add_rounded,
+        //   backgroundColor: AppColors.accentMint,
+        //   foregroundColor: AppColors.medium,
+        //   border: Border.all(color: AppColors.mintBorder),
+        //   onTap: () async {
+        //     await Navigator.pushNamed(context, RouteNames.myDhikir);
+        //     setState(() {});
+        //   },
+        // ),
+        // const SizedBox(width: 8),
+        // _NavButton(
+        //   label: 'Analytics',
+        //   icon: Icons.bar_chart_rounded,
+        //   backgroundColor: AppColors.dark,
+        //   foregroundColor: Colors.white,
+        //   onTap: () async {
+        //     await Navigator.pushNamed(context, RouteNames.analytics);
+        //     setState(() {});
+        //   },
+        // ),
+        // const SizedBox(width: 16),
+        // ],
+        // flexibleSpace: FlexibleSpaceBar(
+        //   titlePadding: const EdgeInsets.only(left: 24, bottom: 16),
+        //   title: Text(
+        //     'Daily Dhikir',
+        //     style: GoogleFonts.playfairDisplay(
+        //       fontSize: 26,
+        //       fontWeight: FontWeight.w700,
+        //       color: AppColors.dark,
+        //     ),
+        //   ),
+        // ),
+        // ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: Row(
+              children: [
+                Spacer(),
+                _NavButton(
+                  label: l10n.navMyDhikir,
+                  icon: Icons.add_rounded,
+                  backgroundColor: AppColors.accentMint,
+                  foregroundColor: AppColors.medium,
+                  border: Border.all(color: AppColors.mintBorder),
+                  onTap: () async {
+                    await Navigator.pushNamed(context, RouteNames.myDhikir);
+                    setState(() {});
+                  },
                 ),
-              ),
+                IconButton(
+                  tooltip: l10n.aboutTitle,
+                  icon: const Icon(Icons.info_outline, color: AppColors.dark),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, RouteNames.about),
+                ),
+                const SizedBox(width: 8)
+              ],
             ),
           ),
+        ),
+        // ── Date + prayer time ───────────────────────────────────────────
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: DateHeaderRow(
+              hijriOffsetDays:
+                  context.watch<PrayerTimeProvider>().displayHijriOffsetDays,
+              sunrise:
+                  context.watch<PrayerTimeProvider>().today?.sunrise.toLocal(),
+              sunset:
+                  context.watch<PrayerTimeProvider>().today?.sunset.toLocal(),
+              onHijriTap: () =>
+                  Navigator.pushNamed(context, RouteNames.hijriSettings),
+            ),
+          ),
+        ),
+        const SliverToBoxAdapter(child: PrayerTimeCard()),
+        const SliverToBoxAdapter(child: PrayerScheduleSection()),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: _QuickActionsSection(onReturn: () => setState(() {})),
+          ),
+        ),
 
-          // ── Dhikir grid ───────────────────────────────────────────────────
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.2,
+        const SliverToBoxAdapter(child: ForbiddenTimesCard()),
+
+        SliverToBoxAdapter(
+            child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          child: Text(l10n.homeSectionTitle,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        )),
+
+        // ── Dhikir grid ───────────────────────────────────────────────────
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.2,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (_, i) => _DhikirGridCard(
+                item: allDhikir[i],
+                year: now.year,
+                month: now.month,
+                onReturn: () => setState(() {}),
               ),
-              delegate: SliverChildBuilderDelegate(
-                (_, i) => _DhikirGridCard(
-                  item: allDhikir[i],
-                  year: now.year,
-                  month: now.month,
-                  onReturn: () => setState(() {}),
-                ),
-                childCount: allDhikir.length,
-              ),
+              childCount: allDhikir.length,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -219,6 +300,7 @@ class _DhikirGridCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final progress = HiveService.getProgress(item.id);
     final daysInMonth = DateTime(year, month + 1, 0).day;
     final completed = progress.completedCountInMonth(year, month);
@@ -268,7 +350,7 @@ class _DhikirGridCard extends StatelessWidget {
                     if (todayCount > 0) ...[
                       const SizedBox(height: 3),
                       _Badge(
-                        label: '$todayCount× today',
+                        label: l10n.todayCountBadge(todayCount),
                         bgColor: AppColors.dark,
                         textColor: Colors.white,
                       ),
@@ -279,7 +361,7 @@ class _DhikirGridCard extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              item.title,
+              localizedDhikirTitle(context, item.id) ?? item.title,
               style: GoogleFonts.playfairDisplay(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
@@ -294,7 +376,8 @@ class _DhikirGridCard extends StatelessWidget {
                 value: ratio,
                 minHeight: 5,
                 backgroundColor: Colors.white.withValues(alpha: 0.6),
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.medium.withValues(alpha: 0.6)),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.medium.withValues(alpha: 0.6)),
               ),
             ),
           ],
@@ -328,7 +411,8 @@ class _Badge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: textColor),
+        style: GoogleFonts.inter(
+            fontSize: 10, fontWeight: FontWeight.w600, color: textColor),
       ),
     );
   }
@@ -369,10 +453,108 @@ class _NavButton extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: foregroundColor),
+              style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: foregroundColor),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// "Quick Actions" row shown between the prayer cards and the dhikir grid.
+class _QuickActionsSection extends StatelessWidget {
+  final VoidCallback onReturn;
+
+  const _QuickActionsSection({required this.onReturn});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.quickActionsTitle,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            _QuickActionTile(
+              icon: Icons.schedule,
+              label: l10n.quickActionPrayerTime,
+              backgroundColor: AppColors.dark,
+              foregroundColor: Colors.white,
+              onTap: () async {
+                await Navigator.pushNamed(context, RouteNames.prayerTime);
+                onReturn();
+              },
+            ),
+            const SizedBox(width: 16),
+            _QuickActionTile(
+              icon: Icons.explore,
+              label: l10n.quickActionQibla,
+              backgroundColor: AppColors.accentMint,
+              foregroundColor: AppColors.medium,
+              border: Border.all(color: AppColors.mintBorder),
+              onTap: () => Navigator.pushNamed(context, RouteNames.qibla),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Square icon-filled tile with its title below — single item in
+/// [_QuickActionsSection].
+class _QuickActionTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final BoxBorder? border;
+  final VoidCallback onTap;
+
+  const _QuickActionTile({
+    required this.icon,
+    required this.label,
+    required this.backgroundColor,
+    required this.foregroundColor,
+    required this.onTap,
+    this.border,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(16),
+              border: border,
+            ),
+            child: Icon(icon, color: foregroundColor, size: 26),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.dark,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -383,8 +565,11 @@ class _ThemeToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<ThemeProvider>();
+    final l10n = context.l10n;
     return IconButton(
-      tooltip: theme.isDark ? 'Switch to light mode' : 'Switch to dark mode',
+      tooltip: theme.isDark
+          ? l10n.themeToggleSwitchToLight
+          : l10n.themeToggleSwitchToDark,
       icon: Icon(
         theme.isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
         color: AppColors.dark,

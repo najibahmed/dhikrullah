@@ -12,6 +12,8 @@ import 'package:dhikir_app/core/providers/favorites_provider.dart';
 import 'package:dhikir_app/features/my_dhikir/screens/my_dhikir_screen.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/data/dhikir_localizations.dart';
 
 /// Shows all dhikir as a list with per-item session-start buttons.
 class CounterTab extends StatefulWidget {
@@ -26,6 +28,7 @@ class CounterTab extends StatefulWidget {
 class _CounterTabState extends State<CounterTab> {
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final builtIn = dhikirList.map(SessionDhikir.fromItem).toList();
     final custom = CustomDhikirService.getAll().map(SessionDhikir.fromCustom).toList();
     final all = [...builtIn, ...custom];
@@ -38,13 +41,13 @@ class _CounterTabState extends State<CounterTab> {
           children: [
             // Full-session button
             _SessionStartButton(
-              label: 'Start Full Session — ${all.length} Dhikir',
+              label: l10n.startFullSessionButton(all.length),
               onTap: () => widget.onStartSession(all),
             ),
             const SizedBox(height: 16),
 
             SectionHeader(
-              title: 'All Dhikir',
+              title: l10n.allDhikirSectionTitle,
               count: all.length,
               onSession: () => widget.onStartSession(all),
             ),
@@ -54,7 +57,7 @@ class _CounterTabState extends State<CounterTab> {
             ...all.map((item) {
               return FavRow(
                   id: item.id,
-                  title: item.title,
+                  title: localizedDhikirTitle(context, item.id) ?? item.title,
                   arabic: item.arabicText,
                   transliteration: item.transliteration,
                   icon: item.icon,

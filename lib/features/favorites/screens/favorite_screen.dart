@@ -10,6 +10,7 @@ import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/widgets/fav_row.dart';
 import 'package:dhikir_app/core/widgets/section_header.dart';
 import 'package:dhikir_app/core/widgets/session_setup_sheet.dart';
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 
 class FavouritesScreen extends StatefulWidget {
   const FavouritesScreen({
@@ -51,6 +52,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     // Watch the provider so UI rebuilds on any favourite change.
     final favProvider = context.watch<FavoritesProvider>();
     final favIds = favProvider.all;
@@ -74,10 +76,10 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                     size: 70,
                   ),
                   const SizedBox(height: 16),
-                  Text('No favorite dhikir yet',
+                  Text(l10n.favoritesEmptyTitle,
                       style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
                   const SizedBox(height: 8),
-                  Text('Tap the heart icon to favorite your dhikir',
+                  Text(l10n.favoritesEmptySubtitle,
                       style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF718096), height: 1.5), textAlign: TextAlign.center)
                 ],
               ),
@@ -106,7 +108,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                             children: [
                               const Icon(Icons.play_circle_rounded, color: Colors.white, size: 20),
                               const SizedBox(width: 8),
-                              Text('Start Full Session — ${combined.length} Dhikir',
+                              Text(l10n.startFullSessionButton(combined.length),
                                   style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
                             ],
                           ),
@@ -116,7 +118,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                     if (customFavorites.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       SectionHeader(
-                        title: 'Custom Favourite Dhikir',
+                        title: l10n.favoritesCustomSectionTitle,
                         count: customSession.length,
                         onSession: () => _showSessionSetup(customSession),
                       ),
@@ -135,7 +137,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                     if (favBuiltInSession.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       SectionHeader(
-                        title: 'Favourite Dhikir',
+                        title: l10n.favoritesSectionTitle,
                         count: favBuiltInSession.length,
                         onSession: () => _showSessionSetup(favBuiltInSession),
                       ),

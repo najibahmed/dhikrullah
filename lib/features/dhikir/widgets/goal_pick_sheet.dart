@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/l10n/generated/app_localizations.dart';
+
 class GoalPickerSheet extends StatefulWidget {
   final int currentTarget;
   final Color accentColor;
@@ -30,14 +33,6 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
     -1: '∞',
   };
 
-  static const _subtitles = {
-    33: 'Tasbih — SubhanAllah',
-    34: 'Tasbih — Alhamdulillah',
-    99: 'Names of Allah',
-    100: 'Daily century goal',
-    -1: 'No limit — count freely',
-  };
-
   @override
   void initState() {
     super.initState();
@@ -45,10 +40,19 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
   }
 
   String _label(int v) => _labels[v] ?? '$v';
-  String _subtitle(int v) => _subtitles[v] ?? '';
+
+  String _subtitle(AppLocalizations l10n, int v) => switch (v) {
+        33 => l10n.goalSubtitleTasbihSubhanallah,
+        34 => l10n.goalSubtitleTasbihAlhamdulillah,
+        99 => l10n.goalSubtitleNamesOfAllah,
+        100 => l10n.goalSubtitleDailyCentury,
+        -1 => l10n.goalSubtitleNoLimit,
+        _ => '',
+      };
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final accent = widget.accentColor;
 
     return SafeArea(
@@ -91,7 +95,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Set Counter Goal',
+                          l10n.goalPickSheetTitle,
                           style: GoogleFonts.playfairDisplay(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -99,7 +103,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                           ),
                         ),
                         Text(
-                          'Choose how many times to recite',
+                          l10n.goalPickSheetSubtitle,
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: const Color(0xFF718096),
@@ -161,7 +165,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  goal == -1 ? 'Unlimited' : '$goal times',
+                                  goal == -1 ? l10n.goalLabelUnlimited : l10n.goalLabelTimes(goal),
                                   style: GoogleFonts.inter(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
@@ -170,7 +174,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  _subtitle(goal),
+                                  _subtitle(l10n, goal),
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     color: isSelected ? Colors.white60 : const Color(0xFF718096),
@@ -218,7 +222,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                           ),
                           child: Center(
                             child: Text(
-                              'Cancel',
+                              l10n.commonCancel,
                               style: GoogleFonts.inter(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -255,7 +259,9 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                                 const Icon(Icons.flag_rounded, size: 16, color: Colors.white),
                                 const SizedBox(width: 8),
                                 Text(
-                                  _selected == -1 ? 'Set Unlimited' : 'Set Goal: ${_label(_selected)}',
+                                  _selected == -1
+                                      ? l10n.setUnlimitedButton
+                                      : l10n.setGoalButton(_label(_selected)),
                                   style: GoogleFonts.inter(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
