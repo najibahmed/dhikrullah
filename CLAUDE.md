@@ -66,6 +66,26 @@ Built-in and custom dhikir share the same progress/favorites boxes and keys — 
 
 **Dates as strings**: progress is keyed by `"yyyy-MM-dd"` strings (`DhikirProgress.dateKey`), not `DateTime`, both for the Hive map keys and for the `completedDates` list. Streak/heatmap/month-completion calculations all parse/compare these strings — keep new date logic consistent with that format rather than introducing `DateTime`-keyed storage.
 
+## Alarm & Adhan Module
+
+For any alarm-related task, Claude must first read:
+
+- .claude/specs/alarm-specs/alarm_implementation.md
+- .claude/specs/alarm-specs/alarm_api_contract.md
+- .claude/specs/alarm-specs/alarm_android_setup.md
+- .claude/specs/alarm-specs/alarm_foreground_service.md
+- .claude/specs/alarm-specs/alarm_fullscreen_flow.md
+
+Rules:
+- Keep alarm scheduling separate from reminder notifications.
+- Reuse the existing prayer calculation and notification scheduling.
+- Use Provider, Hive, SharedPreferences, flutter_local_notifications.
+- Use Android exact alarms and a foreground service.
+- Full-screen alarm is optional per prayer.
+- If full-screen is disabled, dismissal is via the foreground notification.
+- Ask questions instead of making assumptions.
+- Implement incrementally.
+
 ## Theming
 
 **ThemeData only** — going forward, all colors/styles should come from `Theme.of(context)` (light/dark `ThemeData` defined in `main.dart`, Material 3, `google_fonts` Inter + Playfair Display). Some existing widgets still read a fixed-palette `AppColors` (`lib/core/app_colors.dart`) directly instead of `Theme.of(context)`, which is why dark mode isn't fully wired through every screen — when you touch one of these widgets, migrate it to `Theme.of(context)` rather than adding a new `AppColors` reference. Don't reintroduce a second parallel color system.
