@@ -100,7 +100,7 @@ Keys (Label = Fajr | Dhuhr | Asr | Maghrib | Isha | Tahajjud)
 - alarm_offset_<Label> — int, -60..+60 step 5, default 0
 - alarm_vibrate_<Label> — bool, default true
 - alarm_fullscreen_<Label> — bool, default false
-- alarm_scheduled_times — JSON list {prayerId, label, epochMillis}
+- alarm_scheduled_times — JSON list {prayerId, epochMillis}. prayerId is the label string itself, used directly as the native notification's display text.
 
 Public API
 
@@ -138,7 +138,7 @@ Channel: `dhikir_app/alarm`
 
 Dart → Kotlin
 
-- armAlarm(prayerId, label, epochMillis)
+- armAlarm(prayerId, epochMillis)
 - cancelAlarm(prayerId)
 - cancelAllAlarms()
 - dismissActiveAlarm()
