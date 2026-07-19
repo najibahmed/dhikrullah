@@ -17,16 +17,19 @@ import androidx.core.app.NotificationManagerCompat
 
 /** Native alarm playback lifecycle: audio + vibration + ongoing notification,
  * auto-stopping when playback completes (per alarm_foreground_service.md).
- * Fullscreen launch is added in a later phase. */
+ * Optionally launches FullScreenAlarmActivity via full-screen intent when
+ * alarm_fullscreen_<Label> is on and the OS grants full-screen-intent use. */
 class ForegroundAlarmService : Service() {
 
     companion object {
         private const val TAG = "ForegroundAlarmService"
         const val ACTION_DISMISS = "com.example.dhikir_app.action.DISMISS_ALARM"
+        const val ACTION_ALARM_STOPPED = "com.example.dhikir_app.action.ALARM_STOPPED"
         private const val CHANNEL_ID = "alarm_playback_channel"
         private const val NOTIFICATION_ID = 1001
         private const val PREFS_NAME = "FlutterSharedPreferences"
         private const val KEY_VIBRATE_PREFIX = "flutter.alarm_vibrate_"
+        private const val KEY_FULLSCREEN_PREFIX = "flutter.alarm_fullscreen_"
         private val VIBRATE_PATTERN = longArrayOf(0, 1000, 1000)
     }
 
@@ -90,7 +93,7 @@ class ForegroundAlarmService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("$prayerId")
             .setContentText("Prayer alarm is playing")
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
@@ -99,12 +102,39 @@ class ForegroundAlarmService : Service() {
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .addAction(0, "Dismiss", dismissPendingIntent)
-            .build()
+
+        if (isFullscreenEnabled(prayerId) && canUseFullScreenIntent()) {
+            val fullScreenIntent = Intent(this, FullScreenAlarmActivity::class.java)
+                .putExtra(FullScreenAlarmActivity.EXTRA_PRAYER_ID, prayerId)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            val fullScreenPendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                fullScreenIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            builder.setFullScreenIntent(fullScreenPendingIntent, true)
+        }
+
+        return builder.build()
     }
 
     private fun isVibrationEnabled(prayerId: String): Boolean {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getBoolean("$KEY_VIBRATE_PREFIX$prayerId", true)
+    }
+
+    private fun isFullscreenEnabled(prayerId: String): Boolean {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getBoolean("$KEY_FULLSCREEN_PREFIX$prayerId", false)
+    }
+
+    private fun canUseFullScreenIntent(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            getSystemService(NotificationManager::class.java).canUseFullScreenIntent()
+        } else {
+            true
+        }
     }
 
     private fun startVibration() {
@@ -148,6 +178,7 @@ class ForegroundAlarmService : Service() {
             it.release()
         }
         mediaPlayer = null
+        sendBroadcast(Intent(ACTION_ALARM_STOPPED).setPackage(packageName))
         NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_REMOVE)
