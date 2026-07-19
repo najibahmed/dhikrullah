@@ -103,7 +103,7 @@ class ForegroundAlarmService : Service() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .addAction(0, "Dismiss", dismissPendingIntent)
 
-        if (isFullscreenEnabled(prayerId) && canUseFullScreenIntent()) {
+        if (isFullscreenEnabled(prayerId) && AlarmPermissions.canUseFullScreenIntent(this)) {
             val fullScreenIntent = Intent(this, FullScreenAlarmActivity::class.java)
                 .putExtra(FullScreenAlarmActivity.EXTRA_PRAYER_ID, prayerId)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -127,14 +127,6 @@ class ForegroundAlarmService : Service() {
     private fun isFullscreenEnabled(prayerId: String): Boolean {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getBoolean("$KEY_FULLSCREEN_PREFIX$prayerId", false)
-    }
-
-    private fun canUseFullScreenIntent(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            getSystemService(NotificationManager::class.java).canUseFullScreenIntent()
-        } else {
-            true
-        }
     }
 
     private fun startVibration() {

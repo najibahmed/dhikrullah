@@ -68,7 +68,7 @@ Prayer time (from PrayerTimeProvider)
 4. ~~ForegroundAlarmService: MediaPlayer + vibration + ongoing notification + auto-stop~~ done
 5. ~~BootReceiver restore~~ done
 6. ~~FullScreenAlarmActivity (optional per prayer)~~ done
-7. Permissions flows (exact alarm, full-screen intent special access on Android 14+)
+7. ~~Permissions flows (exact alarm, full-screen intent special access on Android 14+)~~ done
 8. Bottom-sheet alarm UI section + reschedule triggers
 9. Testing
 

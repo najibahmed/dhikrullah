@@ -2,8 +2,11 @@
 //
 // Primary Dart entry point for the alarm module (per alarm_api_contract.md).
 // Bridges AlarmScheduler's computed timestamps to native exact alarms via
-// AlarmMethodChannel. Dismiss/isRunning arrive once ForegroundAlarmService
-// exists (phase 4); fullscreen permission methods arrive with phase 6/7.
+// AlarmMethodChannel, and exposes the exact-alarm / full-screen-intent
+// permission flows from alarm_android_setup.md for the settings UI to drive.
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 import 'package:dhikir_app/features/alarm/models/scheduled_alarm.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_method_channel.dart';
@@ -26,14 +29,28 @@ class AlarmService {
     return methodChannel.openExactAlarmSettings();
   }
 
+  Future<bool> canUseFullScreenIntent() {
+    return methodChannel.canUseFullScreenIntent();
+  }
+
+  Future<void> openFullScreenIntentSettings() {
+    return methodChannel.openFullScreenIntentSettings();
+  }
+
   /// Recomputes upcoming alarms from current settings/prayer times, persists
   /// them, and re-arms every one natively. Call on app open and whenever
-  /// alarm settings change.
+  /// alarm settings change. A single prayer failing to arm (e.g. exact-alarm
+  /// permission revoked) is logged and skipped rather than throwing — never
+  /// crashes the caller, per alarm_api_contract.md's error contract.
   Future<List<ScheduledAlarm>> rescheduleAllPrayerAlarms({DateTime? from}) async {
     await methodChannel.cancelAllAlarms();
     final alarms = await scheduler.scheduleUpcoming(from: from);
     for (final alarm in alarms) {
-      await methodChannel.armAlarm(alarm.prayerId, alarm.epochMillis);
+      try {
+        await methodChannel.armAlarm(alarm.prayerId, alarm.epochMillis);
+      } on PlatformException catch (e) {
+        debugPrint('AlarmService: failed to arm ${alarm.prayerId}: ${e.message}');
+      }
     }
     return alarms;
   }

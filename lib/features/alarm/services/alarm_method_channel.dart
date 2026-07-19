@@ -32,4 +32,13 @@ class AlarmMethodChannel {
   Future<void> openExactAlarmSettings() {
     return _channel.invokeMethod('openExactAlarmSettings');
   }
+
+  Future<bool> canUseFullScreenIntent() async {
+    final result = await _channel.invokeMethod<bool>('canUseFullScreenIntent');
+    return result ?? false;
+  }
+
+  Future<void> openFullScreenIntentSettings() {
+    return _channel.invokeMethod('openFullScreenIntentSettings');
+  }
 }

@@ -4,12 +4,14 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.util.Log
 
 /** Shared AlarmManager arm/cancel logic — used by both AlarmMethodChannel
  * (live app requests) and BootReceiver (restore after reboot), so the two
  * never construct PendingIntents differently for the same prayer. */
 object AlarmArmer {
+
+    private const val TAG = "AlarmArmer"
 
     /** Must match lib/features/alarm/models/alarm_settings.dart's alarmPrayerLabels. */
     val prayerLabels = listOf("Fajr", "Dhuhr", "Asr", "Maghrib", "Isha", "Tahajjud")
@@ -29,12 +31,20 @@ object AlarmArmer {
         )
     }
 
-    fun arm(context: Context, prayerId: String, epochMillis: Long) {
-        alarmManager(context).setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            epochMillis,
-            pendingIntentFor(context, prayerId)
-        )
+    /** Returns false (never throws) if the OS refused the exact alarm —
+     * e.g. SCHEDULE_EXACT_ALARM revoked at runtime on Android 12+. */
+    fun arm(context: Context, prayerId: String, epochMillis: Long): Boolean {
+        return try {
+            alarmManager(context).setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                epochMillis,
+                pendingIntentFor(context, prayerId)
+            )
+            true
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Exact alarm permission denied for $prayerId", e)
+            false
+        }
     }
 
     fun cancel(context: Context, prayerId: String) {
@@ -43,13 +53,5 @@ object AlarmArmer {
 
     fun cancelAll(context: Context) {
         prayerLabels.forEach { cancel(context, it) }
-    }
-
-    fun canScheduleExactAlarms(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            alarmManager(context).canScheduleExactAlarms()
-        } else {
-            true
-        }
     }
 }
