@@ -44,7 +44,12 @@
   "settingsLanguageDialogTitle": "ভাষা নির্বাচন করুন",
 
   "qiblaTitle": "কিবলা কম্পাস",
-  "qiblaComingSoon": "শীঘ্রই আসছে",
+  "qiblaFacing": "কিবলার দিকে আছেন",
+  "qiblaTurnLeft": "বামে ঘুরুন",
+  "qiblaTurnRight": "ডানে ঘুরুন",
+  "qiblaHeadingLabel": "দিক",
+  "qiblaBearingLabel": "কিবলা",
+  "qiblaNoSensor": "এই ডিভাইসে কম্পাস সেন্সর নেই।",
 
   "favoritesEmptyTitle": "এখনও কোনো প্রিয় যিকির নেই",
   "favoritesEmptySubtitle": "আপনার যিকির প্রিয় তালিকায় যুক্ত করতে হার্ট আইকনে ট্যাপ করুন",

@@ -145,7 +145,22 @@ class AppLocalizationsBn extends AppLocalizations {
   String get qiblaTitle => 'কিবলা কম্পাস';
 
   @override
-  String get qiblaComingSoon => 'শীঘ্রই আসছে';
+  String get qiblaFacing => 'কিবলার দিকে আছেন';
+
+  @override
+  String get qiblaTurnLeft => 'বামে ঘুরুন';
+
+  @override
+  String get qiblaTurnRight => 'ডানে ঘুরুন';
+
+  @override
+  String get qiblaHeadingLabel => 'দিক';
+
+  @override
+  String get qiblaBearingLabel => 'কিবলা';
+
+  @override
+  String get qiblaNoSensor => 'এই ডিভাইসে কম্পাস সেন্সর নেই।';
 
   @override
   String get favoritesEmptyTitle => 'এখনও কোনো প্রিয় যিকির নেই';

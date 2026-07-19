@@ -50,7 +50,12 @@
   "settingsLanguageDialogTitle": "Choose Language",
 
   "qiblaTitle": "Qibla Compass",
-  "qiblaComingSoon": "Coming soon",
+  "qiblaFacing": "Facing Qibla",
+  "qiblaTurnLeft": "Turn left",
+  "qiblaTurnRight": "Turn right",
+  "qiblaHeadingLabel": "Heading",
+  "qiblaBearingLabel": "Qibla",
+  "qiblaNoSensor": "Compass sensor is not available on this device.",
 
   "favoritesEmptyTitle": "No favorite dhikir yet",
   "favoritesEmptySubtitle": "Tap the heart icon to favorite your dhikir",

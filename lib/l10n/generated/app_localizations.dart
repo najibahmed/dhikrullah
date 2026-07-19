@@ -344,11 +344,41 @@ abstract class AppLocalizations {
   /// **'Qibla Compass'**
   String get qiblaTitle;
 
-  /// No description provided for @qiblaComingSoon.
+  /// No description provided for @qiblaFacing.
   ///
   /// In en, this message translates to:
-  /// **'Coming soon'**
-  String get qiblaComingSoon;
+  /// **'Facing Qibla'**
+  String get qiblaFacing;
+
+  /// No description provided for @qiblaTurnLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn left'**
+  String get qiblaTurnLeft;
+
+  /// No description provided for @qiblaTurnRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn right'**
+  String get qiblaTurnRight;
+
+  /// No description provided for @qiblaHeadingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Heading'**
+  String get qiblaHeadingLabel;
+
+  /// No description provided for @qiblaBearingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Qibla'**
+  String get qiblaBearingLabel;
+
+  /// No description provided for @qiblaNoSensor.
+  ///
+  /// In en, this message translates to:
+  /// **'Compass sensor is not available on this device.'**
+  String get qiblaNoSensor;
 
   /// No description provided for @favoritesEmptyTitle.
   ///

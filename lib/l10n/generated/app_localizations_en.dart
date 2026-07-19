@@ -145,7 +145,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qiblaTitle => 'Qibla Compass';
 
   @override
-  String get qiblaComingSoon => 'Coming soon';
+  String get qiblaFacing => 'Facing Qibla';
+
+  @override
+  String get qiblaTurnLeft => 'Turn left';
+
+  @override
+  String get qiblaTurnRight => 'Turn right';
+
+  @override
+  String get qiblaHeadingLabel => 'Heading';
+
+  @override
+  String get qiblaBearingLabel => 'Qibla';
+
+  @override
+  String get qiblaNoSensor => 'Compass sensor is not available on this device.';
 
   @override
   String get favoritesEmptyTitle => 'No favorite dhikir yet';
