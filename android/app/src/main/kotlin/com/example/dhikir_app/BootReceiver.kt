@@ -30,9 +30,10 @@ class BootReceiver : BroadcastReceiver() {
                 val entry = entries.getJSONObject(i)
                 val prayerId = entry.getString("prayerId")
                 val epochMillis = entry.getLong("epochMillis")
+                val label = entry.optString("label", prayerId)
                 if (prayerId !in AlarmArmer.prayerLabels) continue
                 if (epochMillis <= now) continue
-                AlarmArmer.arm(context, prayerId, epochMillis)
+                AlarmArmer.arm(context, prayerId, epochMillis, label)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to restore alarms from $KEY_SCHEDULED_TIMES", e)

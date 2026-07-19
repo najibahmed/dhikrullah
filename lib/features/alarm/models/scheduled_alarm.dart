@@ -6,23 +6,33 @@
 // alarm module must never calculate prayer times itself).
 
 class ScheduledAlarm {
-  /// Same string as [AlarmSettings.prayerId] / prayer label (`Fajr`..
-  /// `Tahajjud`) — already human-readable, so it doubles as the native
-  /// notification's display text.
+  /// Fixed English identifier (`Fajr`..`Tahajjud`) — used as the
+  /// SharedPreferences key suffix and never localized.
   final String prayerId;
   final int epochMillis;
 
-  const ScheduledAlarm({required this.prayerId, required this.epochMillis});
+  /// Locale-aware display name (via `prayerDisplayNameFor`) shown as the
+  /// native alarm notification's title — computed once at schedule time
+  /// since native Kotlin has no access to Flutter's AppLocalizations.
+  final String label;
+
+  const ScheduledAlarm({
+    required this.prayerId,
+    required this.epochMillis,
+    required this.label,
+  });
 
   DateTime get time => DateTime.fromMillisecondsSinceEpoch(epochMillis);
 
   Map<String, dynamic> toJson() => {
         'prayerId': prayerId,
         'epochMillis': epochMillis,
+        'label': label,
       };
 
   factory ScheduledAlarm.fromJson(Map<String, dynamic> json) => ScheduledAlarm(
         prayerId: json['prayerId'] as String,
         epochMillis: json['epochMillis'] as int,
+        label: json['label'] as String? ?? json['prayerId'] as String,
       );
 }

@@ -5,6 +5,8 @@
 // AlarmMethodChannel, and exposes the exact-alarm / full-screen-intent
 // permission flows from alarm_android_setup.md for the settings UI to drive.
 
+import 'dart:ui' show Locale;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -42,12 +44,17 @@ class AlarmService {
   /// alarm settings change. A single prayer failing to arm (e.g. exact-alarm
   /// permission revoked) is logged and skipped rather than throwing — never
   /// crashes the caller, per alarm_api_contract.md's error contract.
-  Future<List<ScheduledAlarm>> rescheduleAllPrayerAlarms({DateTime? from}) async {
+  Future<List<ScheduledAlarm>> rescheduleAllPrayerAlarms({
+    DateTime? from,
+    required Locale locale,
+  }) async {
     await methodChannel.cancelAllAlarms();
-    final alarms = await scheduler.scheduleUpcoming(from: from);
+    final alarms =
+        await scheduler.scheduleUpcoming(from: from, locale: locale);
     for (final alarm in alarms) {
       try {
-        await methodChannel.armAlarm(alarm.prayerId, alarm.epochMillis);
+        await methodChannel.armAlarm(
+            alarm.prayerId, alarm.epochMillis, alarm.label);
       } on PlatformException catch (e) {
         debugPrint('AlarmService: failed to arm ${alarm.prayerId}: ${e.message}');
       }

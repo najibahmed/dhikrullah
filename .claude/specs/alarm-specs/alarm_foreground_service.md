@@ -20,6 +20,10 @@ Alarm fires (AlarmReceiver)
 ## Auto-stop
 MediaPlayer onCompletion → same teardown as dismiss. No looping, no timeout needed.
 
+## Ringer mode
+Ringer is Silent or Vibrate (`AudioManager.getRingerMode() != RINGER_MODE_NORMAL`) → skip adhan playback, log only.
+Vibration unaffected — still gated purely by `alarm_vibrate_<Label>`, never forced on.
+
 ## Notification
 - Prayer name
 - Dismiss action

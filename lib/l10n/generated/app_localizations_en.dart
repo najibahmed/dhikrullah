@@ -673,6 +673,58 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get alarmSectionTitle => 'Alarm';
+
+  @override
+  String get alarmFullWithAdhan => 'Full alarm with Adhan';
+
+  @override
+  String get alarmStateOn => 'On';
+
+  @override
+  String get alarmStateOff => 'Off';
+
+  @override
+  String get alarmTimeOffset => 'Alarm time offset';
+
+  @override
+  String get alarmOffsetOnTime => 'On time';
+
+  @override
+  String alarmOffsetMinutesPlus(Object minutes) {
+    return '+$minutes min';
+  }
+
+  @override
+  String alarmOffsetMinutesMinus(Object minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get alarmVibration => 'Vibration';
+
+  @override
+  String get alarmFullScreen => 'Full-screen alarm';
+
+  @override
+  String get alarmFullScreenSubtitle =>
+      'Show a lock-screen alert when the alarm fires';
+
+  @override
+  String get alarmExactPermissionTitle => 'Exact alarms are off';
+
+  @override
+  String get alarmExactPermissionBody =>
+      'Allow exact alarms in system settings so this prayer alarm fires on time.';
+
+  @override
+  String get alarmFullScreenPermissionTitle => 'Full-screen alerts are off';
+
+  @override
+  String get alarmFullScreenPermissionBody =>
+      'Allow full-screen alerts in system settings so this alarm can show over the lock screen. It still rings as a notification either way.';
+
+  @override
   String hijriOffsetDayLabel(Object days) {
     return '$days Day';
   }

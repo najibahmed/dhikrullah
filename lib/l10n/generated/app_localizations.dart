@@ -1286,6 +1286,96 @@ abstract class AppLocalizations {
   /// **'Time for {label}.'**
   String notifOptionalBody(Object label);
 
+  /// No description provided for @alarmSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm'**
+  String get alarmSectionTitle;
+
+  /// No description provided for @alarmFullWithAdhan.
+  ///
+  /// In en, this message translates to:
+  /// **'Full alarm with Adhan'**
+  String get alarmFullWithAdhan;
+
+  /// No description provided for @alarmStateOn.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get alarmStateOn;
+
+  /// No description provided for @alarmStateOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get alarmStateOff;
+
+  /// No description provided for @alarmTimeOffset.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm time offset'**
+  String get alarmTimeOffset;
+
+  /// No description provided for @alarmOffsetOnTime.
+  ///
+  /// In en, this message translates to:
+  /// **'On time'**
+  String get alarmOffsetOnTime;
+
+  /// No description provided for @alarmOffsetMinutesPlus.
+  ///
+  /// In en, this message translates to:
+  /// **'+{minutes} min'**
+  String alarmOffsetMinutesPlus(Object minutes);
+
+  /// No description provided for @alarmOffsetMinutesMinus.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String alarmOffsetMinutesMinus(Object minutes);
+
+  /// No description provided for @alarmVibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibration'**
+  String get alarmVibration;
+
+  /// No description provided for @alarmFullScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Full-screen alarm'**
+  String get alarmFullScreen;
+
+  /// No description provided for @alarmFullScreenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show a lock-screen alert when the alarm fires'**
+  String get alarmFullScreenSubtitle;
+
+  /// No description provided for @alarmExactPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact alarms are off'**
+  String get alarmExactPermissionTitle;
+
+  /// No description provided for @alarmExactPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow exact alarms in system settings so this prayer alarm fires on time.'**
+  String get alarmExactPermissionBody;
+
+  /// No description provided for @alarmFullScreenPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Full-screen alerts are off'**
+  String get alarmFullScreenPermissionTitle;
+
+  /// No description provided for @alarmFullScreenPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow full-screen alerts in system settings so this alarm can show over the lock screen. It still rings as a notification either way.'**
+  String get alarmFullScreenPermissionBody;
+
   /// No description provided for @hijriOffsetDayLabel.
   ///
   /// In en, this message translates to:

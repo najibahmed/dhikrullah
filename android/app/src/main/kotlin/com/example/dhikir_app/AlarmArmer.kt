@@ -19,9 +19,10 @@ object AlarmArmer {
     private fun alarmManager(context: Context): AlarmManager =
         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    private fun pendingIntentFor(context: Context, prayerId: String): PendingIntent {
+    private fun pendingIntentFor(context: Context, prayerId: String, label: String): PendingIntent {
         val intent = Intent(context, AlarmReceiver::class.java)
             .putExtra(AlarmReceiver.EXTRA_PRAYER_ID, prayerId)
+            .putExtra(AlarmReceiver.EXTRA_PRAYER_LABEL, label)
         val requestCode = prayerLabels.indexOf(prayerId)
         return PendingIntent.getBroadcast(
             context,
@@ -31,14 +32,17 @@ object AlarmArmer {
         )
     }
 
-    /** Returns false (never throws) if the OS refused the exact alarm —
-     * e.g. SCHEDULE_EXACT_ALARM revoked at runtime on Android 12+. */
-    fun arm(context: Context, prayerId: String, epochMillis: Long): Boolean {
+    /** [label] is the locale-aware display name computed by Dart at schedule
+     * time (native has no access to Flutter's AppLocalizations) — shown as
+     * the alarm notification's title; [prayerId] stays the fixed English key.
+     * Returns false (never throws) if the OS refused the exact alarm — e.g.
+     * SCHEDULE_EXACT_ALARM revoked at runtime on Android 12+. */
+    fun arm(context: Context, prayerId: String, epochMillis: Long, label: String): Boolean {
         return try {
             alarmManager(context).setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 epochMillis,
-                pendingIntentFor(context, prayerId)
+                pendingIntentFor(context, prayerId, label)
             )
             true
         } catch (e: SecurityException) {
@@ -48,7 +52,9 @@ object AlarmArmer {
     }
 
     fun cancel(context: Context, prayerId: String) {
-        alarmManager(context).cancel(pendingIntentFor(context, prayerId))
+        // PendingIntent matching ignores extras (action/component/requestCode
+        // only), so the label passed here doesn't need to match the armed one.
+        alarmManager(context).cancel(pendingIntentFor(context, prayerId, prayerId))
     }
 
     fun cancelAll(context: Context) {

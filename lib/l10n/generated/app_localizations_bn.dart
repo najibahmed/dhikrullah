@@ -673,6 +673,58 @@ class AppLocalizationsBn extends AppLocalizations {
   }
 
   @override
+  String get alarmSectionTitle => 'অ্যালার্ম';
+
+  @override
+  String get alarmFullWithAdhan => 'আজানসহ সম্পূর্ণ অ্যালার্ম';
+
+  @override
+  String get alarmStateOn => 'চালু';
+
+  @override
+  String get alarmStateOff => 'বন্ধ';
+
+  @override
+  String get alarmTimeOffset => 'অ্যালার্মের সময় অফসেট';
+
+  @override
+  String get alarmOffsetOnTime => 'সঠিক সময়ে';
+
+  @override
+  String alarmOffsetMinutesPlus(Object minutes) {
+    return '+$minutes মিনিট';
+  }
+
+  @override
+  String alarmOffsetMinutesMinus(Object minutes) {
+    return '$minutes মিনিট';
+  }
+
+  @override
+  String get alarmVibration => 'কম্পন';
+
+  @override
+  String get alarmFullScreen => 'ফুল-স্ক্রিন অ্যালার্ম';
+
+  @override
+  String get alarmFullScreenSubtitle =>
+      'অ্যালার্ম বাজলে লক-স্ক্রিনে সতর্কতা দেখান';
+
+  @override
+  String get alarmExactPermissionTitle => 'সঠিক অ্যালার্ম বন্ধ আছে';
+
+  @override
+  String get alarmExactPermissionBody =>
+      'এই সালাতের অ্যালার্ম সঠিক সময়ে বাজার জন্য সিস্টেম সেটিংসে সঠিক অ্যালার্মের অনুমতি দিন।';
+
+  @override
+  String get alarmFullScreenPermissionTitle => 'ফুল-স্ক্রিন সতর্কতা বন্ধ আছে';
+
+  @override
+  String get alarmFullScreenPermissionBody =>
+      'এই অ্যালার্ম লক-স্ক্রিনে দেখানোর জন্য সিস্টেম সেটিংসে ফুল-স্ক্রিন সতর্কতার অনুমতি দিন। যেকোনো অবস্থায় এটি নোটিফিকেশন হিসেবেও বাজবে।';
+
+  @override
   String hijriOffsetDayLabel(Object days) {
     return '$days দিন';
   }

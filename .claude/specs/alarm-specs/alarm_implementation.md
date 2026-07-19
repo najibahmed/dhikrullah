@@ -47,7 +47,7 @@ Labels match existing prayer labels (`Fajr`, `Dhuhr`, `Asr`, `Maghrib`, `Isha`, 
 - `alarm_offset_<Label>` — int minutes, -60..+60 step 5, default 0
 - `alarm_vibrate_<Label>` — bool, default true
 - `alarm_fullscreen_<Label>` — bool, default false
-- `alarm_scheduled_times` — JSON list of upcoming armed alarms `{prayerId, epochMillis}` for BootReceiver restore. `prayerId` is the label string itself (`Fajr`..`Tahajjud`) — already human-readable, so it doubles as the native notification's display text with no separate field.
+- `alarm_scheduled_times` — JSON list of upcoming armed alarms `{prayerId, epochMillis, label}` for BootReceiver restore. `prayerId` (`Fajr`..`Tahajjud`) is the fixed English settings key; `label` is the locale-aware display name computed by Dart at schedule time (via `prayerDisplayNameFor`) and shown as the native notification/full-screen-activity title, since native Kotlin has no access to Flutter's `AppLocalizations`.
 
 ## Flow
 Prayer time (from PrayerTimeProvider)
@@ -70,7 +70,7 @@ Prayer time (from PrayerTimeProvider)
 6. ~~FullScreenAlarmActivity (optional per prayer)~~ done
 7. ~~Permissions flows (exact alarm, full-screen intent special access on Android 14+)~~ done
 8. ~~Bottom-sheet alarm UI section + reschedule triggers~~ done
-9. Testing
+9. ~~Testing~~ done (on-device, Pixel 5 / Android 14)
 
 See:
 - alarm_api_contract.md

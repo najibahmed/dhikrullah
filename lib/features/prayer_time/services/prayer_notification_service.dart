@@ -7,6 +7,7 @@
 // background rescheduling (out of scope; see module plan).
 
 import 'package:adhan_dart/adhan_dart.dart' as adhan;
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -136,14 +137,20 @@ class PrayerNotificationService {
         }
 
         final displayName = prayerDisplayNameFor(l10n, label);
-        await _plugin.zonedSchedule(
-          id: id,
-          title: l10n.notifPrayerTitle(displayName),
-          body: l10n.notifPrayerBody(displayName),
-          scheduledDate: scheduled,
-          notificationDetails: _detailsFor(label, soundChoice, l10n),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        );
+        try {
+          await _plugin.zonedSchedule(
+            id: id,
+            title: l10n.notifPrayerTitle(displayName),
+            body: l10n.notifPrayerBody(displayName),
+            scheduledDate: scheduled,
+            notificationDetails: _detailsFor(label, soundChoice, l10n),
+            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          );
+        } catch (e) {
+          // One bad prayer/locale must not cancel every remaining
+          // notification for the day — log and keep scheduling the rest.
+          debugPrint('PrayerNotificationService: failed to schedule $label: $e');
+        }
         id++;
       }
     }
@@ -161,14 +168,19 @@ class PrayerNotificationService {
         if (time != null) {
           final scheduled = tz.TZDateTime.from(time, tz.local);
           if (!scheduled.isBefore(tz.TZDateTime.now(tz.local))) {
-            await _plugin.zonedSchedule(
-              id: optionalId,
-              title: displayName,
-              body: l10n.notifOptionalBody(displayName),
-              scheduledDate: scheduled,
-              notificationDetails: _detailsFor(label, soundChoice, l10n),
-              androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-            );
+            try {
+              await _plugin.zonedSchedule(
+                id: optionalId,
+                title: displayName,
+                body: l10n.notifOptionalBody(displayName),
+                scheduledDate: scheduled,
+                notificationDetails: _detailsFor(label, soundChoice, l10n),
+                androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+              );
+            } catch (e) {
+              debugPrint(
+                  'PrayerNotificationService: failed to schedule $label: $e');
+            }
           }
         }
         optionalId++;

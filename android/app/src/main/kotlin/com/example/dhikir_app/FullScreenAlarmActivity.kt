@@ -19,6 +19,7 @@ class FullScreenAlarmActivity : Activity() {
 
     companion object {
         const val EXTRA_PRAYER_ID = "prayerId"
+        const val EXTRA_PRAYER_LABEL = "prayerLabel"
     }
 
     private val alarmStoppedReceiver = object : BroadcastReceiver() {
@@ -30,8 +31,10 @@ class FullScreenAlarmActivity : Activity() {
         showOverLockScreen()
         setContentView(R.layout.activity_full_screen_alarm)
 
-        val prayerId = intent.getStringExtra(EXTRA_PRAYER_ID) ?: "Prayer"
-        findViewById<TextView>(R.id.tvPrayerName).text = prayerId
+        val label = intent.getStringExtra(EXTRA_PRAYER_LABEL)
+            ?: intent.getStringExtra(EXTRA_PRAYER_ID)
+            ?: "Prayer"
+        findViewById<TextView>(R.id.tvPrayerName).text = label
         findViewById<Button>(R.id.btnStop).setOnClickListener { stopAlarmAndFinish() }
     }
 

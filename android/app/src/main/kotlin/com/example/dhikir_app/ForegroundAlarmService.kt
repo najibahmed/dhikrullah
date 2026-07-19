@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
@@ -57,10 +58,15 @@ class ForegroundAlarmService : Service() {
             stopSelf(startId)
             return START_NOT_STICKY
         }
+        val label = intent.getStringExtra(AlarmReceiver.EXTRA_PRAYER_LABEL) ?: prayerId
 
-        startForeground(NOTIFICATION_ID, buildNotification(prayerId))
+        startForeground(NOTIFICATION_ID, buildNotification(prayerId, label))
         if (isVibrationEnabled(prayerId)) startVibration()
-        startPlayback()
+        if (isRingerSilentOrVibrate()) {
+            Log.i(TAG, "Ringer is silent/vibrate — skipping adhan playback for $prayerId")
+        } else {
+            startPlayback()
+        }
         return START_NOT_STICKY
     }
 
@@ -84,7 +90,7 @@ class ForegroundAlarmService : Service() {
         manager.createNotificationChannel(channel)
     }
 
-    private fun buildNotification(prayerId: String): android.app.Notification {
+    private fun buildNotification(prayerId: String, label: String): android.app.Notification {
         val dismissIntent = Intent(this, ForegroundAlarmService::class.java).setAction(ACTION_DISMISS)
         val dismissPendingIntent = PendingIntent.getService(
             this,
@@ -94,7 +100,7 @@ class ForegroundAlarmService : Service() {
         )
 
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("$prayerId")
+            .setContentTitle(label)
             .setContentText("Prayer alarm is playing")
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setOngoing(true)
@@ -106,6 +112,7 @@ class ForegroundAlarmService : Service() {
         if (isFullscreenEnabled(prayerId) && AlarmPermissions.canUseFullScreenIntent(this)) {
             val fullScreenIntent = Intent(this, FullScreenAlarmActivity::class.java)
                 .putExtra(FullScreenAlarmActivity.EXTRA_PRAYER_ID, prayerId)
+                .putExtra(FullScreenAlarmActivity.EXTRA_PRAYER_LABEL, label)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             val fullScreenPendingIntent = PendingIntent.getActivity(
                 this,
@@ -127,6 +134,13 @@ class ForegroundAlarmService : Service() {
     private fun isFullscreenEnabled(prayerId: String): Boolean {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getBoolean("$KEY_FULLSCREEN_PREFIX$prayerId", false)
+    }
+
+    /** Silent and Vibrate ringer modes both suppress adhan audio — vibration
+     * still follows [isVibrationEnabled] unchanged, it isn't forced on. */
+    private fun isRingerSilentOrVibrate(): Boolean {
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        return audioManager.ringerMode != AudioManager.RINGER_MODE_NORMAL
     }
 
     private fun startVibration() {

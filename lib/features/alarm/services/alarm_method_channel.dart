@@ -9,10 +9,11 @@ import 'package:flutter/services.dart';
 class AlarmMethodChannel {
   static const _channel = MethodChannel('dhikir_app/alarm');
 
-  Future<void> armAlarm(String prayerId, int epochMillis) {
+  Future<void> armAlarm(String prayerId, int epochMillis, String label) {
     return _channel.invokeMethod('armAlarm', {
       'prayerId': prayerId,
       'epochMillis': epochMillis,
+      'label': label,
     });
   }
 

@@ -7,13 +7,16 @@
 // that stays owned by PrayerTimeProvider.
 
 import 'dart:convert';
+import 'dart:ui' show Locale;
 
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:dhikir_app/core/l10n/prayer_localization.dart';
 import 'package:dhikir_app/features/alarm/models/scheduled_alarm.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_settings_repository.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
 const _kScheduledTimesKey = 'alarm_scheduled_times';
 
@@ -53,8 +56,14 @@ class AlarmScheduler {
   /// [kAlarmScheduleHorizonDays] days starting at [from]'s calendar
   /// date, dropping anything not after [from]. Reads offsets from
   /// [settingsRepository]; reads prayer/Tahajjud times from
-  /// [prayerTimeProvider] — no calculation happens here.
-  Future<List<ScheduledAlarm>> computeUpcoming(DateTime from) async {
+  /// [prayerTimeProvider] — no calculation happens here. [locale] is used
+  /// only to compute each alarm's display label (native Kotlin has no
+  /// access to Flutter's AppLocalizations, so it's baked in here).
+  Future<List<ScheduledAlarm>> computeUpcoming(
+    DateTime from, {
+    required Locale locale,
+  }) async {
+    final l10n = lookupAppLocalizations(locale);
     final settings = await settingsRepository.getAll();
     final byId = {for (final s in settings) s.prayerId: s};
     final result = <ScheduledAlarm>[];
@@ -76,6 +85,7 @@ class AlarmScheduler {
             result.add(ScheduledAlarm(
               prayerId: label,
               epochMillis: alarmTime.millisecondsSinceEpoch,
+              label: prayerDisplayNameFor(l10n, label),
             ));
           }
         }
@@ -94,6 +104,7 @@ class AlarmScheduler {
             result.add(ScheduledAlarm(
               prayerId: 'Tahajjud',
               epochMillis: alarmTime.millisecondsSinceEpoch,
+              label: prayerDisplayNameFor(l10n, 'Tahajjud'),
             ));
           }
         }
@@ -126,8 +137,12 @@ class AlarmScheduler {
   /// Computes upcoming alarms and persists them in one step — the entry
   /// point AlarmService calls on app open and whenever alarm settings
   /// change, before arming each timestamp via the native MethodChannel.
-  Future<List<ScheduledAlarm>> scheduleUpcoming({DateTime? from}) async {
-    final alarms = await computeUpcoming(from ?? DateTime.now());
+  Future<List<ScheduledAlarm>> scheduleUpcoming({
+    DateTime? from,
+    required Locale locale,
+  }) async {
+    final alarms =
+        await computeUpcoming(from ?? DateTime.now(), locale: locale);
     await persist(alarms);
     return alarms;
   }

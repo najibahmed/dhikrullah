@@ -8,11 +8,13 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/features/alarm/models/alarm_settings.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_scheduler.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_service.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_settings_repository.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
 class AlarmSettingsSection extends StatefulWidget {
   final String prayerId;
@@ -56,6 +58,7 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
     bool? vibrationEnabled,
     bool? fullscreenEnabled,
   }) async {
+    final locale = Localizations.localeOf(context);
     final updated = await _repository.update(
       widget.prayerId,
       enabled: enabled,
@@ -64,7 +67,7 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
       fullscreenEnabled: fullscreenEnabled,
     );
     if (mounted) setState(() => _settings = updated);
-    await _alarmService.rescheduleAllPrayerAlarms();
+    await _alarmService.rescheduleAllPrayerAlarms(locale: locale);
   }
 
   Future<void> _onToggleEnabled(bool value) async {
@@ -72,10 +75,10 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
     if (!value || !mounted) return;
     final granted = await _alarmService.canScheduleExactAlarms();
     if (!granted && mounted) {
+      final l10n = context.l10n;
       await _showPermissionDialog(
-        title: 'Exact alarms are off',
-        body:
-            'Allow exact alarms in system settings so this prayer alarm fires on time.',
+        title: l10n.alarmExactPermissionTitle,
+        body: l10n.alarmExactPermissionBody,
         onOpenSettings: _alarmService.openExactAlarmSettings,
       );
     }
@@ -86,10 +89,10 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
     if (!value || !mounted) return;
     final granted = await _alarmService.canUseFullScreenIntent();
     if (!granted && mounted) {
+      final l10n = context.l10n;
       await _showPermissionDialog(
-        title: 'Full-screen alerts are off',
-        body:
-            'Allow full-screen alerts in system settings so this alarm can show over the lock screen. It still rings as a notification either way.',
+        title: l10n.alarmFullScreenPermissionTitle,
+        body: l10n.alarmFullScreenPermissionBody,
         onOpenSettings: _alarmService.openFullScreenIntentSettings,
       );
     }
@@ -100,6 +103,7 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
     required String body,
     required Future<void> Function() onOpenSettings,
   }) {
+    final l10n = context.l10n;
     return showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -108,23 +112,25 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Not now'),
+            child: Text(l10n.notNowButton),
           ),
           FilledButton(
             onPressed: () {
               Navigator.pop(dialogContext);
               onOpenSettings();
             },
-            child: const Text('Open Settings'),
+            child: Text(l10n.openSettingsButton),
           ),
         ],
       ),
     );
   }
 
-  String _offsetLabel(int minutes) {
-    if (minutes == 0) return 'On time';
-    return minutes > 0 ? '+$minutes min' : '$minutes min';
+  String _offsetLabel(AppLocalizations l10n, int minutes) {
+    if (minutes == 0) return l10n.alarmOffsetOnTime;
+    return minutes > 0
+        ? l10n.alarmOffsetMinutesPlus(minutes)
+        : l10n.alarmOffsetMinutesMinus(minutes);
   }
 
   @override
@@ -133,19 +139,20 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
     if (settings == null) return const SizedBox.shrink();
 
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Divider(height: 32),
-        Text('Alarm',
+        Text(l10n.alarmSectionTitle,
             style:
                 theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text('Full alarm with Adhan'),
-          subtitle: Text(settings.enabled ? 'On' : 'Off'),
+          title: Text(l10n.alarmFullWithAdhan),
+          subtitle: Text(settings.enabled ? l10n.alarmStateOn : l10n.alarmStateOff),
           value: settings.enabled,
           onChanged: _onToggleEnabled,
         ),
@@ -154,7 +161,7 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
           Row(
             children: [
               Expanded(
-                child: Text('Alarm time offset', style: theme.textTheme.bodyMedium),
+                child: Text(l10n.alarmTimeOffset, style: theme.textTheme.bodyMedium),
               ),
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline),
@@ -167,7 +174,7 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
               SizedBox(
                 width: 72,
                 child: Text(
-                  _offsetLabel(settings.offsetMinutes),
+                  _offsetLabel(l10n, settings.offsetMinutes),
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium,
                 ),
@@ -184,14 +191,14 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
           ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Vibration'),
+            title: Text(l10n.alarmVibration),
             value: settings.vibrationEnabled,
             onChanged: (value) => _update(vibrationEnabled: value),
           ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Full-screen alarm'),
-            subtitle: const Text('Show a lock-screen alert when the alarm fires'),
+            title: Text(l10n.alarmFullScreen),
+            subtitle: Text(l10n.alarmFullScreenSubtitle),
             value: settings.fullscreenEnabled,
             onChanged: _onToggleFullscreen,
           ),

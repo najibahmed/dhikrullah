@@ -80,16 +80,16 @@ class _PrayerNotificationSheet extends StatelessWidget {
     final sound = provider.prayerSoundChoice[label] ?? 'default';
 
     return FractionallySizedBox(
-      heightFactor: 0.7,
+      heightFactor: 0.85,
       child: Container(
         decoration: BoxDecoration(
           color: theme.scaffoldBackgroundColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(20),
+          child: Column(
             children: [
+              const SizedBox(height: 20),
               Center(
                 child: Container(
                   width: 40,
@@ -100,34 +100,54 @@ class _PrayerNotificationSheet extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              Text(prayerDisplayName(context, label),
-                  style: theme.textTheme.titleLarge
-                      ?.copyWith(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 8),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.notificationSwitchTitle),
-                subtitle: Text(
-                    enabled ? l10n.notificationOnSubtitle : l10n.notificationOffSubtitle),
-                value: enabled,
-                onChanged: (value) => provider.setPrayerNotification(
-                    label, value,
-                    locale: Localizations.localeOf(context)),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(prayerDisplayName(context, label),
+                            style: theme.textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.w700)),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close),
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(l10n.notificationSwitchTitle),
+                      subtitle: Text(enabled
+                          ? l10n.notificationOnSubtitle
+                          : l10n.notificationOffSubtitle),
+                      value: enabled,
+                      onChanged: (value) => provider.setPrayerNotification(
+                          label, value,
+                          locale: Localizations.localeOf(context)),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(l10n.soundSection,
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 8),
+                    _soundOption(context, theme, provider,
+                        label: l10n.soundDefault,
+                        value: 'default',
+                        selected: sound),
+                    const SizedBox(height: 8),
+                    _soundOption(context, theme, provider,
+                        label: l10n.soundSilent,
+                        value: 'silent',
+                        selected: sound),
+                    if (alarmPrayerLabels.contains(label))
+                      AlarmSettingsSection(
+                          prayerId: label, prayerTimeProvider: provider),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              Text(l10n.soundSection,
-                  style: theme.textTheme.bodyMedium
-                      ?.copyWith(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 8),
-              _soundOption(context, theme, provider,
-                  label: l10n.soundDefault, value: 'default', selected: sound),
-              const SizedBox(height: 8),
-              _soundOption(context, theme, provider,
-                  label: l10n.soundSilent, value: 'silent', selected: sound),
-              if (alarmPrayerLabels.contains(label))
-                AlarmSettingsSection(
-                    prayerId: label, prayerTimeProvider: provider),
             ],
           ),
         ),

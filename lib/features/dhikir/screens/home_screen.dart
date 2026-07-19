@@ -132,6 +132,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     final prayerTimeProvider = context.read<PrayerTimeProvider>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await prayerTimeProvider.init();
+      if (!mounted) return;
       // Alarms depend on today/tomorrow's prayer times, so reschedule right
       // after they're resolved — matches alarm_implementation.md's "on app
       // open" trigger. Failures (e.g. no alarms enabled) are silent no-ops.
@@ -140,7 +141,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           prayerTimeProvider: prayerTimeProvider,
           settingsRepository: AlarmSettingsRepository(),
         ),
-      ).rescheduleAllPrayerAlarms();
+      ).rescheduleAllPrayerAlarms(locale: Localizations.localeOf(context));
     });
   }
 

@@ -33,11 +33,12 @@ class AlarmMethodChannel(private val activity: Activity) : MethodChannel.MethodC
             "armAlarm" -> {
                 val prayerId = call.argument<String>("prayerId")
                 val epochMillis = call.argument<Number>("epochMillis")?.toLong()
+                val label = call.argument<String>("label") ?: prayerId
                 if (prayerId == null || epochMillis == null || prayerId !in AlarmArmer.prayerLabels) {
                     result.error("invalid_args", "prayerId/epochMillis missing or unknown prayerId", null)
                     return
                 }
-                val armed = AlarmArmer.arm(activity, prayerId, epochMillis)
+                val armed = AlarmArmer.arm(activity, prayerId, epochMillis, label ?: prayerId)
                 if (armed) {
                     result.success(null)
                 } else {
