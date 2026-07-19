@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/routing/route_names.dart';
 import 'package:dhikir_app/core/widgets/date_header_row.dart';
+import 'package:dhikir_app/features/alarm/services/alarm_settings_repository.dart';
 import 'package:dhikir_app/features/prayer_time/models/forbidden_period.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_notification_bottom_sheet.dart';
@@ -30,12 +31,32 @@ class PrayerTimeScreen extends StatefulWidget {
 
 class _PrayerTimeScreenState extends State<PrayerTimeScreen> {
   late DateTime _selectedDate;
+  Map<String, bool> _alarmEnabled = {};
 
   @override
   void initState() {
     super.initState();
     final now = DateTime.now();
     _selectedDate = DateTime(now.year, now.month, now.day);
+    _loadAlarmEnabled();
+  }
+
+  /// Bell icon per row needs to know alarm state too (not just the
+  /// reminder-notification toggle) — AlarmSettingsRepository isn't a
+  /// ChangeNotifier, so this is a manual refresh, same pattern as other
+  /// screens that mutate shared prefs-backed data and refresh on return.
+  Future<void> _loadAlarmEnabled() async {
+    final settings = await AlarmSettingsRepository().getAll();
+    if (mounted) {
+      setState(() {
+        _alarmEnabled = {for (final s in settings) s.prayerId: s.enabled};
+      });
+    }
+  }
+
+  Future<void> _onBellTap(String label) async {
+    await handlePrayerBellTap(context, label);
+    await _loadAlarmEnabled();
   }
 
   void _goToDate(DateTime date) {
@@ -99,6 +120,8 @@ class _PrayerTimeScreenState extends State<PrayerTimeScreen> {
                       key: ValueKey(_selectedDate),
                       date: _selectedDate,
                       provider: provider,
+                      alarmEnabled: _alarmEnabled,
+                      onBellTap: _onBellTap,
                     ),
                   ),
                 ),
@@ -204,9 +227,16 @@ class _DateNavCard extends StatelessWidget {
 class _DatePrayerList extends StatelessWidget {
   final DateTime date;
   final PrayerTimeProvider provider;
+  final Map<String, bool> alarmEnabled;
+  final Future<void> Function(String label) onBellTap;
 
-  const _DatePrayerList(
-      {super.key, required this.date, required this.provider});
+  const _DatePrayerList({
+    super.key,
+    required this.date,
+    required this.provider,
+    required this.alarmEnabled,
+    required this.onBellTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -271,6 +301,8 @@ class _DatePrayerList extends StatelessWidget {
     }
 
     final notifyEnabled = provider.prayerNotificationsEnabled[w.name] ?? false;
+    final alarmOn = alarmEnabled[w.name] ?? false;
+    final bellActive = notifyEnabled || alarmOn;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -306,13 +338,13 @@ class _DatePrayerList extends StatelessWidget {
               visualDensity: VisualDensity.compact,
               tooltip: context.l10n.notificationTooltip(prayerDisplayName(context, w.name)),
               icon: Icon(
-                notifyEnabled
+                bellActive
                     ? Icons.notifications_active
                     : Icons.notifications_off_outlined,
                 size: 20,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
-              onPressed: () => handlePrayerBellTap(context, w.name),
+              onPressed: () => onBellTap(w.name),
             ),
           ],
         ),
