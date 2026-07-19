@@ -23,6 +23,9 @@ import 'package:dhikir_app/core/widgets/date_header_row.dart';
 import 'package:dhikir_app/features/dhikir/widgets/counter_tab.dart';
 import 'package:dhikir_app/features/favorites/screens/favorite_screen.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
+import 'package:dhikir_app/features/alarm/services/alarm_scheduler.dart';
+import 'package:dhikir_app/features/alarm/services/alarm_service.dart';
+import 'package:dhikir_app/features/alarm/services/alarm_settings_repository.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_time_card.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_schedule_cards.dart';
@@ -126,9 +129,19 @@ class _HomeWidgetState extends State<HomeWidget> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => context.read<PrayerTimeProvider>().init(),
-    );
+    final prayerTimeProvider = context.read<PrayerTimeProvider>();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await prayerTimeProvider.init();
+      // Alarms depend on today/tomorrow's prayer times, so reschedule right
+      // after they're resolved — matches alarm_implementation.md's "on app
+      // open" trigger. Failures (e.g. no alarms enabled) are silent no-ops.
+      await AlarmService(
+        scheduler: AlarmScheduler(
+          prayerTimeProvider: prayerTimeProvider,
+          settingsRepository: AlarmSettingsRepository(),
+        ),
+      ).rescheduleAllPrayerAlarms();
+    });
   }
 
   @override

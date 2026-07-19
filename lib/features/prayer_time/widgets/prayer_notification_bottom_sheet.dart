@@ -9,6 +9,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:dhikir_app/features/alarm/models/alarm_settings.dart';
+import 'package:dhikir_app/features/alarm/widgets/alarm_settings_section.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 import 'package:dhikir_app/features/prayer_time/services/location_service.dart';
 import 'package:dhikir_app/features/prayer_time/services/prayer_notification_service.dart';
@@ -123,6 +125,9 @@ class _PrayerNotificationSheet extends StatelessWidget {
               const SizedBox(height: 8),
               _soundOption(context, theme, provider,
                   label: l10n.soundSilent, value: 'silent', selected: sound),
+              if (alarmPrayerLabels.contains(label))
+                AlarmSettingsSection(
+                    prayerId: label, prayerTimeProvider: provider),
             ],
           ),
         ),
