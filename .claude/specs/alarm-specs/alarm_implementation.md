@@ -65,7 +65,7 @@ Prayer time (from PrayerTimeProvider)
 1. Dart data model + AlarmSettingsRepository (SharedPreferences)
 2. Dart AlarmScheduler: timestamp computation + persistence (+48h)
 3. ~~MethodChannel bridge + Kotlin AlarmMethodChannel + AlarmReceiver (arm/cancel exact alarms)~~ done
-4. ForegroundAlarmService: MediaPlayer + vibration + ongoing notification + auto-stop
+4. ~~ForegroundAlarmService: MediaPlayer + vibration + ongoing notification + auto-stop~~ done
 5. BootReceiver restore
 6. FullScreenAlarmActivity (optional per prayer)
 7. Permissions flows (exact alarm, full-screen intent special access on Android 14+)

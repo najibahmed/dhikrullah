@@ -1,19 +1,159 @@
 package com.example.dhikir_app
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
+import android.os.Build
 import android.os.IBinder
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 
-/** Stub — phase 4 adds startForeground()+notification, MediaPlayer playback of
- * res/raw/athan, vibration and auto-stop. AlarmReceiver already targets this class
- * so the arm -> fire -> receiver -> service chain is wired end to end. */
+/** Native alarm playback lifecycle: audio + vibration + ongoing notification,
+ * auto-stopping when playback completes (per alarm_foreground_service.md).
+ * Fullscreen launch is added in a later phase. */
 class ForegroundAlarmService : Service() {
+
+    companion object {
+        private const val TAG = "ForegroundAlarmService"
+        const val ACTION_DISMISS = "com.example.dhikir_app.action.DISMISS_ALARM"
+        private const val CHANNEL_ID = "alarm_playback_channel"
+        private const val NOTIFICATION_ID = 1001
+        private const val PREFS_NAME = "FlutterSharedPreferences"
+        private const val KEY_VIBRATE_PREFIX = "flutter.alarm_vibrate_"
+        private val VIBRATE_PATTERN = longArrayOf(0, 1000, 1000)
+    }
+
+    private var mediaPlayer: MediaPlayer? = null
+    private var vibrator: Vibrator? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+        @Suppress("DEPRECATION")
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // TODO(phase 4): read AlarmReceiver.EXTRA_PRAYER_ID, startForeground with
-        // ongoing notification, play athan, vibrate, auto-stop on completion.
+        if (intent?.action == ACTION_DISMISS) {
+            stopAlarm()
+            stopSelf(startId)
+            return START_NOT_STICKY
+        }
+
+        val prayerId = intent?.getStringExtra(AlarmReceiver.EXTRA_PRAYER_ID)
+        if (prayerId == null) {
+            stopSelf(startId)
+            return START_NOT_STICKY
+        }
+
+        startForeground(NOTIFICATION_ID, buildNotification(prayerId))
+        if (isVibrationEnabled(prayerId)) startVibration()
+        startPlayback()
         return START_NOT_STICKY
+    }
+
+    override fun onDestroy() {
+        stopAlarm()
+        super.onDestroy()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val manager = getSystemService(NotificationManager::class.java)
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            "Prayer Alarms",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Full prayer alarm playback, separate from prayer reminders"
+            setSound(null, null)
+            enableVibration(false)
+        }
+        manager.createNotificationChannel(channel)
+    }
+
+    private fun buildNotification(prayerId: String): android.app.Notification {
+        val dismissIntent = Intent(this, ForegroundAlarmService::class.java).setAction(ACTION_DISMISS)
+        val dismissPendingIntent = PendingIntent.getService(
+            this,
+            0,
+            dismissIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("$prayerId")
+            .setContentText("Prayer alarm is playing")
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .addAction(0, "Dismiss", dismissPendingIntent)
+            .build()
+    }
+
+    private fun isVibrationEnabled(prayerId: String): Boolean {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getBoolean("$KEY_VIBRATE_PREFIX$prayerId", true)
+    }
+
+    private fun startVibration() {
+        val vib = vibrator ?: return
+        if (!vib.hasVibrator()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vib.vibrate(VibrationEffect.createWaveform(VIBRATE_PATTERN, 0))
+        } else {
+            @Suppress("DEPRECATION")
+            vib.vibrate(VIBRATE_PATTERN, 0)
+        }
+    }
+
+    private fun startPlayback() {
+        try {
+            val player = MediaPlayer.create(this, R.raw.athan)
+            if (player == null) {
+                Log.w(TAG, "MediaPlayer.create returned null for R.raw.athan — notification-only alarm")
+                return
+            }
+            mediaPlayer = player
+            player.setOnCompletionListener {
+                stopAlarm()
+                stopSelf()
+            }
+            player.start()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start adhan playback, falling back to notification-only", e)
+            mediaPlayer = null
+        }
+    }
+
+    private fun stopAlarm() {
+        vibrator?.cancel()
+        mediaPlayer?.let {
+            try {
+                if (it.isPlaying) it.stop()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error stopping MediaPlayer", e)
+            }
+            it.release()
+        }
+        mediaPlayer = null
+        NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
     }
 }
