@@ -26,6 +26,12 @@ class BootReceiver : BroadcastReceiver() {
         val now = System.currentTimeMillis()
         try {
             val entries = JSONArray(raw)
+            // Entries are persisted ascending by epochMillis and may hold
+            // both a today and tomorrow occurrence per prayer — arm only
+            // the nearest, since AlarmArmer's PendingIntent identity is
+            // keyed by prayerId alone and a second arm() for the same
+            // prayer would silently replace the first.
+            val armedPrayerIds = mutableSetOf<String>()
             for (i in 0 until entries.length()) {
                 val entry = entries.getJSONObject(i)
                 val prayerId = entry.getString("prayerId")
@@ -33,6 +39,7 @@ class BootReceiver : BroadcastReceiver() {
                 val label = entry.optString("label", prayerId)
                 if (prayerId !in AlarmArmer.prayerLabels) continue
                 if (epochMillis <= now) continue
+                if (!armedPrayerIds.add(prayerId)) continue
                 AlarmArmer.arm(context, prayerId, epochMillis, label)
             }
         } catch (e: Exception) {

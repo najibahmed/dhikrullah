@@ -51,7 +51,14 @@ class AlarmService {
     await methodChannel.cancelAllAlarms();
     final alarms =
         await scheduler.scheduleUpcoming(from: from, locale: locale);
+    // alarms is sorted ascending by epochMillis and may contain both a
+    // today and tomorrow occurrence for the same prayer — only arm the
+    // nearest one, since AlarmArmer's PendingIntent identity is keyed by
+    // prayerId alone and a second armAlarm() call for the same prayer
+    // would silently replace (not add to) the first.
+    final armedPrayerIds = <String>{};
     for (final alarm in alarms) {
+      if (!armedPrayerIds.add(alarm.prayerId)) continue;
       try {
         await methodChannel.armAlarm(
             alarm.prayerId, alarm.epochMillis, alarm.label);
