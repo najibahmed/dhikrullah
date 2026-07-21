@@ -211,6 +211,31 @@ class AppLocalizationsBn extends AppLocalizations {
   String get names99ScreenTitle => 'আল্লাহর ৯৯ নাম';
 
   @override
+  String get quickActionDua => 'দোয়া';
+
+  @override
+  String get duaScreenTitle => 'দোয়া';
+
+  @override
+  String get duaCategoryAll => 'সব';
+
+  @override
+  String get duaCategoryAllDescription => 'প্রতিটি বিভাগের দোয়া দেখুন';
+
+  @override
+  String get duaCategorySheetTitle => 'দোয়ার বিভাগ';
+
+  @override
+  String duaCountLabel(Object count) {
+    return '$countটি দোয়া';
+  }
+
+  @override
+  String duaRepeatLabel(Object count) {
+    return '×$count বার পাঠ';
+  }
+
+  @override
   String get themeToggleSwitchToLight => 'লাইট মোডে যান';
 
   @override

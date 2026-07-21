@@ -211,6 +211,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get names99ScreenTitle => 'Allah\'s 99 Names';
 
   @override
+  String get quickActionDua => 'Dua';
+
+  @override
+  String get duaScreenTitle => 'Dua';
+
+  @override
+  String get duaCategoryAll => 'All';
+
+  @override
+  String get duaCategoryAllDescription => 'Show duas from every category';
+
+  @override
+  String get duaCategorySheetTitle => 'Dua Category';
+
+  @override
+  String duaCountLabel(Object count) {
+    return '$count duas';
+  }
+
+  @override
+  String duaRepeatLabel(Object count) {
+    return 'Repeat ×$count';
+  }
+
+  @override
   String get themeToggleSwitchToLight => 'Switch to light mode';
 
   @override

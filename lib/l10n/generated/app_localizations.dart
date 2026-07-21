@@ -470,6 +470,48 @@ abstract class AppLocalizations {
   /// **'Allah\'s 99 Names'**
   String get names99ScreenTitle;
 
+  /// No description provided for @quickActionDua.
+  ///
+  /// In en, this message translates to:
+  /// **'Dua'**
+  String get quickActionDua;
+
+  /// No description provided for @duaScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dua'**
+  String get duaScreenTitle;
+
+  /// No description provided for @duaCategoryAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get duaCategoryAll;
+
+  /// No description provided for @duaCategoryAllDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Show duas from every category'**
+  String get duaCategoryAllDescription;
+
+  /// No description provided for @duaCategorySheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dua Category'**
+  String get duaCategorySheetTitle;
+
+  /// No description provided for @duaCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} duas'**
+  String duaCountLabel(Object count);
+
+  /// No description provided for @duaRepeatLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat ×{count}'**
+  String duaRepeatLabel(Object count);
+
   /// No description provided for @themeToggleSwitchToLight.
   ///
   /// In en, this message translates to:

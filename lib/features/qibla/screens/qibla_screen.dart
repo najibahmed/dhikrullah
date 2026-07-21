@@ -225,11 +225,11 @@ class _Dial extends StatelessWidget {
             child: Align(
               alignment: Alignment.topCenter,
               child: Padding(
-                  padding: const EdgeInsets.only(top: 38),
+                  padding: const EdgeInsets.only(top: 0),
                   child: Image.asset(
-                    'assets/images/kaaba.png',
-                    width: 32,
-                    height: 32,
+                    'assets/images/kibla_arrow.png',
+                    width: 62,
+                    height: 62,
                   )),
             ),
           ),

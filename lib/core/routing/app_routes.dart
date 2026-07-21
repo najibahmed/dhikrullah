@@ -21,6 +21,7 @@ import 'package:dhikir_app/features/prayer_time/screens/hijri_settings_screen.da
 import 'package:dhikir_app/features/about/screens/about_screen.dart';
 import 'package:dhikir_app/features/qibla/screens/qibla_screen.dart';
 import 'package:dhikir_app/features/allah_names/screens/allah_names_screen.dart';
+import 'package:dhikir_app/features/dua/screens/dua_screen.dart';
 import 'route_names.dart';
 
 class SessionCounterArgs {
@@ -133,6 +134,12 @@ class AppRoutes {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const AllahNamesScreen(),
+        );
+
+      case RouteNames.dua:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const DuaScreen(),
         );
 
       default:

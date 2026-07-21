@@ -18,4 +18,5 @@ class RouteNames {
   static const String about = '/about';
   static const String qibla = '/qibla';
   static const String allahNames = '/allah-names';
+  static const String dua = '/dua';
 }

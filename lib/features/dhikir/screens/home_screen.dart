@@ -492,6 +492,22 @@ class _QuickActionsSection extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            _QuickActionTile(
+              icon: Icons.menu_book_rounded,
+              label: l10n.quickActionDua,
+              backgroundColor: const Color(0xFFFFF3E0),
+              foregroundColor: const Color(0xFFB26A00),
+              border: Border.all(color: const Color(0xFFFFE0B2)),
+              onTap: () async {
+                await Navigator.pushNamed(context, RouteNames.dua);
+                onReturn();
+              },
+            ),
+          ],
+        ),
       ],
     );
   }

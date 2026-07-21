@@ -43,3 +43,5 @@ flutter:
     - assets/audio/adhan_makkah.mp3
     - assets/json/allah_names_en.json
     - assets/json/allah_names_bn.json
+    - assets/json/all_dua_en.json
+    - assets/json/all_dua_bn.json
