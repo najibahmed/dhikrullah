@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/utils/time_format.dart';
 import 'package:dhikir_app/features/alarm/models/alarm_settings.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_scheduler.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_service.dart';
@@ -126,6 +127,11 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
     );
   }
 
+  DateTime? _alarmClockTime(int offsetMinutes) {
+    final base = widget.prayerTimeProvider.windowForLabel(widget.prayerId)?.start;
+    return base?.add(Duration(minutes: offsetMinutes));
+  }
+
   String _offsetLabel(AppLocalizations l10n, int minutes) {
     if (minutes == 0) return l10n.alarmOffsetOnTime;
     return minutes > 0
@@ -172,11 +178,22 @@ class _AlarmSettingsSectionState extends State<AlarmSettingsSection> {
                     : null,
               ),
               SizedBox(
-                width: 72,
-                child: Text(
-                  _offsetLabel(l10n, settings.offsetMinutes),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium,
+                width: 90,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _offsetLabel(l10n, settings.offsetMinutes),
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    if (_alarmClockTime(settings.offsetMinutes) case final time?)
+                      Text(
+                        formatClockTime(time),
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall,
+                      ),
+                  ],
                 ),
               ),
               IconButton(

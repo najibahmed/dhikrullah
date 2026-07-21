@@ -205,6 +205,12 @@ class AppLocalizationsBn extends AppLocalizations {
   String get quickActionQibla => 'কিবলা';
 
   @override
+  String get quickActionNames99 => '৯৯ নাম';
+
+  @override
+  String get names99ScreenTitle => 'আল্লাহর ৯৯ নাম';
+
+  @override
   String get themeToggleSwitchToLight => 'লাইট মোডে যান';
 
   @override
@@ -543,7 +549,7 @@ class AppLocalizationsBn extends AppLocalizations {
   String get arabicTextRequiredError => 'আরবি লেখা আবশ্যক';
 
   @override
-  String get transliterationFieldLabel => 'প্রতিবর্ণীকরণ (ইংরেজি)';
+  String get transliterationFieldLabel => 'প্রতিবর্ণীকরণ';
 
   @override
   String get transliterationFieldHint => 'যেমন: Subḥān Allāh';

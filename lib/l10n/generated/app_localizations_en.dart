@@ -205,6 +205,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickActionQibla => 'Qibla';
 
   @override
+  String get quickActionNames99 => '99 Names';
+
+  @override
+  String get names99ScreenTitle => 'Allah\'s 99 Names';
+
+  @override
   String get themeToggleSwitchToLight => 'Switch to light mode';
 
   @override
@@ -543,7 +549,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get arabicTextRequiredError => 'Arabic text is required';
 
   @override
-  String get transliterationFieldLabel => 'Transliteration (English)';
+  String get transliterationFieldLabel => 'Transliteration';
 
   @override
   String get transliterationFieldHint => 'e.g. Subḥān Allāh';

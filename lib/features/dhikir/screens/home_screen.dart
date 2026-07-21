@@ -214,17 +214,6 @@ class _HomeWidgetState extends State<HomeWidget> {
             child: Row(
               children: [
                 Spacer(),
-                _NavButton(
-                  label: l10n.navMyDhikir,
-                  icon: Icons.add_rounded,
-                  backgroundColor: AppColors.accentMint,
-                  foregroundColor: AppColors.medium,
-                  border: Border.all(color: AppColors.mintBorder),
-                  onTap: () async {
-                    await Navigator.pushNamed(context, RouteNames.myDhikir);
-                    setState(() {});
-                  },
-                ),
                 IconButton(
                   tooltip: l10n.aboutTitle,
                   icon: const Icon(Icons.info_outline, color: AppColors.dark),
@@ -432,52 +421,6 @@ class _Badge extends StatelessWidget {
   }
 }
 
-/// Pill button used in the app-bar action area.
-class _NavButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color backgroundColor;
-  final Color foregroundColor;
-  final BoxBorder? border;
-  final VoidCallback onTap;
-
-  const _NavButton({
-    required this.label,
-    required this.icon,
-    required this.backgroundColor,
-    required this.foregroundColor,
-    required this.onTap,
-    this.border,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
-          border: border,
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 15, color: foregroundColor),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: foregroundColor),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 /// "Quick Actions" row shown between the prayer cards and the dhikir grid.
 class _QuickActionsSection extends StatelessWidget {
@@ -498,24 +441,54 @@ class _QuickActionsSection extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           children: [
-            _QuickActionTile(
-              icon: Icons.schedule,
-              label: l10n.quickActionPrayerTime,
-              backgroundColor: AppColors.dark,
-              foregroundColor: Colors.white,
-              onTap: () async {
-                await Navigator.pushNamed(context, RouteNames.prayerTime);
-                onReturn();
-              },
+            Expanded(
+              child: _QuickActionTile(
+                icon: Icons.schedule,
+                label: l10n.quickActionPrayerTime,
+                backgroundColor: AppColors.dark,
+                foregroundColor: Colors.white,
+                onTap: () async {
+                  await Navigator.pushNamed(context, RouteNames.prayerTime);
+                  onReturn();
+                },
+              ),
             ),
             const SizedBox(width: 16),
-            _QuickActionTile(
-              icon: Icons.explore,
-              label: l10n.quickActionQibla,
-              backgroundColor: AppColors.accentMint,
-              foregroundColor: AppColors.medium,
-              border: Border.all(color: AppColors.mintBorder),
-              onTap: () => Navigator.pushNamed(context, RouteNames.qibla),
+            Expanded(
+              child: _QuickActionTile(
+                icon: Icons.explore,
+                label: l10n.quickActionQibla,
+                backgroundColor: AppColors.accentMint,
+                foregroundColor: AppColors.medium,
+                border: Border.all(color: AppColors.mintBorder),
+                onTap: () => Navigator.pushNamed(context, RouteNames.qibla),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _QuickActionTile(
+                icon: Icons.star_border_rounded,
+                label: l10n.quickActionNames99,
+                backgroundColor: const Color(0xFFF3E5F5),
+                foregroundColor: const Color(0xFF6A1B9A),
+                border: Border.all(color: const Color(0xFFE1BEE7)),
+                onTap: () =>
+                    Navigator.pushNamed(context, RouteNames.allahNames),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _QuickActionTile(
+                icon: Icons.add_rounded,
+                label: l10n.navMyDhikir,
+                backgroundColor: AppColors.accentMint,
+                foregroundColor: AppColors.medium,
+                border: Border.all(color: AppColors.mintBorder),
+                onTap: () async {
+                  await Navigator.pushNamed(context, RouteNames.myDhikir);
+                  onReturn();
+                },
+              ),
             ),
           ],
         ),

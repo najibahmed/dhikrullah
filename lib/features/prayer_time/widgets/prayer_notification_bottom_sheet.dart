@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:dhikir_app/core/utils/time_format.dart';
 import 'package:dhikir_app/features/alarm/models/alarm_settings.dart';
 import 'package:dhikir_app/features/alarm/widgets/alarm_settings_section.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
@@ -83,6 +84,7 @@ class _PrayerNotificationSheet extends StatelessWidget {
     final provider = context.watch<PrayerTimeProvider>();
     final enabled = provider.prayerNotificationsEnabled[label] ?? true;
     final sound = provider.prayerSoundChoice[label] ?? 'default';
+    final window = provider.windowForLabel(label);
 
     return FractionallySizedBox(
       heightFactor: 0.85,
@@ -119,6 +121,13 @@ class _PrayerNotificationSheet extends StatelessWidget {
                         )
                       ],
                     ),
+                    if (window != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        '${formatClockTime(window.start)} - ${formatClockTime(window.end)}',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ],
                     const SizedBox(height: 8),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,

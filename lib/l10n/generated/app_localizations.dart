@@ -458,6 +458,18 @@ abstract class AppLocalizations {
   /// **'Qibla'**
   String get quickActionQibla;
 
+  /// No description provided for @quickActionNames99.
+  ///
+  /// In en, this message translates to:
+  /// **'99 Names'**
+  String get quickActionNames99;
+
+  /// No description provided for @names99ScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allah\'s 99 Names'**
+  String get names99ScreenTitle;
+
   /// No description provided for @themeToggleSwitchToLight.
   ///
   /// In en, this message translates to:
@@ -1061,7 +1073,7 @@ abstract class AppLocalizations {
   /// No description provided for @transliterationFieldLabel.
   ///
   /// In en, this message translates to:
-  /// **'Transliteration (English)'**
+  /// **'Transliteration'**
   String get transliterationFieldLabel;
 
   /// No description provided for @transliterationFieldHint.

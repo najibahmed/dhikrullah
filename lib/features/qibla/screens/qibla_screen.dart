@@ -204,7 +204,12 @@ class _Dial extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          for (final (angle, label) in [(0, 'N'), (90, 'E'), (180, 'S'), (270, 'W')])
+          for (final (angle, label) in [
+            (0, 'N'),
+            (90, 'E'),
+            (180, 'S'),
+            (270, 'W')
+          ])
             Transform.rotate(
               angle: angle * math.pi / 180,
               child: Align(
@@ -220,13 +225,12 @@ class _Dial extends StatelessWidget {
             child: Align(
               alignment: Alignment.topCenter,
               child: Padding(
-                padding: const EdgeInsets.only(top: 38),
-                child: Icon(
-                  Icons.mosque,
-                  size: 32,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
+                  padding: const EdgeInsets.only(top: 38),
+                  child: Image.asset(
+                    'assets/images/kaaba.png',
+                    width: 32,
+                    height: 32,
+                  )),
             ),
           ),
           Icon(

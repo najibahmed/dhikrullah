@@ -17,4 +17,5 @@ class RouteNames {
   static const String hijriSettings = '/hijri-settings';
   static const String about = '/about';
   static const String qibla = '/qibla';
+  static const String allahNames = '/allah-names';
 }

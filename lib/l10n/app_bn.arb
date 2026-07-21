@@ -65,6 +65,8 @@
   "quickActionsTitle": "দ্রুত কার্যক্রম",
   "quickActionPrayerTime": "সালাতের সময়",
   "quickActionQibla": "কিবলা",
+  "quickActionNames99": "৯৯ নাম",
+  "names99ScreenTitle": "আল্লাহর ৯৯ নাম",
   "themeToggleSwitchToLight": "লাইট মোডে যান",
   "themeToggleSwitchToDark": "ডার্ক মোডে যান",
 
@@ -172,7 +174,7 @@
   "arabicTextFieldLabel": "আরবি লেখা",
   "arabicTextFieldHint": "سُبْحَانَ اللّهِ",
   "arabicTextRequiredError": "আরবি লেখা আবশ্যক",
-  "transliterationFieldLabel": "প্রতিবর্ণীকরণ (ইংরেজি)",
+  "transliterationFieldLabel": "প্রতিবর্ণীকরণ",
   "transliterationFieldHint": "যেমন: Subḥān Allāh",
   "transliterationRequiredError": "প্রতিবর্ণীকরণ আবশ্যক",
   "meaningFieldLabel": "অর্থ / বিবরণ",

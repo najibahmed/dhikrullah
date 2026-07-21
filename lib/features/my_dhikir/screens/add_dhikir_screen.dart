@@ -117,10 +117,18 @@ class _AddDhikirViewState extends State<_AddDhikirView>
       _selectedColor = e.colorHex;
       _selectedIcon = e.icon;
     }
+    for (final c in [_titleCtrl, _arabicCtrl, _translitCtrl, _meaningCtrl]) {
+      c.addListener(_onFieldChanged);
+    }
   }
+
+  void _onFieldChanged() => setState(() {});
 
   @override
   void dispose() {
+    for (final c in [_titleCtrl, _arabicCtrl, _translitCtrl, _meaningCtrl]) {
+      c.removeListener(_onFieldChanged);
+    }
     _titleCtrl.dispose();
     _arabicCtrl.dispose();
     _translitCtrl.dispose();
@@ -225,7 +233,9 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _isEdit ? l10n.addDhikirEditTitle : l10n.addDhikirNewTitle,
+                              _isEdit
+                                  ? l10n.addDhikirEditTitle
+                                  : l10n.addDhikirNewTitle,
                               style: GoogleFonts.playfairDisplay(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
@@ -546,7 +556,9 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                                         style: const TextStyle(fontSize: 18)),
                                     const SizedBox(width: 10),
                                     Text(
-                                      _isEdit ? l10n.addDhikirUpdateButton : l10n.addDhikirSaveButton,
+                                      _isEdit
+                                          ? l10n.addDhikirUpdateButton
+                                          : l10n.addDhikirSaveButton,
                                       style: GoogleFonts.inter(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,

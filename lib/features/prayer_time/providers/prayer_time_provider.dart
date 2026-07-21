@@ -248,6 +248,24 @@ class PrayerTimeProvider extends ChangeNotifier {
     return _buildWindows(times, yesterday);
   }
 
+  /// Single window for [label] (any name from [windowsForDate]). Tahajjud
+  /// always resolves to the trailing (upcoming) instance — same instance
+  /// AlarmScheduler.computeUpcoming arms — since [windowsForDate] always
+  /// ends with that date's own Tahajjud window.
+  ({DateTime start, DateTime end})? windowForLabel(String label,
+      {DateTime? date}) {
+    final windows = windowsForDate(date ?? DateTime.now());
+    if (windows.isEmpty) return null;
+    if (label == 'Tahajjud') {
+      final w = windows.last;
+      return (start: w.start, end: w.end);
+    }
+    for (final w in windows) {
+      if (w.name == label) return (start: w.start, end: w.end);
+    }
+    return null;
+  }
+
   /// [displayPrayerWindows], generalized to any date — Tahajjud appears
   /// once (that date's morning instance), no trailing duplicate.
   List<({String name, DateTime start, DateTime end})>

@@ -72,6 +72,8 @@
   "quickActionsTitle": "Quick Actions",
   "quickActionPrayerTime": "Prayer Time",
   "quickActionQibla": "Qibla",
+  "quickActionNames99": "99 Names",
+  "names99ScreenTitle": "Allah's 99 Names",
   "themeToggleSwitchToLight": "Switch to light mode",
   "themeToggleSwitchToDark": "Switch to dark mode",
 
@@ -197,7 +199,7 @@
   "arabicTextFieldLabel": "Arabic Text",
   "arabicTextFieldHint": "سُبْحَانَ اللّهِ",
   "arabicTextRequiredError": "Arabic text is required",
-  "transliterationFieldLabel": "Transliteration (English)",
+  "transliterationFieldLabel": "Transliteration",
   "transliterationFieldHint": "e.g. Subḥān Allāh",
   "transliterationRequiredError": "Transliteration is required",
   "meaningFieldLabel": "Meaning / Description",
