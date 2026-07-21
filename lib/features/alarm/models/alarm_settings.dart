@@ -10,7 +10,7 @@ const alarmPrayerLabels = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha', 'Tahajjud'
 
 /// Only bundled tone right now; kept as a string id so a future tone
 /// picker doesn't require a model or storage-format change.
-const kDefaultToneId = 'athan';
+const kDefaultToneId = 'adhan_makkah';
 
 const kAlarmOffsetMinMinutes = -60;
 const kAlarmOffsetMaxMinutes = 60;

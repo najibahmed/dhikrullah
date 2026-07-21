@@ -20,8 +20,8 @@ Register (Kotlin, app package):
 - FullScreenAlarmActivity (showWhenLocked, turnScreenOn, excludeFromRecents)
 
 ## Audio Asset
-- `assets/audio/athan.mp3` declared in pubspec (Flutter side, future preview use)
-- Mirrored to `android/app/src/main/res/raw/athan.mp3` — native MediaPlayer source
+- `assets/audio/adhan_makkah.mp3` declared in pubspec (Flutter side, future preview use)
+- Mirrored to `android/app/src/main/res/raw/adhan_makkah.mp3` — native MediaPlayer source
 
 ## Exact Alarm Flow
 App start / alarm enable

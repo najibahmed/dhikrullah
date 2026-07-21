@@ -39,4 +39,4 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
-    - assets/audio/athan.mp3
+    - assets/audio/adhan_makkah.mp3

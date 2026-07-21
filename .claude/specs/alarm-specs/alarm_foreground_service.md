@@ -7,7 +7,7 @@ Alarm fires (AlarmReceiver)
 → Start foreground service
 → Acquire audio focus
 → Start vibration (if alarm_vibrate_<Label> true)
-→ Play `res/raw/athan.mp3` via MediaPlayer
+→ Play `res/raw/adhan_makkah.mp3` via MediaPlayer
 → Show ongoing notification
 → If fullscreen enabled: full-screen intent launches FullScreenAlarmActivity
 → Wait for dismiss OR MediaPlayer completion

@@ -18,7 +18,7 @@ const _kFullscreenPrefix = 'alarm_fullscreen_';
 class AlarmSettingsRepository {
   /// Reads a single prayer's alarm settings, falling back to the
   /// documented defaults (enabled=false, offset=0, vibration=true,
-  /// fullscreen=false, tone=athan) for anything not yet saved.
+  /// fullscreen=false, tone=adhan_makkah) for anything not yet saved.
   Future<AlarmSettings> get(String prayerId) async {
     final prefs = await SharedPreferences.getInstance();
     const defaults = AlarmSettings(prayerId: '');

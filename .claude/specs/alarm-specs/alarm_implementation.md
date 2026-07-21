@@ -16,13 +16,13 @@ All open decisions resolved (2026-07-18). This file is the source of truth for t
 ## Resolved Decisions
 - **Scope**: 6 alarm-capable prayers — Fajr, Dhuhr, Asr, Maghrib, Isha, Tahajjud. Ishraq/Chasht stay notification-only.
 - **Architecture**: native Kotlin. AlarmManager exact alarms → BroadcastReceiver → ForegroundService (MediaPlayer) → optional native FullScreenAlarmActivity. Flutter side: settings UI + scheduling only, bridged via MethodChannel. No new Flutter packages.
-- **Audio**: single bundled tone `assets/audio/athan.mp3` (declare in pubspec) mirrored into `android/app/src/main/res/raw/athan.mp3` so native MediaPlayer plays without the Flutter engine. No tone picker; ToneId reserved for future.
+- **Audio**: single bundled tone `assets/audio/adhan_makkah.mp3` (declare in pubspec) mirrored into `android/app/src/main/res/raw/adhan_makkah.mp3` so native MediaPlayer plays without the Flutter engine. No tone picker; ToneId reserved for future.
 - **Persistence**: SharedPreferences only. Native reads the same `FlutterSharedPreferences` store. No new Hive box/typeId.
 - **Rescheduling**: Flutter precomputes alarm timestamps for today + tomorrow (+48h) on app open and on alarm-setting change, persists them, arms via MethodChannel. Native BootReceiver re-arms from persisted timestamps only (future ones only). App unopened 2+ days → alarms lapse until next open (accepted; same limitation as notifications).
 - **Playback end**: auto-stop. Audio finishes → vibration stops, notification cleared, fullscreen finishes, service stops itself. Dismiss only cuts it short.
 - **Tahajjud time**: window start (last third of night, from existing provider) + offset.
 - **Offset**: -60..+60 minutes, step 5, per prayer.
-- **Defaults**: enabled=false, offset=0, vibration=on, fullscreen=off, tone=athan.
+- **Defaults**: enabled=false, offset=0, vibration=on, fullscreen=off, tone=adhan_makkah.
 - **Coexistence**: alarms independent of reminder notifications; both may be enabled for the same prayer.
 - **Settings UI**: alarm section added to the existing per-prayer bell bottom sheet (`prayer_notification_bottom_sheet.dart`), shown only for the 6 alarm-capable prayers.
 
@@ -36,7 +36,7 @@ All open decisions resolved (2026-07-18). This file is the source of truth for t
 ### Kotlin (android/)
 - **AlarmMethodChannel** — MethodChannel handler in MainActivity; arm/cancel exact alarms, query state.
 - **AlarmReceiver** — BroadcastReceiver; alarm fires → starts ForegroundAlarmService.
-- **ForegroundAlarmService** — audio focus, vibration, MediaPlayer playback of res/raw/athan, ongoing notification, auto-stop on completion.
+- **ForegroundAlarmService** — audio focus, vibration, MediaPlayer playback of res/raw/adhan_makkah, ongoing notification, auto-stop on completion.
 - **FullScreenAlarmActivity** — native activity; prayer name + stop button; launched via full-screen intent when enabled.
 - **BootReceiver** — BOOT_COMPLETED → re-arm future alarms from persisted timestamps.
 

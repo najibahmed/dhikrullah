@@ -156,9 +156,9 @@ class ForegroundAlarmService : Service() {
 
     private fun startPlayback() {
         try {
-            val player = MediaPlayer.create(this, R.raw.athan)
+            val player = MediaPlayer.create(this, R.raw.adhan_makkah)
             if (player == null) {
-                Log.w(TAG, "MediaPlayer.create returned null for R.raw.athan — notification-only alarm")
+                Log.w(TAG, "MediaPlayer.create returned null for R.raw.adhan_makkah — notification-only alarm")
                 return
             }
             mediaPlayer = player

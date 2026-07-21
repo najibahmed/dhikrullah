@@ -172,7 +172,7 @@ isRunning()
 
 Purpose
 
-Play bundled `res/raw/athan.mp3` via MediaPlayer.
+Play bundled `res/raw/adhan_makkah.mp3` via MediaPlayer.
 
 Public API
 
@@ -198,7 +198,7 @@ Enabled (default false)
 
 OffsetMinutes (default 0)
 
-ToneId (reserved — single tone "athan" for now, no picker)
+ToneId (reserved — single tone "adhan_makkah" for now, no picker)
 
 VibrationEnabled (default true)
 
@@ -386,7 +386,7 @@ Fallback
 
 ↓
 
-Notification-only alarm (no default asset beyond athan)
+Notification-only alarm (no default asset beyond adhan_makkah)
 
 ---
 
