@@ -24,11 +24,16 @@ Future<void> handlePrayerBellTap(
   BuildContext context,
   String label,
 ) async {
-  await PrayerNotificationService.init();
+  var granted = false;
+  try {
+    await PrayerNotificationService.init();
 
-  var granted = await PrayerNotificationService.hasPermission();
-  if (!granted) {
-    granted = await PrayerNotificationService.requestPermission();
+    granted = await PrayerNotificationService.hasPermission();
+    if (!granted) {
+      granted = await PrayerNotificationService.requestPermission();
+    }
+  } catch (e) {
+    debugPrint('handlePrayerBellTap: permission flow failed: $e');
   }
 
   if (!context.mounted) return;
@@ -107,9 +112,7 @@ class _PrayerNotificationSheet extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(prayerDisplayName(context, label),
-                            style: theme.textTheme.titleLarge
-                                ?.copyWith(fontWeight: FontWeight.w700)),
+                        Text(prayerDisplayName(context, label), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
                         IconButton(
                           onPressed: () => Navigator.pop(context),
                           icon: const Icon(Icons.close),
@@ -120,31 +123,17 @@ class _PrayerNotificationSheet extends StatelessWidget {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: Text(l10n.notificationSwitchTitle),
-                      subtitle: Text(enabled
-                          ? l10n.notificationOnSubtitle
-                          : l10n.notificationOffSubtitle),
+                      subtitle: Text(enabled ? l10n.notificationOnSubtitle : l10n.notificationOffSubtitle),
                       value: enabled,
-                      onChanged: (value) => provider.setPrayerNotification(
-                          label, value,
-                          locale: Localizations.localeOf(context)),
+                      onChanged: (value) => provider.setPrayerNotification(label, value, locale: Localizations.localeOf(context)),
                     ),
                     const SizedBox(height: 16),
-                    Text(l10n.soundSection,
-                        style: theme.textTheme.bodyMedium
-                            ?.copyWith(fontWeight: FontWeight.w700)),
+                    Text(l10n.soundSection, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
                     const SizedBox(height: 8),
-                    _soundOption(context, theme, provider,
-                        label: l10n.soundDefault,
-                        value: 'default',
-                        selected: sound),
+                    _soundOption(context, theme, provider, label: l10n.soundDefault, value: 'default', selected: sound),
                     const SizedBox(height: 8),
-                    _soundOption(context, theme, provider,
-                        label: l10n.soundSilent,
-                        value: 'silent',
-                        selected: sound),
-                    if (alarmPrayerLabels.contains(label))
-                      AlarmSettingsSection(
-                          prayerId: label, prayerTimeProvider: provider),
+                    _soundOption(context, theme, provider, label: l10n.soundSilent, value: 'silent', selected: sound),
+                    if (alarmPrayerLabels.contains(label)) AlarmSettingsSection(prayerId: label, prayerTimeProvider: provider),
                   ],
                 ),
               ),
@@ -165,20 +154,15 @@ class _PrayerNotificationSheet extends StatelessWidget {
   }) {
     final isSelected = selected == value;
     return GestureDetector(
-      onTap: () => provider.setPrayerSound(this.label, value,
-          locale: Localizations.localeOf(context)),
+      onTap: () => provider.setPrayerSound(this.label, value, locale: Localizations.localeOf(context)),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected
-              ? theme.colorScheme.secondary.withValues(alpha: 0.15)
-              : null,
+          color: isSelected ? theme.colorScheme.secondary.withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? theme.colorScheme.secondary
-                : theme.dividerColor.withValues(alpha: 0.4),
+            color: isSelected ? theme.colorScheme.secondary : theme.dividerColor.withValues(alpha: 0.4),
             width: isSelected ? 1.5 : 1,
           ),
         ),

@@ -49,7 +49,7 @@ class PrayerNotificationService {
     final timeZoneName = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(timeZoneName));
 
-    const androidInit = AndroidInitializationSettings('ic_launcher');
+    const androidInit = AndroidInitializationSettings('notification_icon');
     await _plugin.initialize(
       settings: const InitializationSettings(android: androidInit),
     );
@@ -59,8 +59,7 @@ class PrayerNotificationService {
 
   /// Whether this app currently has permission to post notifications.
   static Future<bool> hasPermission() async {
-    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
     return await androidPlugin?.areNotificationsEnabled() ?? false;
   }
 
@@ -68,32 +67,28 @@ class PrayerNotificationService {
   /// whether permission ended up granted.
   static Future<bool> requestPermission() async {
     if (!_initialized) await init();
-    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
     final granted = await androidPlugin?.requestNotificationsPermission();
-    if (granted != null && granted) {
-      await androidPlugin?.requestExactAlarmsPermission();
-    }
+    // if (granted != null && granted) {
+    //   await androidPlugin?.requestExactAlarmsPermission();
+    // }
     return granted ?? await hasPermission();
   }
 
-  static Future<bool> requestAlarmPermission() async {
-    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
-    final granted = await androidPlugin?.requestExactAlarmsPermission();
+  // static Future<bool> requestAlarmPermission() async {
+  //   final androidPlugin = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+  //   final granted = await androidPlugin?.requestExactAlarmsPermission();
 
-    return granted ?? await hasPermission();
-  }
+  //   return granted ?? await hasPermission();
+  // }
 
-  static NotificationDetails _detailsFor(
-      String label, Map<String, String> soundChoice, AppLocalizations l10n) {
+  static NotificationDetails _detailsFor(String label, Map<String, String> soundChoice, AppLocalizations l10n) {
     final silent = soundChoice[label] == 'silent';
     return NotificationDetails(
       android: AndroidNotificationDetails(
         silent ? _kSilentChannelId : _kChannelId,
         silent ? l10n.notifSilentChannelName : l10n.notifChannelName,
-        channelDescription:
-            silent ? l10n.notifSilentChannelDescription : l10n.notifChannelDescription,
+        channelDescription: silent ? l10n.notifSilentChannelDescription : l10n.notifChannelDescription,
         playSound: !silent,
       ),
     );
@@ -178,8 +173,7 @@ class PrayerNotificationService {
                 androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
               );
             } catch (e) {
-              debugPrint(
-                  'PrayerNotificationService: failed to schedule $label: $e');
+              debugPrint('PrayerNotificationService: failed to schedule $label: $e');
             }
           }
         }
@@ -187,4 +181,16 @@ class PrayerNotificationService {
       }
     }
   }
+}
+
+class NotificationPermissionResult {
+  final bool notificationGranted;
+  final bool exactAlarmGranted;
+
+  const NotificationPermissionResult({
+    required this.notificationGranted,
+    required this.exactAlarmGranted,
+  });
+
+  bool get fullyGranted => notificationGranted && exactAlarmGranted;
 }
