@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
+import 'package:dhikir_app/core/providers/font_size_provider.dart';
 import 'package:dhikir_app/core/theme/app_colors.dart';
 import 'package:dhikir_app/features/allah_names/models/allah_name.dart';
 
@@ -31,6 +33,7 @@ class AllahNameCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fontSize = context.watch<FontSizeProvider>();
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -65,7 +68,7 @@ class AllahNameCard extends StatelessWidget {
                 child: Text(
                   name.arabic,
                   style: GoogleFonts.playfairDisplay(
-                    fontSize: 38,
+                    fontSize: fontSize.arabicFontSize,
                     fontWeight: FontWeight.w800,
                     color: AppColors.dark,
                   ),
@@ -77,7 +80,7 @@ class AllahNameCard extends StatelessWidget {
           Text(
             name.transliteration,
             style: GoogleFonts.inter(
-              fontSize: 15,
+              fontSize: fontSize.transliterationFontSize,
               fontWeight: FontWeight.w700,
               color: AppColors.dark,
             ),
@@ -95,7 +98,7 @@ class AllahNameCard extends StatelessWidget {
           Text(
             name.meaning,
             style: GoogleFonts.inter(
-              fontSize: 13,
+              fontSize: fontSize.meaningFontSize,
               height: 1.4,
               color: AppColors.subtle,
             ),

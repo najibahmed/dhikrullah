@@ -7,13 +7,29 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/providers/font_size_provider.dart';
 import 'package:dhikir_app/core/theme/app_colors.dart';
+import 'package:dhikir_app/core/widgets/font_size_settings_dialog.dart';
 import 'package:dhikir_app/features/dua/models/dua_item.dart';
 import 'package:dhikir_app/features/dua/services/dua_service.dart';
 import 'package:dhikir_app/features/dua/widgets/dua_card.dart';
 import 'package:dhikir_app/features/dua/widgets/dua_category_sheet.dart';
+
+const _duaFontSizeConfig = FontSizeConfig(
+  id: 'dua',
+  arabicDefault: 22,
+  arabicMin: 16,
+  arabicMax: 32,
+  transliterationDefault: 12,
+  transliterationMin: 10,
+  transliterationMax: 20,
+  meaningDefault: 13,
+  meaningMin: 11,
+  meaningMax: 20,
+);
 
 class DuaScreen extends StatefulWidget {
   const DuaScreen({super.key});
@@ -25,8 +41,16 @@ class DuaScreen extends StatefulWidget {
 class _DuaScreenState extends State<DuaScreen> {
   final _service = const DuaService();
   late final Future<DuaData> _future = _service.load(context);
+  late final FontSizeProvider _fontSizeProvider =
+      FontSizeProvider(_duaFontSizeConfig)..hydrate();
 
   String? _selectedCategoryId;
+
+  @override
+  void dispose() {
+    _fontSizeProvider.dispose();
+    super.dispose();
+  }
 
   Future<void> _openCategorySheet(DuaData data) async {
     final result = await showDuaCategorySheet(
@@ -43,70 +67,81 @@ class _DuaScreenState extends State<DuaScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
+    return ChangeNotifierProvider.value(
+      value: _fontSizeProvider,
+      child: Scaffold(
         backgroundColor: AppColors.background,
-        elevation: 0,
-        title: Text(
-          l10n.duaScreenTitle,
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: AppColors.dark,
+        appBar: AppBar(
+          backgroundColor: AppColors.background,
+          elevation: 0,
+          title: Text(
+            l10n.duaScreenTitle,
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: AppColors.dark,
+            ),
           ),
+          iconTheme: const IconThemeData(color: AppColors.dark),
+          actions: [
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.tune_rounded),
+                onPressed: () => showFontSizeSettingsDialog(context),
+              ),
+            ),
+          ],
         ),
-        iconTheme: const IconThemeData(color: AppColors.dark),
-      ),
-      body: FutureBuilder<DuaData>(
-        future: _future,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final data = snapshot.data!;
-          final categoryName = _selectedCategoryId == null
-              ? l10n.duaCategoryAll
-              : data.categories
-                  .firstWhere((c) => c.id == _selectedCategoryId)
-                  .name;
-          final filtered = _selectedCategoryId == null
-              ? data.duas
-              : data.duas
-                  .where((d) => d.category == _selectedCategoryId)
-                  .toList();
+        body: FutureBuilder<DuaData>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final data = snapshot.data!;
+            final categoryName = _selectedCategoryId == null
+                ? l10n.duaCategoryAll
+                : data.categories
+                    .firstWhere((c) => c.id == _selectedCategoryId)
+                    .name;
+            final filtered = _selectedCategoryId == null
+                ? data.duas
+                : data.duas
+                    .where((d) => d.category == _selectedCategoryId)
+                    .toList();
 
-          return Column(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                  child: _CategoryFilterButton(
-                    label: categoryName,
-                    onTap: () => _openCategorySheet(data),
+            return Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                    child: _CategoryFilterButton(
+                      label: categoryName,
+                      onTap: () => _openCategorySheet(data),
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: Scrollbar(
-                  thumbVisibility: true,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                    itemCount: filtered.length,
-                    itemBuilder: (context, index) {
-                      final dua = filtered[index];
-                      final catName = data.categories
-                          .firstWhere((c) => c.id == dua.category)
-                          .name;
-                      return DuaCard(dua: dua, categoryName: catName);
-                    },
+                Expanded(
+                  child: Scrollbar(
+                    thumbVisibility: true,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final dua = filtered[index];
+                        final catName = data.categories
+                            .firstWhere((c) => c.id == dua.category)
+                            .name;
+                        return DuaCard(dua: dua, categoryName: catName);
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

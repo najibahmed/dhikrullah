@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/providers/font_size_provider.dart';
 import 'package:dhikir_app/core/theme/app_colors.dart';
 import 'package:dhikir_app/features/dua/models/dua_item.dart';
 
@@ -17,6 +19,7 @@ class DuaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final fontSize = context.watch<FontSizeProvider>();
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -83,7 +86,7 @@ class DuaCard extends StatelessWidget {
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.right,
             style: GoogleFonts.amiri(
-              fontSize: 22,
+              fontSize: fontSize.arabicFontSize,
               fontWeight: FontWeight.w700,
               color: AppColors.dark,
               height: 1.8,
@@ -93,7 +96,7 @@ class DuaCard extends StatelessWidget {
           Text(
             dua.transliteration,
             style: GoogleFonts.inter(
-              fontSize: 12,
+              fontSize: fontSize.transliterationFontSize,
               fontStyle: FontStyle.italic,
               height: 1.4,
               color: AppColors.subtle,
@@ -103,7 +106,7 @@ class DuaCard extends StatelessWidget {
           Text(
             dua.translation,
             style: GoogleFonts.inter(
-              fontSize: 13,
+              fontSize: fontSize.meaningFontSize,
               height: 1.45,
               color: AppColors.medium,
             ),

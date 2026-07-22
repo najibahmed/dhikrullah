@@ -163,6 +163,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qiblaNoSensor => 'Compass sensor is not available on this device.';
 
   @override
+  String get favoritesScreenTitle => 'Favourites';
+
+  @override
   String get favoritesEmptyTitle => 'No favorite dhikir yet';
 
   @override
@@ -233,6 +236,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get duaCategorySheetTitle => 'Dua Category';
+
+  @override
+  String get fontSettingsTitle => 'Font Settings';
+
+  @override
+  String get arabicFontSizeLabel => 'Arabic Font Size';
+
+  @override
+  String get transliterationFontSizeLabel => 'Transliteration Font Size';
+
+  @override
+  String get meaningFontSizeLabel => 'Meaning Font Size';
 
   @override
   String duaCountLabel(Object count) {

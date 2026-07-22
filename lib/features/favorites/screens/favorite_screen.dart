@@ -58,105 +58,147 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
     final favIds = favProvider.all;
 
     final customFavorites = CustomDhikirService.getFavorites();
-    final builtInFavorites = built_in.dhikirList.where((d) => favIds.contains(d.id)).toList();
-    final favBuiltInSession = builtInFavorites.map((d) => SessionDhikir.fromItem(d)).toList();
-    final customSession = customFavorites.map((d) => SessionDhikir.fromCustom(d)).toList();
-    final List<SessionDhikir> combined = [...customSession, ...favBuiltInSession];
+    final builtInFavorites =
+        built_in.dhikirList.where((d) => favIds.contains(d.id)).toList();
+    final favBuiltInSession =
+        builtInFavorites.map((d) => SessionDhikir.fromItem(d)).toList();
+    final customSession =
+        customFavorites.map((d) => SessionDhikir.fromCustom(d)).toList();
+    final List<SessionDhikir> combined = [
+      ...customSession,
+      ...favBuiltInSession
+    ];
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: combined.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 60),
-                  const Icon(
-                    Icons.favorite,
-                    size: 70,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.favoritesScreenTitle,
+            style: GoogleFonts.playfairDisplay(
+                fontSize: 20, fontWeight: FontWeight.w700)),
+        centerTitle: false,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+          child: combined.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 60),
+                      const Icon(
+                        Icons.favorite,
+                        size: 70,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(l10n.favoritesEmptyTitle,
+                          style: GoogleFonts.playfairDisplay(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF2D3748))),
+                      const SizedBox(height: 8),
+                      Text(l10n.favoritesEmptySubtitle,
+                          style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: const Color(0xFF718096),
+                              height: 1.5),
+                          textAlign: TextAlign.center)
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(l10n.favoritesEmptyTitle,
-                      style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
-                  const SizedBox(height: 8),
-                  Text(l10n.favoritesEmptySubtitle,
-                      style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF718096), height: 1.5), textAlign: TextAlign.center)
-                ],
-              ),
-            )
-          : SingleChildScrollView(
-              child: Center(
-                child: Column(
-                  // crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:
-                      // Quick session: all built-in
-                      [
-                    if (combined.isNotEmpty)
-                      GestureDetector(
-                        onTap: () => _showSessionSetup(combined),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2D3748),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [BoxShadow(color: const Color(0xFF2D3748).withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
+                )
+              : SingleChildScrollView(
+                  child: Center(
+                    child: Column(
+                      // crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children:
+                          // Quick session: all built-in
+                          [
+                        if (combined.isNotEmpty)
+                          GestureDetector(
+                            onTap: () => _showSessionSetup(combined),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 14, horizontal: 20),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2D3748),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: const Color(0xFF2D3748)
+                                          .withValues(alpha: 0.3),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4))
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.play_circle_rounded,
+                                      color: Colors.white, size: 20),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                      l10n.startFullSessionButton(
+                                          combined.length),
+                                      style: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white)),
+                                ],
+                              ),
+                            ),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.play_circle_rounded, color: Colors.white, size: 20),
-                              const SizedBox(width: 8),
-                              Text(l10n.startFullSessionButton(combined.length),
-                                  style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
-                            ],
+                        const SizedBox(height: 16),
+                        if (customFavorites.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          SectionHeader(
+                            title: l10n.favoritesCustomSectionTitle,
+                            count: customSession.length,
+                            onSession: () => _showSessionSetup(customSession),
                           ),
-                        ),
-                      ),
-                    const SizedBox(height: 16),
-                    if (customFavorites.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      SectionHeader(
-                        title: l10n.favoritesCustomSectionTitle,
-                        count: customSession.length,
-                        onSession: () => _showSessionSetup(customSession),
-                      ),
-                      const SizedBox(height: 8),
-                      ...customFavorites.map((item) => FavRow(
-                            id: item.id,
-                            title: item.title,
-                            arabic: item.arabicText,
-                            transliteration: item.transliteration,
-                            icon: item.icon,
-                            colorHex: item.colorHex,
-                            onSession: () => _showSessionSetup([SessionDhikir.fromCustom(item)]),
-                            onToggleFav: () => context.read<FavoritesProvider>().toggle(item.id),
-                          )),
-                    ],
-                    if (favBuiltInSession.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      SectionHeader(
-                        title: l10n.favoritesSectionTitle,
-                        count: favBuiltInSession.length,
-                        onSession: () => _showSessionSetup(favBuiltInSession),
-                      ),
-                      const SizedBox(height: 8),
-                      ...favBuiltInSession.map((item) => FavRow(
-                            id: item.id,
-                            title: item.title,
-                            arabic: item.arabicText,
-                            transliteration: item.transliteration,
-                            icon: item.icon,
-                            colorHex: item.colorHex,
-                            onSession: () => _showSessionSetup([item]),
-                            onToggleFav: () => context.read<FavoritesProvider>().toggle(item.id),
-                          )),
-                    ],
-                  ],
+                          const SizedBox(height: 8),
+                          ...customFavorites.map((item) => FavRow(
+                                id: item.id,
+                                title: item.title,
+                                arabic: item.arabicText,
+                                transliteration: item.transliteration,
+                                icon: item.icon,
+                                colorHex: item.colorHex,
+                                onSession: () => _showSessionSetup(
+                                    [SessionDhikir.fromCustom(item)]),
+                                onToggleFav: () => context
+                                    .read<FavoritesProvider>()
+                                    .toggle(item.id),
+                              )),
+                        ],
+                        if (favBuiltInSession.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          SectionHeader(
+                            title: l10n.favoritesSectionTitle,
+                            count: favBuiltInSession.length,
+                            onSession: () =>
+                                _showSessionSetup(favBuiltInSession),
+                          ),
+                          const SizedBox(height: 8),
+                          ...favBuiltInSession.map((item) => FavRow(
+                                id: item.id,
+                                title: item.title,
+                                arabic: item.arabicText,
+                                transliteration: item.transliteration,
+                                icon: item.icon,
+                                colorHex: item.colorHex,
+                                onSession: () => _showSessionSetup([item]),
+                                onToggleFav: () => context
+                                    .read<FavoritesProvider>()
+                                    .toggle(item.id),
+                              )),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
+        ),
+      ),
     );
   }
 }

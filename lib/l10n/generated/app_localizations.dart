@@ -380,6 +380,12 @@ abstract class AppLocalizations {
   /// **'Compass sensor is not available on this device.'**
   String get qiblaNoSensor;
 
+  /// No description provided for @favoritesScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourites'**
+  String get favoritesScreenTitle;
+
   /// No description provided for @favoritesEmptyTitle.
   ///
   /// In en, this message translates to:
@@ -517,6 +523,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dua Category'**
   String get duaCategorySheetTitle;
+
+  /// No description provided for @fontSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Font Settings'**
+  String get fontSettingsTitle;
+
+  /// No description provided for @arabicFontSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Font Size'**
+  String get arabicFontSizeLabel;
+
+  /// No description provided for @transliterationFontSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Transliteration Font Size'**
+  String get transliterationFontSizeLabel;
+
+  /// No description provided for @meaningFontSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Meaning Font Size'**
+  String get meaningFontSizeLabel;
 
   /// No description provided for @duaCountLabel.
   ///

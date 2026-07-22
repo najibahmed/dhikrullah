@@ -57,6 +57,7 @@
   "qiblaBearingLabel": "Qibla",
   "qiblaNoSensor": "Compass sensor is not available on this device.",
 
+  "favoritesScreenTitle": "Favourites",
   "favoritesEmptyTitle": "No favorite dhikir yet",
   "favoritesEmptySubtitle": "Tap the heart icon to favorite your dhikir",
   "favoritesCustomSectionTitle": "Custom Favourite Dhikir",
@@ -82,6 +83,10 @@
   "duaCategoryAll": "All",
   "duaCategoryAllDescription": "Show duas from every category",
   "duaCategorySheetTitle": "Dua Category",
+  "fontSettingsTitle": "Font Settings",
+  "arabicFontSizeLabel": "Arabic Font Size",
+  "transliterationFontSizeLabel": "Transliteration Font Size",
+  "meaningFontSizeLabel": "Meaning Font Size",
   "duaCountLabel": "{count} duas",
   "@duaCountLabel": {"placeholders": {"count": {}}},
   "duaRepeatLabel": "Repeat ×{count}",

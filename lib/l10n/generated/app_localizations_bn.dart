@@ -163,6 +163,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get qiblaNoSensor => 'এই ডিভাইসে কম্পাস সেন্সর নেই।';
 
   @override
+  String get favoritesScreenTitle => 'প্রিয়';
+
+  @override
   String get favoritesEmptyTitle => 'এখনও কোনো প্রিয় যিকির নেই';
 
   @override
@@ -233,6 +236,18 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get duaCategorySheetTitle => 'দোয়ার বিভাগ';
+
+  @override
+  String get fontSettingsTitle => 'ফন্ট সেটিংস';
+
+  @override
+  String get arabicFontSizeLabel => 'আরবি ফন্ট সাইজ';
+
+  @override
+  String get transliterationFontSizeLabel => 'উচ্চারণ ফন্ট সাইজ';
+
+  @override
+  String get meaningFontSizeLabel => 'অর্থ ফন্ট সাইজ';
 
   @override
   String duaCountLabel(Object count) {
