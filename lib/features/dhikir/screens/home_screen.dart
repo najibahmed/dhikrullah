@@ -150,8 +150,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     final l10n = context.l10n;
     final now = DateTime.now();
     final builtIn = built_in.dhikirList.map(SessionDhikir.fromItem).toList();
-    final custom =
-        CustomDhikirService.getAll().map(SessionDhikir.fromCustom).toList();
+    final custom = CustomDhikirService.getAll().map(SessionDhikir.fromCustom).toList();
     final allDhikir = [...builtIn, ...custom];
 
     return CustomScrollView(
@@ -217,8 +216,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                 IconButton(
                   tooltip: l10n.aboutTitle,
                   icon: const Icon(Icons.info_outline, color: AppColors.dark),
-                  onPressed: () =>
-                      Navigator.pushNamed(context, RouteNames.about),
+                  onPressed: () => Navigator.pushNamed(context, RouteNames.about),
                 ),
                 const SizedBox(width: 8)
               ],
@@ -230,14 +228,10 @@ class _HomeWidgetState extends State<HomeWidget> {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: DateHeaderRow(
-              hijriOffsetDays:
-                  context.watch<PrayerTimeProvider>().displayHijriOffsetDays,
-              sunrise:
-                  context.watch<PrayerTimeProvider>().today?.sunrise.toLocal(),
-              sunset:
-                  context.watch<PrayerTimeProvider>().today?.sunset.toLocal(),
-              onHijriTap: () =>
-                  Navigator.pushNamed(context, RouteNames.hijriSettings),
+              hijriOffsetDays: context.watch<PrayerTimeProvider>().displayHijriOffsetDays,
+              sunrise: context.watch<PrayerTimeProvider>().today?.sunrise.toLocal(),
+              sunset: context.watch<PrayerTimeProvider>().today?.sunset.toLocal(),
+              onHijriTap: () => Navigator.pushNamed(context, RouteNames.hijriSettings),
             ),
           ),
         ),
@@ -255,8 +249,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         SliverToBoxAdapter(
             child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-          child: Text(l10n.homeSectionTitle,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          child: Text(l10n.homeSectionTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         )),
 
         // ── Dhikir grid ───────────────────────────────────────────────────
@@ -379,8 +372,7 @@ class _DhikirGridCard extends StatelessWidget {
                 value: ratio,
                 minHeight: 5,
                 backgroundColor: Colors.white.withValues(alpha: 0.6),
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    AppColors.medium.withValues(alpha: 0.6)),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.medium.withValues(alpha: 0.6)),
               ),
             ),
           ],
@@ -414,13 +406,11 @@ class _Badge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.inter(
-            fontSize: 10, fontWeight: FontWeight.w600, color: textColor),
+        style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: textColor),
       ),
     );
   }
 }
-
 
 /// "Quick Actions" row shown between the prayer cards and the dhikir grid.
 class _QuickActionsSection extends StatelessWidget {
@@ -443,7 +433,7 @@ class _QuickActionsSection extends StatelessWidget {
           children: [
             Expanded(
               child: _QuickActionTile(
-                icon: Icons.schedule,
+                imagePath: 'assets/images/prayer_time.png',
                 label: l10n.quickActionPrayerTime,
                 backgroundColor: AppColors.dark,
                 foregroundColor: Colors.white,
@@ -456,7 +446,7 @@ class _QuickActionsSection extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: _QuickActionTile(
-                icon: Icons.explore,
+                imagePath: 'assets/images/compass.png',
                 label: l10n.quickActionQibla,
                 backgroundColor: AppColors.accentMint,
                 foregroundColor: AppColors.medium,
@@ -467,19 +457,18 @@ class _QuickActionsSection extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: _QuickActionTile(
-                icon: Icons.star_border_rounded,
+                imagePath: 'assets/images/allahu.png',
                 label: l10n.quickActionNames99,
                 backgroundColor: const Color(0xFFF3E5F5),
                 foregroundColor: const Color(0xFF6A1B9A),
                 border: Border.all(color: const Color(0xFFE1BEE7)),
-                onTap: () =>
-                    Navigator.pushNamed(context, RouteNames.allahNames),
+                onTap: () => Navigator.pushNamed(context, RouteNames.allahNames),
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: _QuickActionTile(
-                icon: Icons.add_rounded,
+                imagePath: 'assets/images/tasbih.png',
                 label: l10n.navMyDhikir,
                 backgroundColor: AppColors.accentMint,
                 foregroundColor: AppColors.medium,
@@ -496,7 +485,7 @@ class _QuickActionsSection extends StatelessWidget {
         Row(
           children: [
             _QuickActionTile(
-              icon: Icons.menu_book_rounded,
+              imagePath: 'assets/images/dua.png',
               label: l10n.quickActionDua,
               backgroundColor: const Color(0xFFFFF3E0),
               foregroundColor: const Color(0xFFB26A00),
@@ -516,7 +505,7 @@ class _QuickActionsSection extends StatelessWidget {
 /// Square icon-filled tile with its title below — single item in
 /// [_QuickActionsSection].
 class _QuickActionTile extends StatelessWidget {
-  final IconData icon;
+  final String imagePath;
   final String label;
   final Color backgroundColor;
   final Color foregroundColor;
@@ -524,7 +513,7 @@ class _QuickActionTile extends StatelessWidget {
   final VoidCallback onTap;
 
   const _QuickActionTile({
-    required this.icon,
+    required this.imagePath,
     required this.label,
     required this.backgroundColor,
     required this.foregroundColor,
@@ -534,6 +523,7 @@ class _QuickActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dpr = MediaQuery.of(context).devicePixelRatio;
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -541,12 +531,17 @@ class _QuickActionTile extends StatelessWidget {
           Container(
             width: 64,
             height: 64,
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: backgroundColor,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: border,
             ),
-            child: Icon(icon, color: foregroundColor, size: 26),
+            child: Image.asset(
+              cacheHeight: 64 * dpr.round(),
+              cacheWidth: 64 * dpr.round(),
+              imagePath,
+            ),
           ),
           const SizedBox(height: 6),
           Text(
@@ -570,9 +565,7 @@ class _ThemeToggleButton extends StatelessWidget {
     final theme = context.watch<ThemeProvider>();
     final l10n = context.l10n;
     return IconButton(
-      tooltip: theme.isDark
-          ? l10n.themeToggleSwitchToLight
-          : l10n.themeToggleSwitchToDark,
+      tooltip: theme.isDark ? l10n.themeToggleSwitchToLight : l10n.themeToggleSwitchToDark,
       icon: Icon(
         theme.isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
         color: AppColors.dark,

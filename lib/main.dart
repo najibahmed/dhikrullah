@@ -66,7 +66,7 @@ class DhikirApp extends StatelessWidget {
     final localeProvider = context.watch<LocaleProvider>();
 
     return MaterialApp(
-      title: 'Daily Dhikir',
+      title: 'Dhikrullah',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: AppTheme.light,
