@@ -211,6 +211,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get names99ScreenTitle => 'Allah\'s 99 Names';
 
   @override
+  String get quickActionTasbih => 'Tasbih';
+
+  @override
+  String get counterAddCustomDhikir => 'Add Custom Dhikir';
+
+  @override
+  String get counterAnalytics => 'Dhikir Analytics';
+
+  @override
   String get quickActionDua => 'Dua';
 
   @override

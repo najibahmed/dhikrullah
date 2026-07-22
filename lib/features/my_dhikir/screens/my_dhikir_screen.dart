@@ -127,28 +127,28 @@ class _MyDhikirViewState extends State<_MyDhikirView> with SingleTickerProviderS
               ),
               onPressed: () => Navigator.pop(context),
             ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, RouteNames.addDhikir),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2D3748),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.add_rounded, size: 16, color: Colors.white),
-                        const SizedBox(width: 5),
-                        Text(l10n.commonAdd, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            // actions: [
+            //   Padding(
+            //     padding: const EdgeInsets.only(right: 16),
+            //     child: GestureDetector(
+            //       onTap: () => Navigator.pushNamed(context, RouteNames.addDhikir),
+            //       child: Container(
+            //         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            //         decoration: BoxDecoration(
+            //           color: const Color(0xFF2D3748),
+            //           borderRadius: BorderRadius.circular(12),
+            //         ),
+            //         child: Row(
+            //           children: [
+            //             const Icon(Icons.add_rounded, size: 16, color: Colors.white),
+            //             const SizedBox(width: 5),
+            //             Text(l10n.commonAdd, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
+            //           ],
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ],
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 24, bottom: 56),
               title: Column(

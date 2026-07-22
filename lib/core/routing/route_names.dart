@@ -7,6 +7,8 @@ class RouteNames {
   RouteNames._();
 
   static const String sessionCounter = '/session-counter';
+  static const String counter = '/counter';
+  static const String favorites = '/favorites';
   static const String myDhikir = '/my-dhikir';
   static const String analytics = '/analytics';
   static const String dhikirDetail = '/dhikir-detail';

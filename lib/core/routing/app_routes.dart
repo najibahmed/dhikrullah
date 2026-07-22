@@ -13,6 +13,8 @@ import 'package:dhikir_app/features/my_dhikir/screens/add_dhikir_screen.dart';
 import 'package:dhikir_app/features/analytics/screens/analytics_screen.dart';
 import 'package:dhikir_app/features/dhikir/screens/dhikir_calendar_screen.dart';
 import 'package:dhikir_app/features/dhikir/screens/dhikir_detail_screen.dart';
+import 'package:dhikir_app/features/dhikir/screens/counter_screen.dart';
+import 'package:dhikir_app/features/favorites/screens/favorite_screen.dart';
 import 'package:dhikir_app/features/my_dhikir/screens/my_dhikir_screen.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'package:dhikir_app/features/prayer_time/screens/prayer_time_screen.dart';
@@ -65,6 +67,18 @@ class AppRoutes {
             initialIndex: args.initialIndex,
             sharedGoal: args.sharedGoal,
           ),
+        );
+
+      case RouteNames.counter:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const CounterScreen(),
+        );
+
+      case RouteNames.favorites:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const FavouritesScreen(),
         );
 
       case RouteNames.myDhikir:

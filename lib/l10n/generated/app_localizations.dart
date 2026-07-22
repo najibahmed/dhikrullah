@@ -470,6 +470,24 @@ abstract class AppLocalizations {
   /// **'Allah\'s 99 Names'**
   String get names99ScreenTitle;
 
+  /// No description provided for @quickActionTasbih.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasbih'**
+  String get quickActionTasbih;
+
+  /// No description provided for @counterAddCustomDhikir.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Custom Dhikir'**
+  String get counterAddCustomDhikir;
+
+  /// No description provided for @counterAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhikir Analytics'**
+  String get counterAnalytics;
+
   /// No description provided for @quickActionDua.
   ///
   /// In en, this message translates to:

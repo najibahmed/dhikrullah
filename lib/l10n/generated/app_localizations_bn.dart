@@ -211,6 +211,15 @@ class AppLocalizationsBn extends AppLocalizations {
   String get names99ScreenTitle => 'আল্লাহর ৯৯ নাম';
 
   @override
+  String get quickActionTasbih => 'তসবিহ';
+
+  @override
+  String get counterAddCustomDhikir => 'কাস্টম যিকির যোগ করুন';
+
+  @override
+  String get counterAnalytics => 'যিকির বিশ্লেষণ';
+
+  @override
   String get quickActionDua => 'দোয়া';
 
   @override

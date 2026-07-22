@@ -1,12 +1,9 @@
 // lib/screens/home_screen.dart
 //
-// Root scaffold with a bottom navigation bar hosting three tabs:
-//   0 → HomeWidget  (dhikir grid)
-//   1 → _CounterTab (session launcher list)
-//   2 → FavouritesScreen
-//
-// Session setup and navigation are handled here so tab widgets remain
-// stateless / presentation-only.
+// Root scaffold: HomeWidget (dhikir grid). Counter and Favorites are no
+// longer inline tabs — Counter is reached via the "Tasbih" quick-action
+// tile (pushes CounterScreen), which itself exposes My Dhikir / Favorite /
+// Add Custom Dhikir via its own bottom action bar.
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,10 +15,7 @@ import 'package:dhikir_app/core/data/dhikir_data.dart' as built_in;
 import 'package:dhikir_app/core/providers/theme_provider.dart';
 import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/persistence/hive_service.dart';
-import 'package:dhikir_app/core/widgets/session_setup_sheet.dart';
 import 'package:dhikir_app/core/widgets/date_header_row.dart';
-import 'package:dhikir_app/features/dhikir/widgets/counter_tab.dart';
-import 'package:dhikir_app/features/favorites/screens/favorite_screen.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_scheduler.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_service.dart';
@@ -43,74 +37,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-
-  // Tab pages — rebuilt on each setState so they pick up fresh data.
-  List<Widget> get _pages => [
-        const HomeWidget(),
-        CounterTab(onStartSession: _showSessionSetup),
-        const FavouritesScreen(),
-      ];
-
-  // ── Session helpers ──────────────────────────────────────────────────────────
-
-  /// Shows the goal-picker sheet, then launches the session screen.
-  Future<void> _showSessionSetup(List<SessionDhikir> list) async {
-    if (list.isEmpty) return;
-    int goal = 100;
-
-    final confirmed = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => SessionSetupSheet(
-        dhikirList: list,
-        onStart: (g) {
-          goal = g;
-          Navigator.pop(ctx, true);
-        },
-      ),
-    );
-
-    if (confirmed == true && mounted) {
-      await Navigator.pushNamed(
-        context,
-        RouteNames.sessionCounter,
-        arguments: SessionCounterArgs(dhikirList: list, sharedGoal: goal),
-      );
-      setState(() {});
-    }
-  }
-
-  // ── Build ────────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(child: _pages[_selectedIndex]),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (i) => setState(() => _selectedIndex = i),
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home_outlined),
-            activeIcon: const Icon(Icons.home),
-            label: l10n.navHome,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.play_arrow_outlined),
-            activeIcon: const Icon(Icons.play_arrow_rounded),
-            label: l10n.navCounter,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.favorite_outline),
-            activeIcon: const Icon(Icons.favorite),
-            label: l10n.navFavorites,
-          ),
-        ],
-      ),
+      body: SafeArea(child: HomeWidget()),
     );
   }
 }
@@ -155,64 +86,12 @@ class _HomeWidgetState extends State<HomeWidget> {
 
     return CustomScrollView(
       slivers: [
-        // ── App bar ───────────────────────────────────────────────────────
-        // SliverAppBar(
-        //   // expandedHeight: 130,
-        //   pinned: true,
-        //   floating: false,
-        //   backgroundColor: AppColors.background,
-        //   surfaceTintColor: Colors.transparent,
-        //   elevation: 0,
-        //   actions: [
-        // _ThemeToggleButton(),
-        // IconButton(
-        //   tooltip: 'About',
-        //   icon: const Icon(Icons.info_outline, color: AppColors.dark),
-        //   onPressed: () => Navigator.pushNamed(context, RouteNames.about),
-        // ),
-        // const SizedBox(width: 8),
-        // _NavButton(
-        //   label: 'My Dhikir',
-        //   icon: Icons.add_rounded,
-        //   backgroundColor: AppColors.accentMint,
-        //   foregroundColor: AppColors.medium,
-        //   border: Border.all(color: AppColors.mintBorder),
-        //   onTap: () async {
-        //     await Navigator.pushNamed(context, RouteNames.myDhikir);
-        //     setState(() {});
-        //   },
-        // ),
-        // const SizedBox(width: 8),
-        // _NavButton(
-        //   label: 'Analytics',
-        //   icon: Icons.bar_chart_rounded,
-        //   backgroundColor: AppColors.dark,
-        //   foregroundColor: Colors.white,
-        //   onTap: () async {
-        //     await Navigator.pushNamed(context, RouteNames.analytics);
-        //     setState(() {});
-        //   },
-        // ),
-        // const SizedBox(width: 16),
-        // ],
-        // flexibleSpace: FlexibleSpaceBar(
-        //   titlePadding: const EdgeInsets.only(left: 24, bottom: 16),
-        //   title: Text(
-        //     'Daily Dhikir',
-        //     style: GoogleFonts.playfairDisplay(
-        //       fontSize: 26,
-        //       fontWeight: FontWeight.w700,
-        //       color: AppColors.dark,
-        //     ),
-        //   ),
-        // ),
-        // ),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: Row(
               children: [
-                Spacer(),
+                const Spacer(),
                 IconButton(
                   tooltip: l10n.aboutTitle,
                   icon: const Icon(Icons.info_outline, color: AppColors.dark),
@@ -469,12 +348,12 @@ class _QuickActionsSection extends StatelessWidget {
             Expanded(
               child: _QuickActionTile(
                 imagePath: 'assets/images/tasbih.png',
-                label: l10n.navMyDhikir,
+                label: l10n.quickActionTasbih,
                 backgroundColor: AppColors.accentMint,
                 foregroundColor: AppColors.medium,
                 border: Border.all(color: AppColors.mintBorder),
                 onTap: () async {
-                  await Navigator.pushNamed(context, RouteNames.myDhikir);
+                  await Navigator.pushNamed(context, RouteNames.counter);
                   onReturn();
                 },
               ),
