@@ -229,15 +229,6 @@ class AppLocalizationsBn extends AppLocalizations {
   String get duaScreenTitle => 'দোয়া';
 
   @override
-  String get duaCategoryAll => 'সব';
-
-  @override
-  String get duaCategoryAllDescription => 'প্রতিটি বিভাগের দোয়া দেখুন';
-
-  @override
-  String get duaCategorySheetTitle => 'দোয়ার বিভাগ';
-
-  @override
   String get fontSettingsTitle => 'ফন্ট সেটিংস';
 
   @override

@@ -229,15 +229,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get duaScreenTitle => 'Dua';
 
   @override
-  String get duaCategoryAll => 'All';
-
-  @override
-  String get duaCategoryAllDescription => 'Show duas from every category';
-
-  @override
-  String get duaCategorySheetTitle => 'Dua Category';
-
-  @override
   String get fontSettingsTitle => 'Font Settings';
 
   @override

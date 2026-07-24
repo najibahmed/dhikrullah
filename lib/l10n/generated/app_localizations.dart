@@ -506,24 +506,6 @@ abstract class AppLocalizations {
   /// **'Dua'**
   String get duaScreenTitle;
 
-  /// No description provided for @duaCategoryAll.
-  ///
-  /// In en, this message translates to:
-  /// **'All'**
-  String get duaCategoryAll;
-
-  /// No description provided for @duaCategoryAllDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Show duas from every category'**
-  String get duaCategoryAllDescription;
-
-  /// No description provided for @duaCategorySheetTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Dua Category'**
-  String get duaCategorySheetTitle;
-
   /// No description provided for @fontSettingsTitle.
   ///
   /// In en, this message translates to:

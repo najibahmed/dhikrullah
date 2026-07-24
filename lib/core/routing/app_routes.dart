@@ -23,6 +23,8 @@ import 'package:dhikir_app/features/prayer_time/screens/hijri_settings_screen.da
 import 'package:dhikir_app/features/about/screens/about_screen.dart';
 import 'package:dhikir_app/features/qibla/screens/qibla_screen.dart';
 import 'package:dhikir_app/features/allah_names/screens/allah_names_screen.dart';
+import 'package:dhikir_app/features/dua/models/dua_item.dart';
+import 'package:dhikir_app/features/dua/screens/dua_list_screen.dart';
 import 'package:dhikir_app/features/dua/screens/dua_screen.dart';
 import 'route_names.dart';
 
@@ -51,6 +53,12 @@ class DhikirCalendarArgs {
 class AddDhikirArgs {
   final CustomDhikirItem? existing;
   const AddDhikirArgs({this.existing});
+}
+
+class DuaListArgs {
+  final String categoryName;
+  final List<DuaItem> duas;
+  const DuaListArgs({required this.categoryName, required this.duas});
 }
 
 class AppRoutes {
@@ -154,6 +162,16 @@ class AppRoutes {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const DuaScreen(),
+        );
+
+      case RouteNames.duaList:
+        final args = settings.arguments as DuaListArgs;
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => DuaListScreen(
+            categoryName: args.categoryName,
+            duas: args.duas,
+          ),
         );
 
       default:
