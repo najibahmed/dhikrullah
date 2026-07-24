@@ -138,14 +138,16 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.inverseSurface,
+        color: const Color.fromARGB(134, 15, 73, 66),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            info.isToday ? l10n.todaysScheduleTitle : l10n.tomorrowsScheduleTitle,
+            info.isToday
+                ? l10n.todaysScheduleTitle
+                : l10n.tomorrowsScheduleTitle,
             style: theme.textTheme.bodyMedium
                 ?.copyWith(color: fg.withValues(alpha: 0.8)),
           ),
@@ -160,7 +162,8 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
                     _scheduleRow(
                         theme, fg, l10n.sehriEndLabel, info.sehriEnd, context),
                     const SizedBox(height: 8),
-                    _scheduleRow(theme, fg, l10n.iftarLabel, info.iftar, context),
+                    _scheduleRow(
+                        theme, fg, l10n.iftarLabel, info.iftar, context),
                   ],
                 ),
               ),

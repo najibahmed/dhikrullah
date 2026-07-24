@@ -79,7 +79,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
               color: provider.status == PrayerStatus.normal
-                  ? theme.colorScheme.secondary
+                  ? const Color.fromARGB(255, 2, 117, 106)
                   : theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(18),
               border:
@@ -114,7 +114,8 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         return l10n.semanticsForbidden(
                 period != null ? prayerDisplayName(context, period.name) : '') +
             (next != null
-                ? l10n.semanticsNextPrayer(prayerDisplayName(context, next.name))
+                ? l10n
+                    .semanticsNextPrayer(prayerDisplayName(context, next.name))
                 : '');
       case PrayerStatus.normal:
         final current = provider.currentPrayer;
@@ -163,7 +164,8 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
             const SizedBox(width: 12),
-            Text(context.l10n.findingPrayerTimes, style: theme.textTheme.bodyMedium),
+            Text(context.l10n.findingPrayerTimes,
+                style: theme.textTheme.bodyMedium),
           ],
         );
       case PrayerStatus.forbidden:
@@ -208,18 +210,23 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.l10n.forbiddenTimeLabel(prayerDisplayName(context, period.name)),
+                  context.l10n.forbiddenTimeLabel(
+                      prayerDisplayName(context, period.name)),
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: theme.colorScheme.error,
                   ),
                 ),
-                Text(context.l10n.endsInLabel(_formatCountdown(context, remaining)),
+                Text(
+                    context.l10n
+                        .endsInLabel(_formatCountdown(context, remaining)),
                     style: theme.textTheme.bodySmall),
                 if (next != null)
                   Text(
-                    context.l10n.nextPrayerInline(prayerDisplayName(context, next.name),
-                        _formatCountdown(context, next.time.difference(DateTime.now()))),
+                    context.l10n.nextPrayerInline(
+                        prayerDisplayName(context, next.name),
+                        _formatCountdown(
+                            context, next.time.difference(DateTime.now()))),
                     style: theme.textTheme.bodySmall,
                   ),
               ],
