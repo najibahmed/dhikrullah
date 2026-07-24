@@ -138,7 +138,7 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(134, 15, 73, 66),
+        color: theme.colorScheme.inverseSurface,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(

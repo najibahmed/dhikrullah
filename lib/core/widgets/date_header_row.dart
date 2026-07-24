@@ -46,7 +46,6 @@ class DateHeaderRow extends StatelessWidget {
         Text(
           formatClockTime(time),
           style: theme.textTheme.bodySmall?.copyWith(
-            color: Colors.black,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -76,7 +75,6 @@ class DateHeaderRow extends StatelessWidget {
                     Text(
                         '${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear}${context.l10n.hijriEraSuffix}',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.black,
                           fontWeight: FontWeight.w600,
                         )),
                     if (onHijriTap != null) ...[
@@ -93,7 +91,6 @@ class DateHeaderRow extends StatelessWidget {
                 Text(
                   _formatGregorian(context, now),
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.black,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
