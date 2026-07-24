@@ -8,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/providers/font_size_provider.dart';
-import 'package:dhikir_app/core/theme/app_colors.dart';
 import 'package:dhikir_app/core/widgets/font_size_settings_dialog.dart';
 import 'package:dhikir_app/features/dua/models/dua_item.dart';
 import 'package:dhikir_app/features/dua/widgets/dua_card.dart';
@@ -55,19 +54,15 @@ class _DuaListScreenState extends State<DuaListScreen> {
     return ChangeNotifierProvider.value(
       value: _fontSizeProvider,
       child: Scaffold(
-        backgroundColor: AppColors.background,
         appBar: AppBar(
-          backgroundColor: AppColors.background,
-          elevation: 0,
           title: Text(
             widget.categoryName,
             style: GoogleFonts.playfairDisplay(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: AppColors.dark,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          iconTheme: const IconThemeData(color: AppColors.dark),
           actions: [
             Builder(
               builder: (context) => IconButton(

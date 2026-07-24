@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:dhikir_app/core/models/dhikir_model.dart';
 import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/core/widgets/counter_button.dart';
 import 'package:dhikir_app/features/counter/providers/session_counter_provider.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
@@ -198,7 +199,7 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.commonCancel)),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF4A5568), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                backgroundColor: Theme.of(context).colorScheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(l10n.commonReset),
           ),
@@ -738,10 +739,13 @@ class _GoalSheetState extends State<_GoalSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
+    final accentColor = adjustForBrightness(widget.accentColor, Theme.of(context).brightness);
+    final onAccent = onColorFor(accentColor);
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(
         child: Padding(
@@ -753,23 +757,23 @@ class _GoalSheetState extends State<_GoalSheet> {
                 width: 40,
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(color: const Color(0xFFE2E8F0), borderRadius: BorderRadius.circular(2)),
+                decoration: BoxDecoration(color: colorScheme.outlineVariant, borderRadius: BorderRadius.circular(2)),
               ),
               Row(
                 children: [
                   Container(
                     width: 38,
                     height: 38,
-                    decoration: BoxDecoration(color: widget.accentColor, borderRadius: BorderRadius.circular(12)),
-                    child: const Icon(Icons.flag_rounded, size: 20, color: Color(0xFF2D3748)),
+                    decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(12)),
+                    child: Icon(Icons.flag_rounded, size: 20, color: onAccent),
                   ),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(l10n.sessionGoalSheetTitle,
-                          style: GoogleFonts.playfairDisplay(fontSize: 17, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
-                      Text(l10n.sessionGoalSheetSubtitle, style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096))),
+                          style: GoogleFonts.playfairDisplay(fontSize: 17, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
+                      Text(l10n.sessionGoalSheetSubtitle, style: GoogleFonts.inter(fontSize: 12, color: colorScheme.onSurfaceVariant)),
                     ],
                   ),
                 ],
@@ -784,9 +788,9 @@ class _GoalSheetState extends State<_GoalSheet> {
                     margin: const EdgeInsets.only(bottom: 10),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF2D3748) : const Color(0xFFF6F4F1),
+                      color: isSelected ? colorScheme.primary : colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(16),
-                      border: isSelected ? null : Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+                      border: isSelected ? null : Border.all(color: colorScheme.outlineVariant, width: 1.5),
                     ),
                     child: Row(
                       children: [
@@ -795,7 +799,7 @@ class _GoalSheetState extends State<_GoalSheet> {
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: isSelected ? widget.accentColor : Colors.white,
+                            color: isSelected ? accentColor : colorScheme.surface,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Center(
@@ -804,7 +808,7 @@ class _GoalSheetState extends State<_GoalSheet> {
                               style: GoogleFonts.playfairDisplay(
                                 fontSize: goal == -1 ? 24 : 18,
                                 fontWeight: FontWeight.w700,
-                                color: const Color(0xFF2D3748),
+                                color: isSelected ? onAccent : colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -819,14 +823,14 @@ class _GoalSheetState extends State<_GoalSheet> {
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: isSelected ? Colors.white : const Color(0xFF2D3748),
+                                  color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
                                 ),
                               ),
                               Text(
                                 _subtitleFor(l10n, goal),
                                 style: GoogleFonts.inter(
                                   fontSize: 11,
-                                  color: isSelected ? Colors.white60 : const Color(0xFF718096),
+                                  color: isSelected ? colorScheme.onPrimary.withValues(alpha: 0.7) : colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -838,8 +842,8 @@ class _GoalSheetState extends State<_GoalSheet> {
                           child: Container(
                             width: 22,
                             height: 22,
-                            decoration: BoxDecoration(color: widget.accentColor, shape: BoxShape.circle),
-                            child: const Icon(Icons.check_rounded, size: 12, color: Color(0xFF2D3748)),
+                            decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+                            child: Icon(Icons.check_rounded, size: 12, color: onAccent),
                           ),
                         ),
                       ],
@@ -856,12 +860,12 @@ class _GoalSheetState extends State<_GoalSheet> {
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF6F4F1),
+                          color: colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+                          border: Border.all(color: colorScheme.outlineVariant, width: 1.5),
                         ),
                         child: Center(
-                          child: Text(l10n.commonCancel, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
+                          child: Text(l10n.commonCancel, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant)),
                         ),
                       ),
                     ),
@@ -874,7 +878,7 @@ class _GoalSheetState extends State<_GoalSheet> {
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2D3748),
+                          color: colorScheme.primary,
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Center(
@@ -882,7 +886,7 @@ class _GoalSheetState extends State<_GoalSheet> {
                             _selected == -1
                                 ? l10n.setUnlimitedButton
                                 : l10n.setGoalButton(_labels[_selected]!),
-                            style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
+                            style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: colorScheme.onPrimary),
                           ),
                         ),
                       ),

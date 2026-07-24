@@ -48,6 +48,11 @@
   "settingsLanguageBangla": "বাংলা",
   "settingsLanguageSystem": "System default",
   "settingsLanguageDialogTitle": "Choose Language",
+  "themeSettingsRowLabel": "Theme",
+  "themeSettingsDialogTitle": "Choose Theme",
+  "themeSettingsSystem": "System default",
+  "themeSettingsLight": "Light",
+  "themeSettingsDark": "Dark",
 
   "qiblaTitle": "Qibla Compass",
   "qiblaFacing": "Facing Qibla",
@@ -88,8 +93,6 @@
   "@duaCountLabel": {"placeholders": {"count": {}}},
   "duaRepeatLabel": "Repeat ×{count}",
   "@duaRepeatLabel": {"placeholders": {"count": {}}},
-  "themeToggleSwitchToLight": "Switch to light mode",
-  "themeToggleSwitchToDark": "Switch to dark mode",
 
   "resetTodayCountBody": "This resets today’s tap counter to 0.",
   "resetMonthTitle": "Reset This Month?",

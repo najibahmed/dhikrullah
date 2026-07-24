@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
 class GoalPickerSheet extends StatefulWidget {
@@ -54,12 +55,14 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final accent = widget.accentColor;
+    final onAccent = onColorFor(accent);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return SafeArea(
       child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: SafeArea(
           child: Padding(
@@ -73,7 +76,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 24),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE2E8F0),
+                    color: colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -88,7 +91,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                         color: accent,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.flag_rounded, size: 20, color: Color(0xFF2D3748)),
+                      child: Icon(Icons.flag_rounded, size: 20, color: onAccent),
                     ),
                     const SizedBox(width: 12),
                     Column(
@@ -99,14 +102,14 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                           style: GoogleFonts.playfairDisplay(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF2D3748),
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         Text(
                           l10n.goalPickSheetSubtitle,
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: const Color(0xFF718096),
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -126,11 +129,11 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF2D3748) : const Color(0xFFF6F4F1),
+                        color: isSelected ? colorScheme.primary : colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(16),
                         border: isSelected
-                            ? Border.all(color: const Color(0xFF2D3748), width: 0)
-                            : Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+                            ? Border.all(color: colorScheme.primary, width: 0)
+                            : Border.all(color: colorScheme.outlineVariant, width: 1.5),
                       ),
                       child: Row(
                         children: [
@@ -140,7 +143,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                             width: 52,
                             height: 52,
                             decoration: BoxDecoration(
-                              color: isSelected ? accent : Colors.white,
+                              color: isSelected ? accent : colorScheme.surface,
                               borderRadius: BorderRadius.circular(14),
                               boxShadow:
                                   isSelected ? [BoxShadow(color: accent.withValues(alpha: 0.4), blurRadius: 10, offset: const Offset(0, 3))] : [],
@@ -151,7 +154,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                                 style: GoogleFonts.playfairDisplay(
                                   fontSize: goal == -1 ? 26 : 20,
                                   fontWeight: FontWeight.w700,
-                                  color: isSelected ? const Color(0xFF2D3748) : const Color(0xFF4A5568),
+                                  color: isSelected ? onAccent : colorScheme.onSurface,
                                 ),
                               ),
                             ),
@@ -169,7 +172,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                                   style: GoogleFonts.inter(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
-                                    color: isSelected ? Colors.white : const Color(0xFF2D3748),
+                                    color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
@@ -177,7 +180,9 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                                   _subtitle(l10n, goal),
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
-                                    color: isSelected ? Colors.white60 : const Color(0xFF718096),
+                                    color: isSelected
+                                        ? colorScheme.onPrimary.withValues(alpha: 0.7)
+                                        : colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -195,7 +200,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                                 color: accent,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.check_rounded, size: 14, color: Color(0xFF2D3748)),
+                              child: Icon(Icons.check_rounded, size: 14, color: onAccent),
                             ),
                           ),
                         ],
@@ -216,9 +221,9 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                         child: Container(
                           height: 52,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF6F4F1),
+                            color: colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+                            border: Border.all(color: colorScheme.outlineVariant, width: 1.5),
                           ),
                           child: Center(
                             child: Text(
@@ -226,7 +231,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                               style: GoogleFonts.inter(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: const Color(0xFF718096),
+                                color: colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ),
@@ -242,11 +247,11 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                         child: Container(
                           height: 52,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2D3748),
+                            color: colorScheme.primary,
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF2D3748).withValues(alpha: 0.3),
+                                color: colorScheme.primary.withValues(alpha: 0.3),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -256,7 +261,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.flag_rounded, size: 16, color: Colors.white),
+                                Icon(Icons.flag_rounded, size: 16, color: colorScheme.onPrimary),
                                 const SizedBox(width: 8),
                                 Text(
                                   _selected == -1
@@ -265,7 +270,7 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
                                   style: GoogleFonts.inter(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
-                                    color: Colors.white,
+                                    color: colorScheme.onPrimary,
                                   ),
                                 ),
                               ],

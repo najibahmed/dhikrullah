@@ -142,6 +142,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguageDialogTitle => 'Choose Language';
 
   @override
+  String get themeSettingsRowLabel => 'Theme';
+
+  @override
+  String get themeSettingsDialogTitle => 'Choose Theme';
+
+  @override
+  String get themeSettingsSystem => 'System default';
+
+  @override
+  String get themeSettingsLight => 'Light';
+
+  @override
+  String get themeSettingsDark => 'Dark';
+
+  @override
   String get qiblaTitle => 'Qibla Compass';
 
   @override
@@ -249,12 +264,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String duaRepeatLabel(Object count) {
     return 'Repeat ×$count';
   }
-
-  @override
-  String get themeToggleSwitchToLight => 'Switch to light mode';
-
-  @override
-  String get themeToggleSwitchToDark => 'Switch to dark mode';
 
   @override
   String get resetTodayCountBody => 'This resets today’s tap counter to 0.';

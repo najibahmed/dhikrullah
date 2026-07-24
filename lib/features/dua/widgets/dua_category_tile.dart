@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
-import 'package:dhikir_app/core/theme/app_colors.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 
 /// Full-page navigation tile for a dua category (title, description, count).
 /// Plain tap-to-navigate row — no selected state, unlike a filter picker.
@@ -23,15 +23,16 @@ class DuaCategoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.mintBorder),
+          border: Border.all(color: mintAccentBorder(context)),
         ),
         child: Row(
           children: [
@@ -47,7 +48,7 @@ class DuaCategoryTile extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.dark,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -56,7 +57,7 @@ class DuaCategoryTile extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.subtle,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -66,15 +67,15 @@ class DuaCategoryTile extends StatelessWidget {
                     description,
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: AppColors.subtle,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right_rounded,
-                size: 20, color: AppColors.medium),
+            Icon(Icons.chevron_right_rounded,
+                size: 20, color: colorScheme.primary),
           ],
         ),
       ),

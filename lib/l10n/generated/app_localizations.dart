@@ -338,6 +338,36 @@ abstract class AppLocalizations {
   /// **'Choose Language'**
   String get settingsLanguageDialogTitle;
 
+  /// No description provided for @themeSettingsRowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeSettingsRowLabel;
+
+  /// No description provided for @themeSettingsDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Theme'**
+  String get themeSettingsDialogTitle;
+
+  /// No description provided for @themeSettingsSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System default'**
+  String get themeSettingsSystem;
+
+  /// No description provided for @themeSettingsLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeSettingsLight;
+
+  /// No description provided for @themeSettingsDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeSettingsDark;
+
   /// No description provided for @qiblaTitle.
   ///
   /// In en, this message translates to:
@@ -541,18 +571,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Repeat ×{count}'**
   String duaRepeatLabel(Object count);
-
-  /// No description provided for @themeToggleSwitchToLight.
-  ///
-  /// In en, this message translates to:
-  /// **'Switch to light mode'**
-  String get themeToggleSwitchToLight;
-
-  /// No description provided for @themeToggleSwitchToDark.
-  ///
-  /// In en, this message translates to:
-  /// **'Switch to dark mode'**
-  String get themeToggleSwitchToDark;
 
   /// No description provided for @resetTodayCountBody.
   ///

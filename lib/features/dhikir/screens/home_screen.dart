@@ -8,11 +8,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:dhikir_app/core/theme/app_colors.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/core/routing/app_routes.dart';
 import 'package:dhikir_app/core/routing/route_names.dart';
 import 'package:dhikir_app/core/data/dhikir_data.dart' as built_in;
-import 'package:dhikir_app/core/providers/theme_provider.dart';
 import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/persistence/hive_service.dart';
 import 'package:dhikir_app/core/widgets/date_header_row.dart';
@@ -40,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: AppColors.background,
       body: SafeArea(child: HomeWidget()),
     );
   }
@@ -94,7 +92,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                 const Spacer(),
                 IconButton(
                   tooltip: l10n.aboutTitle,
-                  icon: const Icon(Icons.info_outline, color: AppColors.dark),
+                  icon: Icon(Icons.info_outline, color: Theme.of(context).colorScheme.onSurface),
                   onPressed: () => Navigator.pushNamed(context, RouteNames.about),
                 ),
                 const SizedBox(width: 8)
@@ -181,7 +179,9 @@ class _DhikirGridCard extends StatelessWidget {
     final completed = progress.completedCountInMonth(year, month);
     final todayCount = progress.countForDate(DateTime.now());
     final ratio = daysInMonth > 0 ? completed / daysInMonth : 0.0;
-    final bgColor = item.color;
+    final bgColor = adjustForBrightness(item.color, Theme.of(context).brightness);
+    final onBg = onColorFor(bgColor);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return GestureDetector(
       onTap: () async {
@@ -220,14 +220,14 @@ class _DhikirGridCard extends StatelessWidget {
                     _Badge(
                       label: '$completed/$daysInMonth',
                       bgColor: Colors.white.withValues(alpha: 0.7),
-                      textColor: AppColors.medium,
+                      textColor: const Color(0xFF4A5568),
                     ),
                     if (todayCount > 0) ...[
                       const SizedBox(height: 3),
                       _Badge(
                         label: l10n.todayCountBadge(todayCount),
-                        bgColor: AppColors.dark,
-                        textColor: Colors.white,
+                        bgColor: colorScheme.primary,
+                        textColor: colorScheme.onPrimary,
                       ),
                     ],
                   ],
@@ -240,7 +240,7 @@ class _DhikirGridCard extends StatelessWidget {
               style: GoogleFonts.playfairDisplay(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: AppColors.dark,
+                color: onBg,
               ),
             ),
             const SizedBox(height: 10),
@@ -251,7 +251,7 @@ class _DhikirGridCard extends StatelessWidget {
                 value: ratio,
                 minHeight: 5,
                 backgroundColor: Colors.white.withValues(alpha: 0.6),
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.medium.withValues(alpha: 0.6)),
+                valueColor: AlwaysStoppedAnimation<Color>(onBg.withValues(alpha: 0.6)),
               ),
             ),
           ],
@@ -300,12 +300,16 @@ class _QuickActionsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final namesBorder = isDark ? const Color(0xFF6A4C7A) : const Color(0xFFE1BEE7);
+    final duaBorder = isDark ? const Color(0xFFB8873F) : const Color(0xFFFFE0B2);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.quickActionsTitle,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
         Row(
@@ -314,8 +318,6 @@ class _QuickActionsSection extends StatelessWidget {
               child: _QuickActionTile(
                 imagePath: 'assets/images/prayer_time.png',
                 label: l10n.quickActionPrayerTime,
-                backgroundColor: AppColors.dark,
-                foregroundColor: Colors.white,
                 onTap: () async {
                   await Navigator.pushNamed(context, RouteNames.prayerTime);
                   onReturn();
@@ -327,9 +329,7 @@ class _QuickActionsSection extends StatelessWidget {
               child: _QuickActionTile(
                 imagePath: 'assets/images/compass.png',
                 label: l10n.quickActionQibla,
-                backgroundColor: AppColors.accentMint,
-                foregroundColor: AppColors.medium,
-                border: Border.all(color: AppColors.mintBorder),
+                border: Border.all(color: mintAccentBorder(context)),
                 onTap: () => Navigator.pushNamed(context, RouteNames.qibla),
               ),
             ),
@@ -338,9 +338,7 @@ class _QuickActionsSection extends StatelessWidget {
               child: _QuickActionTile(
                 imagePath: 'assets/images/allahu.png',
                 label: l10n.quickActionNames99,
-                backgroundColor: const Color(0xFFF3E5F5),
-                foregroundColor: const Color(0xFF6A1B9A),
-                border: Border.all(color: const Color(0xFFE1BEE7)),
+                border: Border.all(color: namesBorder),
                 onTap: () => Navigator.pushNamed(context, RouteNames.allahNames),
               ),
             ),
@@ -349,9 +347,7 @@ class _QuickActionsSection extends StatelessWidget {
               child: _QuickActionTile(
                 imagePath: 'assets/images/tasbih.png',
                 label: l10n.quickActionTasbih,
-                backgroundColor: AppColors.accentMint,
-                foregroundColor: AppColors.medium,
-                border: Border.all(color: AppColors.mintBorder),
+                border: Border.all(color: mintAccentBorder(context)),
                 onTap: () async {
                   await Navigator.pushNamed(context, RouteNames.counter);
                   onReturn();
@@ -366,9 +362,7 @@ class _QuickActionsSection extends StatelessWidget {
             _QuickActionTile(
               imagePath: 'assets/images/dua.png',
               label: l10n.quickActionDua,
-              backgroundColor: const Color(0xFFFFF3E0),
-              foregroundColor: const Color(0xFFB26A00),
-              border: Border.all(color: const Color(0xFFFFE0B2)),
+              border: Border.all(color: duaBorder),
               onTap: () async {
                 await Navigator.pushNamed(context, RouteNames.dua);
                 onReturn();
@@ -386,16 +380,12 @@ class _QuickActionsSection extends StatelessWidget {
 class _QuickActionTile extends StatelessWidget {
   final String imagePath;
   final String label;
-  final Color backgroundColor;
-  final Color foregroundColor;
   final BoxBorder? border;
   final VoidCallback onTap;
 
   const _QuickActionTile({
     required this.imagePath,
     required this.label,
-    required this.backgroundColor,
-    required this.foregroundColor,
     required this.onTap,
     this.border,
   });
@@ -412,7 +402,7 @@ class _QuickActionTile extends StatelessWidget {
             height: 64,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
               border: border,
             ),
@@ -428,29 +418,11 @@ class _QuickActionTile extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.dark,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Theme-toggle icon button (moon/sun).
-class _ThemeToggleButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final theme = context.watch<ThemeProvider>();
-    final l10n = context.l10n;
-    return IconButton(
-      tooltip: theme.isDark ? l10n.themeToggleSwitchToLight : l10n.themeToggleSwitchToDark,
-      icon: Icon(
-        theme.isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-        color: AppColors.dark,
-        size: 22,
-      ),
-      onPressed: () => context.read<ThemeProvider>().toggle(),
     );
   }
 }

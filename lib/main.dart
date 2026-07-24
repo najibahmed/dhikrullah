@@ -28,14 +28,6 @@ Future<void> main() async {
   // symbol data loaded before first use.
   await initializeDateFormatting();
 
-  // Transparent status bar with dark icons.
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ),
-  );
-
   // Storage must be ready before providers read from it.
   await HiveService.init();
   await CustomDhikirService.init();
@@ -68,12 +60,28 @@ class DhikirApp extends StatelessWidget {
     return MaterialApp(
       title: 'Dhikrullah',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.light,
+      themeMode: themeProvider.themeMode,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       locale: localeProvider.locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      // Status bar icons must stay legible against whichever theme is
+      // actually resolved (System mode depends on the OS setting), so this
+      // is computed per-build here rather than fixed once in main().
+      builder: (context, child) {
+        final resolvedBrightness = themeProvider.themeMode == ThemeMode.system
+            ? MediaQuery.platformBrightnessOf(context)
+            : (themeProvider.themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light);
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness:
+                resolvedBrightness == Brightness.dark ? Brightness.light : Brightness.dark,
+          ),
+          child: child!,
+        );
+      },
       home: const HomeScreen(),
       onGenerateRoute: AppRoutes.generate,
     );

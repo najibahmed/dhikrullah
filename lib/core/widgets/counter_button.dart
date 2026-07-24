@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 
 class CounterButton extends StatelessWidget {
   final int count;
@@ -32,6 +33,8 @@ class CounterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final onAccent = onColorFor(accentColor);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedBuilder(
@@ -76,6 +79,7 @@ class CounterButton extends StatelessWidget {
                   progress: progress,
                   accentColor: accentColor,
                   isGoalMet: isGoalMet,
+                  trackColor: colorScheme.outlineVariant,
                 ),
               ),
 
@@ -85,7 +89,7 @@ class CounterButton extends StatelessWidget {
                 height: 150,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isGoalMet ? accentColor : const Color(0xFFF6F4F1),
+                  color: isGoalMet ? accentColor : colorScheme.surfaceContainerHighest,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.08),
@@ -98,14 +102,14 @@ class CounterButton extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (isGoalMet)
-                      const Icon(Icons.check_rounded, size: 28, color: Color(0xFF2D3748))
+                      Icon(Icons.check_rounded, size: 28, color: onAccent)
                     else ...[
                       Text(
                         '$count',
                         style: GoogleFonts.playfairDisplay(
                           fontSize: 48,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF2D3748),
+                          color: colorScheme.onSurface,
                           height: 1,
                         ),
                       ),
@@ -116,7 +120,7 @@ class CounterButton extends StatelessWidget {
                             : context.l10n.ofTarget(target),
                         style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: const Color(0xFF718096),
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -127,7 +131,7 @@ class CounterButton extends StatelessWidget {
                         style: GoogleFonts.playfairDisplay(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF2D3748),
+                          color: onAccent,
                         ),
                       ),
                     ]

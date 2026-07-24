@@ -12,7 +12,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/routing/app_routes.dart';
 import 'package:dhikir_app/core/routing/route_names.dart';
-import 'package:dhikir_app/core/theme/app_colors.dart';
 import 'package:dhikir_app/features/dua/models/dua_item.dart';
 import 'package:dhikir_app/features/dua/services/dua_service.dart';
 import 'package:dhikir_app/features/dua/widgets/dua_category_tile.dart';
@@ -41,19 +40,15 @@ class _DuaScreenState extends State<DuaScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
         title: Text(
           l10n.duaScreenTitle,
           style: GoogleFonts.playfairDisplay(
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: AppColors.dark,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
-        iconTheme: const IconThemeData(color: AppColors.dark),
       ),
       body: FutureBuilder<DuaData>(
         future: _future,

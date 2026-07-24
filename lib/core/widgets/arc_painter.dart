@@ -8,8 +8,9 @@ class ArcPainter extends CustomPainter {
   final double progress;
   final Color accentColor;
   final bool isGoalMet;
+  final Color trackColor;
 
-  ArcPainter({required this.progress, required this.accentColor, required this.isGoalMet});
+  ArcPainter({required this.progress, required this.accentColor, required this.isGoalMet, required this.trackColor});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -20,7 +21,7 @@ class ArcPainter extends CustomPainter {
 
     // Track
     final trackPaint = Paint()
-      ..color = const Color(0xFFE2E8F0)
+      ..color = trackColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
@@ -30,7 +31,7 @@ class ArcPainter extends CustomPainter {
     // Fill
     if (progress > 0) {
       final fillPaint = Paint()
-        ..color = isGoalMet ? const Color(0xFF4A5568) : const Color(0xFF4A5568)
+        ..color = accentColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round;

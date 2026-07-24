@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/providers/font_size_provider.dart';
-import 'package:dhikir_app/core/theme/app_colors.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/features/dua/models/dua_item.dart';
 
 /// Single dua card — shows every field (title, arabic, transliteration,
@@ -20,11 +20,12 @@ class DuaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final fontSize = context.watch<FontSizeProvider>();
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -42,7 +43,7 @@ class DuaCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: AppColors.subtle,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 4),
@@ -55,7 +56,7 @@ class DuaCard extends StatelessWidget {
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.dark,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -65,7 +66,7 @@ class DuaCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.accentMint,
+                    color: mintAccentBackground(context),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -73,7 +74,7 @@ class DuaCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.medium,
+                      color: colorScheme.primary,
                     ),
                   ),
                 ),
@@ -88,7 +89,7 @@ class DuaCard extends StatelessWidget {
             style: GoogleFonts.amiri(
               fontSize: fontSize.arabicFontSize,
               fontWeight: FontWeight.w700,
-              color: AppColors.dark,
+              color: colorScheme.onSurface,
               height: 1.8,
             ),
           ),
@@ -99,7 +100,7 @@ class DuaCard extends StatelessWidget {
               fontSize: fontSize.transliterationFontSize,
               fontStyle: FontStyle.italic,
               height: 1.4,
-              color: AppColors.subtle,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
@@ -108,7 +109,7 @@ class DuaCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: fontSize.meaningFontSize,
               height: 1.45,
-              color: AppColors.medium,
+              color: colorScheme.primary,
             ),
           ),
           const SizedBox(height: 10),
@@ -119,7 +120,7 @@ class DuaCard extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: AppColors.subtle,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ),

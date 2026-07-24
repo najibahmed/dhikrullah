@@ -53,6 +53,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
     // Watch the provider so UI rebuilds on any favourite change.
     final favProvider = context.watch<FavoritesProvider>();
     final favIds = favProvider.all;
@@ -94,12 +95,12 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                           style: GoogleFonts.playfairDisplay(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              color: const Color(0xFF2D3748))),
+                              color: colorScheme.onSurface)),
                       const SizedBox(height: 8),
                       Text(l10n.favoritesEmptySubtitle,
                           style: GoogleFonts.inter(
                               fontSize: 13,
-                              color: const Color(0xFF718096),
+                              color: colorScheme.onSurfaceVariant,
                               height: 1.5),
                           textAlign: TextAlign.center)
                     ],
@@ -121,11 +122,11 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 14, horizontal: 20),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF2D3748),
+                                color: colorScheme.primary,
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
-                                      color: const Color(0xFF2D3748)
+                                      color: colorScheme.primary
                                           .withValues(alpha: 0.3),
                                       blurRadius: 12,
                                       offset: const Offset(0, 4))
@@ -134,8 +135,8 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.play_circle_rounded,
-                                      color: Colors.white, size: 20),
+                                  Icon(Icons.play_circle_rounded,
+                                      color: colorScheme.onPrimary, size: 20),
                                   const SizedBox(width: 8),
                                   Text(
                                       l10n.startFullSessionButton(
@@ -143,7 +144,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                                       style: GoogleFonts.inter(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w700,
-                                          color: Colors.white)),
+                                          color: colorScheme.onPrimary)),
                                 ],
                               ),
                             ),

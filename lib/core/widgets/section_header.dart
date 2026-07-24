@@ -17,23 +17,26 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pillColor = isDark ? const Color(0xFF2A2C40) : const Color(0xFFE8EAF6);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: GoogleFonts.playfairDisplay(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
+        Text(title, style: GoogleFonts.playfairDisplay(fontSize: 14, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
         GestureDetector(
           onTap: onSession,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFFE8EAF6),
+              color: pillColor,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               children: [
-                const Icon(Icons.play_arrow_rounded, size: 12, color: Color(0xFF4A5568)),
+                Icon(Icons.play_arrow_rounded, size: 12, color: colorScheme.primary),
                 const SizedBox(width: 3),
-                Text(context.l10n.sessionCountLabel(count), style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF4A5568))),
+                Text(context.l10n.sessionCountLabel(count), style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: colorScheme.primary)),
               ],
             ),
           ),

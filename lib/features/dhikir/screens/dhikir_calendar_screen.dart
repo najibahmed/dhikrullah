@@ -15,6 +15,7 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/data/dhikir_localizations.dart';
 import 'package:dhikir_app/features/dhikir/providers/dhikir_calendar_provider.dart';
@@ -48,25 +49,23 @@ class DhikirCalendarScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final localizedTitle = localizedDhikirTitle(context, dhikir.id) ?? dhikir.title;
+    final colorScheme = Theme.of(context).colorScheme;
+    final accentColor = adjustForBrightness(_accent, Theme.of(context).brightness);
     return ChangeNotifierProvider(
       // Scoped to this screen; auto-disposed when screen is popped.
       create: (_) => DhikirCalendarProvider(dhikir.id),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF6F4F1),
         body: SafeArea(
           child: CustomScrollView(
             slivers: [
               // ── App bar — outside Consumer, never rebuilds ──────────────
               SliverAppBar(
                 pinned: true,
-                backgroundColor: const Color(0xFFF6F4F1),
-                surfaceTintColor: Colors.transparent,
-                elevation: 0,
                 leading: IconButton(
                   icon: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
@@ -76,10 +75,10 @@ class DhikirCalendarScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_back_ios_new,
                       size: 16,
-                      color: Color(0xFF2D3748),
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   onPressed: () => Navigator.pop(context),
@@ -91,12 +90,12 @@ class DhikirCalendarScreen extends StatelessWidget {
                       style: GoogleFonts.playfairDisplay(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF2D3748),
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     Text(
                       l10n.calendarTitle,
-                      style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF718096)),
+                      style: GoogleFonts.inter(fontSize: 11, color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -112,7 +111,7 @@ class DhikirCalendarScreen extends StatelessWidget {
                       Consumer<DhikirCalendarProvider>(
                         builder: (_, cal, __) => _StatsCard(
                           dhikir: dhikir,
-                          accentColor: _accent,
+                          accentColor: accentColor,
                           completedCount: cal.completedCount,
                           daysInMonth: cal.daysInMonth,
                           pct: cal.completionPct,
@@ -129,7 +128,7 @@ class DhikirCalendarScreen extends StatelessWidget {
                       Consumer<DhikirCalendarProvider>(
                         builder: (_, cal, __) => _CalendarCard(
                           cal: cal,
-                          accentColor: _accent,
+                          accentColor: accentColor,
                         ),
                       ),
 
@@ -140,7 +139,7 @@ class DhikirCalendarScreen extends StatelessWidget {
                         builder: (_, cal, __) => _YearHeatmap(
                           progress: cal.progress,
                           focusedMonth: cal.focusedMonth,
-                          accentColor: _accent,
+                          accentColor: accentColor,
                           onMonthTap: cal.jumpTo,
                         ),
                       ),
@@ -185,7 +184,7 @@ class DhikirCalendarScreen extends StatelessWidget {
           ),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF4A5568),
+              backgroundColor: Theme.of(context).colorScheme.primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () => Navigator.pop(ctx, true),
@@ -209,9 +208,10 @@ class _CalendarCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -243,7 +243,7 @@ class _CalendarCard extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: i == 5 ? const Color(0xFF48BB78) : const Color(0xFFA0AEC0),
+                              color: i == 5 ? const Color(0xFF48BB78) : colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ),
@@ -273,11 +273,11 @@ class _CalendarCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _Legend(color: const Color(0xFF4A5568), label: l10n.legendCompleted),
+                _Legend(color: colorScheme.primary, label: l10n.legendCompleted),
                 const SizedBox(width: 20),
                 _Legend(color: accentColor, label: l10n.commonToday),
                 const SizedBox(width: 20),
-                _Legend(color: const Color(0xFFF0EEEb), label: l10n.legendMissed, bordered: true),
+                _Legend(color: colorScheme.surfaceContainerHighest, label: l10n.legendMissed, bordered: true),
               ],
             ),
           ),
@@ -339,10 +339,10 @@ class _MonthNavigator extends StatelessWidget {
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF2D3748),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-              Text('$year', style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096))),
+              Text('$year', style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
             ],
           ),
           _NavArrow(icon: Icons.chevron_right_rounded, onTap: onNext),
@@ -376,6 +376,7 @@ class _StatsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final onAccent = onColorFor(accentColor);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -403,14 +404,14 @@ class _StatsCard extends StatelessWidget {
                     style: GoogleFonts.amiri(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF2D3748),
+                      color: onAccent,
                     ),
                     textDirection: TextDirection.rtl,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     l10n.monthSummary(completedCount, daysInMonth, pct),
-                    style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF4A5568)),
+                    style: GoogleFonts.inter(fontSize: 12, color: onAccent.withValues(alpha: 0.85)),
                   ),
                 ],
               ),
@@ -424,7 +425,7 @@ class _StatsCard extends StatelessWidget {
               value: daysInMonth > 0 ? completedCount / daysInMonth : 0,
               minHeight: 7,
               backgroundColor: Colors.white.withValues(alpha: 0.5),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4A5568)),
+              valueColor: AlwaysStoppedAnimation<Color>(onAccent),
             ),
           ),
           const SizedBox(height: 14),
@@ -461,13 +462,15 @@ class _YearHeatmap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
+    final onAccent = onColorFor(accentColor);
     final year = focusedMonth.year;
     final today = DateTime.now();
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -488,7 +491,7 @@ class _YearHeatmap extends StatelessWidget {
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF2D3748),
+                  color: colorScheme.onSurface,
                 ),
               ),
               Container(
@@ -496,7 +499,7 @@ class _YearHeatmap extends StatelessWidget {
                 decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(8)),
                 child: Text(
                   '$year',
-                  style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF2D3748)),
+                  style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: onAccent),
                 ),
               ),
             ],
@@ -526,14 +529,14 @@ class _YearHeatmap extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   decoration: BoxDecoration(
                     color: isFocused
-                        ? const Color(0xFF4A5568)
+                        ? colorScheme.primary
                         : isFuture
-                            ? const Color(0xFFF8F8F8)
+                            ? colorScheme.surfaceContainerHighest
                             : ratio > 0
                                 ? accentColor.withValues(alpha: 0.3 + ratio * 0.7)
-                                : const Color(0xFFF0EEEB),
+                                : colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
-                    border: isFocused ? Border.all(color: const Color(0xFF2D3748), width: 2) : null,
+                    border: isFocused ? Border.all(color: colorScheme.primary, width: 2) : null,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -544,10 +547,10 @@ class _YearHeatmap extends StatelessWidget {
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: isFocused
-                              ? Colors.white
+                              ? colorScheme.onPrimary
                               : isFuture
-                                  ? const Color(0xFFCBD5E0)
-                                  : const Color(0xFF4A5568),
+                                  ? colorScheme.outline
+                                  : colorScheme.onSurfaceVariant,
                         ),
                       ),
                       if (!isFuture) ...[
@@ -556,7 +559,7 @@ class _YearHeatmap extends StatelessWidget {
                           done > 0 ? l10n.daysCountShort(done) : '–',
                           style: GoogleFonts.inter(
                             fontSize: 10,
-                            color: isFocused ? Colors.white70 : const Color(0xFF718096),
+                            color: isFocused ? colorScheme.onPrimary.withValues(alpha: 0.7) : colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -570,7 +573,7 @@ class _YearHeatmap extends StatelessWidget {
           Center(
             child: Text(
               l10n.calendarFooter(progress.totalCompleted),
-              style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF718096)),
+              style: GoogleFonts.inter(fontSize: 11, color: colorScheme.onSurfaceVariant),
             ),
           ),
         ],
@@ -589,15 +592,16 @@ class _ResetButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onReset,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+          border: Border.all(color: colorScheme.outlineVariant, width: 1.5),
         ),
         child: Center(
           child: Text(
@@ -605,7 +609,7 @@ class _ResetButton extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF718096),
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ),
@@ -635,26 +639,27 @@ class _CalendarCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     // State priority: completed > today > future > missed
     final Color bg;
     final Color textColor;
     final BoxBorder? border;
 
     if (isCompleted) {
-      bg = const Color(0xFF4A5568);
-      textColor = Colors.white;
+      bg = colorScheme.primary;
+      textColor = colorScheme.onPrimary;
       border = null;
     } else if (isToday) {
       bg = accentColor;
-      textColor = const Color(0xFF2D3748);
-      border = Border.all(color: const Color(0xFF4A5568), width: 1.5);
+      textColor = onColorFor(accentColor);
+      border = Border.all(color: colorScheme.primary, width: 1.5);
     } else if (isFuture) {
       bg = Colors.transparent;
-      textColor = const Color(0xFFCBD5E0);
+      textColor = colorScheme.outline;
       border = null;
     } else {
-      bg = const Color(0xFFF0EEEB);
-      textColor = const Color(0xFFA0AEC0);
+      bg = colorScheme.surfaceContainerHighest;
+      textColor = colorScheme.onSurfaceVariant;
       border = null;
     }
 
@@ -670,7 +675,7 @@ class _CalendarCell extends StatelessWidget {
         ),
         child: Center(
           child: isCompleted
-              ? const Icon(Icons.check_rounded, size: 13, color: Colors.white)
+              ? Icon(Icons.check_rounded, size: 13, color: colorScheme.onPrimary)
               : Text(
                   '$day',
                   style: GoogleFonts.inter(
@@ -697,19 +702,20 @@ class _NavArrow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: enabled ? const Color(0xFFF6F4F1) : const Color(0xFFF0EEEB),
+          color: enabled ? colorScheme.surfaceContainerHighest : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
           icon,
           size: 20,
-          color: enabled ? const Color(0xFF4A5568) : const Color(0xFFCBD5E0),
+          color: enabled ? colorScheme.primary : colorScheme.outline,
         ),
       ),
     );
@@ -730,6 +736,7 @@ class _Legend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Container(
@@ -738,11 +745,11 @@ class _Legend extends StatelessWidget {
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(3),
-            border: bordered ? Border.all(color: const Color(0xFFCBD5E0), width: 1) : null,
+            border: bordered ? Border.all(color: colorScheme.outline, width: 1) : null,
           ),
         ),
         const SizedBox(width: 5),
-        Text(label, style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF718096))),
+        Text(label, style: GoogleFonts.inter(fontSize: 11, color: colorScheme.onSurfaceVariant)),
       ],
     );
   }

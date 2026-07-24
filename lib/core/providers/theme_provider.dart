@@ -39,8 +39,4 @@ class ThemeProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_kThemeModeKey, mode.index);
   }
-
-  /// Convenience toggle between light and dark.
-  Future<void> toggle() =>
-      setTheme(_themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
 }

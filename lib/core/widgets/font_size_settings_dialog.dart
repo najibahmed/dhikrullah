@@ -12,9 +12,10 @@ import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/providers/font_size_provider.dart';
-import 'package:dhikir_app/core/theme/app_colors.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 
-const _kSliderActiveColor = Color(0xFF3D8B7D);
+const _kSliderActiveColorLight = Color(0xFF3D8B7D);
+const _kSliderActiveColorDark = Color(0xFF4FA593);
 
 Future<void> showFontSizeSettingsDialog(BuildContext context) {
   // showDialog defaults to the root navigator, whose route sits outside the
@@ -40,8 +41,6 @@ class _FontSizeSettingsDialog extends StatelessWidget {
     final fontSize = context.watch<FontSizeProvider>();
 
     return Dialog(
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
         child: Column(
@@ -52,7 +51,7 @@ class _FontSizeSettingsDialog extends StatelessWidget {
               style: GoogleFonts.playfairDisplay(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.dark,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 16),
@@ -107,6 +106,9 @@ class _FontSizeSliderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final sliderActiveColor =
+        colorScheme.brightness == Brightness.dark ? _kSliderActiveColorDark : _kSliderActiveColorLight;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -118,13 +120,13 @@ class _FontSizeSliderRow extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: AppColors.medium,
+                color: colorScheme.primary,
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -132,7 +134,7 @@ class _FontSizeSliderRow extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.dark,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
@@ -140,10 +142,10 @@ class _FontSizeSliderRow extends StatelessWidget {
         ),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            activeTrackColor: _kSliderActiveColor,
-            inactiveTrackColor: AppColors.accentMint,
-            thumbColor: _kSliderActiveColor,
-            overlayColor: _kSliderActiveColor.withValues(alpha: 0.15),
+            activeTrackColor: sliderActiveColor,
+            inactiveTrackColor: mintAccentBackground(context),
+            thumbColor: sliderActiveColor,
+            overlayColor: sliderActiveColor.withValues(alpha: 0.15),
           ),
           child: Slider(
             value: value,

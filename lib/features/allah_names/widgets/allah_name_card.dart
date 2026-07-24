@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/providers/font_size_provider.dart';
-import 'package:dhikir_app/core/theme/app_colors.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/features/allah_names/models/allah_name.dart';
 
 const List<String> _palette = [
@@ -34,11 +34,13 @@ class AllahNameCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontSize = context.watch<FontSizeProvider>();
+    final bgColor = adjustForBrightness(_colorForNumber(name.number), Theme.of(context).brightness);
+    final onBg = onColorFor(bgColor);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _colorForNumber(name.number),
+        color: bgColor,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -58,7 +60,7 @@ class AllahNameCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.dark,
+                      color: onBg,
                     ),
                   ),
                 ),
@@ -70,7 +72,7 @@ class AllahNameCard extends StatelessWidget {
                   style: GoogleFonts.playfairDisplay(
                     fontSize: fontSize.arabicFontSize,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.dark,
+                    color: onBg,
                   ),
                 ),
               ),
@@ -82,7 +84,7 @@ class AllahNameCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: fontSize.transliterationFontSize,
               fontWeight: FontWeight.w700,
-              color: AppColors.dark,
+              color: onBg,
             ),
           ),
           const SizedBox(height: 8),
@@ -91,7 +93,7 @@ class AllahNameCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.medium,
+              color: onBg.withValues(alpha: 0.75),
             ),
           ),
           const SizedBox(height: 6),
@@ -100,7 +102,7 @@ class AllahNameCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: fontSize.meaningFontSize,
               height: 1.4,
-              color: AppColors.subtle,
+              color: onBg.withValues(alpha: 0.6),
             ),
           ),
         ],

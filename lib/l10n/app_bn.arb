@@ -42,6 +42,11 @@
   "settingsLanguageBangla": "বাংলা",
   "settingsLanguageSystem": "সিস্টেম ডিফল্ট",
   "settingsLanguageDialogTitle": "ভাষা নির্বাচন করুন",
+  "themeSettingsRowLabel": "থিম",
+  "themeSettingsDialogTitle": "থিম নির্বাচন করুন",
+  "themeSettingsSystem": "সিস্টেম ডিফল্ট",
+  "themeSettingsLight": "লাইট",
+  "themeSettingsDark": "ডার্ক",
 
   "qiblaTitle": "কিবলা কম্পাস",
   "qiblaFacing": "কিবলার দিকে আছেন",
@@ -81,8 +86,6 @@
   "@duaCountLabel": {"placeholders": {"count": {}}},
   "duaRepeatLabel": "×{count} বার পাঠ",
   "@duaRepeatLabel": {"placeholders": {"count": {}}},
-  "themeToggleSwitchToLight": "লাইট মোডে যান",
-  "themeToggleSwitchToDark": "ডার্ক মোডে যান",
 
   "resetTodayCountBody": "এটি আজকের ট্যাপ কাউন্টার শূন্যে রিসেট করবে।",
   "resetMonthTitle": "এই মাস রিসেট করবেন?",

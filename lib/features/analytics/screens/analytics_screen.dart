@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'package:provider/provider.dart';
 import 'package:dhikir_app/core/data/dhikir_data.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/data/dhikir_localizations.dart';
 import 'package:dhikir_app/features/analytics/providers/analytics_provider.dart';
@@ -66,8 +67,8 @@ class _AnalyticsViewState extends State<_AnalyticsView> with SingleTickerProvide
     final grandTotal = provider.grandTotal(stats);
     final maxBar = bars.isEmpty ? 1 : bars.map((b) => b.total).reduce(math.max).clamp(1, 999999);
 
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F4F1),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -76,18 +77,15 @@ class _AnalyticsViewState extends State<_AnalyticsView> with SingleTickerProvide
               pinned: true,
               expandedHeight: 170,
               collapsedHeight: 75,
-              backgroundColor: const Color(0xFFF6F4F1),
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
               leadingWidth: 64,
               leading: IconButton(
                 icon: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 6, offset: const Offset(0, 2))]),
-                  child: const Icon(Icons.arrow_back_ios_new, size: 16, color: Color(0xFF2D3748)),
+                  child: Icon(Icons.arrow_back_ios_new, size: 16, color: colorScheme.onSurface),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
@@ -98,7 +96,7 @@ class _AnalyticsViewState extends State<_AnalyticsView> with SingleTickerProvide
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF2D3748),
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 // background: Align(
@@ -171,7 +169,7 @@ class _AnalyticsViewState extends State<_AnalyticsView> with SingleTickerProvide
                     // ── Per-dhikir breakdown list ──────────────────────
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 14, offset: const Offset(0, 4))],
                       ),
@@ -184,11 +182,11 @@ class _AnalyticsViewState extends State<_AnalyticsView> with SingleTickerProvide
                               children: [
                                 Text(
                                   l10n.byDhikirSection,
-                                  style: GoogleFonts.playfairDisplay(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748)),
+                                  style: GoogleFonts.playfairDisplay(fontSize: 15, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
                                 ),
                                 Text(
                                   _periodLabel(l10n, period),
-                                  style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096)),
+                                  style: GoogleFonts.inter(fontSize: 12, color: colorScheme.onSurfaceVariant),
                                 ),
                               ],
                             ),
@@ -201,25 +199,25 @@ class _AnalyticsViewState extends State<_AnalyticsView> with SingleTickerProvide
                                 Expanded(
                                     flex: 3,
                                     child: Text(l10n.colDhikir,
-                                        style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFFA0AEC0)))),
+                                        style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant))),
                                 Expanded(
                                     child: Center(
                                         child: Text(l10n.colCount,
-                                            style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFFA0AEC0))))),
+                                            style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant)))),
                                 Expanded(
                                     child: Center(
                                         child: Text(l10n.colDays,
-                                            style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFFA0AEC0))))),
+                                            style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant)))),
                                 Expanded(
                                     child: Align(
                                         alignment: Alignment.centerRight,
                                         child: Text(l10n.colShare,
-                                            style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFFA0AEC0))))),
+                                            style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant)))),
                               ],
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Divider(height: 1, color: Color(0xFFF0EEEB)),
+                          Divider(height: 1, color: colorScheme.outlineVariant),
                           ...stats.asMap().entries.map((entry) {
                             final i = entry.key;
                             final stat = entry.value;
@@ -279,25 +277,26 @@ class _PeriodTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
       height: 42,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: TabBar(
         controller: controller,
         indicator: BoxDecoration(
-          color: const Color(0xFF4A5568),
+          color: colorScheme.primary,
           borderRadius: BorderRadius.circular(11),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         indicatorPadding: const EdgeInsets.all(3),
         dividerColor: Colors.transparent,
-        labelColor: Colors.white,
-        unselectedLabelColor: const Color(0xFF718096),
+        labelColor: colorScheme.onPrimary,
+        unselectedLabelColor: colorScheme.onSurfaceVariant,
         labelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600),
         unselectedLabelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
         tabs: labels.map((l) => Tab(text: l)).toList(),
@@ -337,6 +336,7 @@ class _SummaryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
         Expanded(
@@ -344,7 +344,7 @@ class _SummaryRow extends StatelessWidget {
             value: '$grandTotal',
             label: l10n.totalCountLabel,
             icon: Icons.tag_rounded,
-            color: const Color(0xFFE8F5E9),
+            color: isDark ? const Color(0xFF1F332A) : const Color(0xFFE8F5E9),
           ),
         ),
         const SizedBox(width: 10),
@@ -353,7 +353,7 @@ class _SummaryRow extends StatelessWidget {
             value: _avgCount(),
             label: _avgLabel(l10n),
             icon: Icons.trending_up_rounded,
-            color: const Color(0xFFE3F2FD),
+            color: isDark ? const Color(0xFF1A2B3A) : const Color(0xFFE3F2FD),
           ),
         ),
         const SizedBox(width: 10),
@@ -362,7 +362,7 @@ class _SummaryRow extends StatelessWidget {
             value: '${_activeDhikir()}',
             label: l10n.activeTypesLabel,
             icon: Icons.auto_awesome_rounded,
-            color: const Color(0xFFFFF8E1),
+            color: isDark ? const Color(0xFF332B14) : const Color(0xFFFFF8E1),
           ),
         ),
       ],
@@ -380,6 +380,7 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onColor = onColorFor(color);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -390,10 +391,10 @@ class _SummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: const Color(0xFF4A5568)),
+          Icon(icon, size: 18, color: onColor),
           const SizedBox(height: 8),
-          Text(value, style: GoogleFonts.playfairDisplay(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
-          Text(label, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF718096))),
+          Text(value, style: GoogleFonts.playfairDisplay(fontSize: 22, fontWeight: FontWeight.w700, color: onColor)),
+          Text(label, style: GoogleFonts.inter(fontSize: 10, color: onColor.withValues(alpha: 0.75))),
         ],
       ),
     );
@@ -529,8 +530,19 @@ class _DhikirStatRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final pct = grandTotal > 0 ? (stat.count / grandTotal * 100).round() : 0;
     final barWidth = maxCount > 0 ? stat.count / maxCount : 0.0;
+    final accentColor = adjustForBrightness(_accentColor, Theme.of(context).brightness);
+    final rankColor = rank == 1
+        ? (isDark ? const Color(0xFF332B14) : const Color(0xFFFFF8E1))
+        : rank == 2
+            ? (isDark ? const Color(0xFF23303B) : const Color(0xFFF0F4F8))
+            : rank == 3
+                ? (isDark ? const Color(0xFF3A2430) : const Color(0xFFFCE4EC))
+                : colorScheme.surfaceContainerHighest;
+    final onRank = onColorFor(rankColor);
 
     return Column(
       children: [
@@ -545,19 +557,13 @@ class _DhikirStatRow extends StatelessWidget {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: rank == 1
-                          ? const Color(0xFFFFF8E1)
-                          : rank == 2
-                              ? const Color(0xFFF0F4F8)
-                              : rank == 3
-                                  ? const Color(0xFFFCE4EC)
-                                  : const Color(0xFFF6F4F1),
+                      color: rankColor,
                       borderRadius: BorderRadius.circular(7),
                     ),
                     child: Center(
                       child: Text(
                         rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : '$rank',
-                        style: GoogleFonts.inter(fontSize: rank <= 3 ? 13 : 11, fontWeight: FontWeight.w600, color: const Color(0xFF718096)),
+                        style: GoogleFonts.inter(fontSize: rank <= 3 ? 13 : 11, fontWeight: FontWeight.w600, color: onRank),
                       ),
                     ),
                   ),
@@ -572,7 +578,7 @@ class _DhikirStatRow extends StatelessWidget {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: _accentColor,
+                            color: accentColor,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Center(
@@ -586,12 +592,12 @@ class _DhikirStatRow extends StatelessWidget {
                             children: [
                               Text(
                                 localizedDhikirTitle(context, stat.dhikir.id) ?? stat.dhikir.title,
-                                style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF2D3748)),
+                                style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: colorScheme.onSurface),
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
                                 stat.dhikir.arabicText,
-                                style: GoogleFonts.amiri(fontSize: 11, color: const Color(0xFF718096)),
+                                style: GoogleFonts.amiri(fontSize: 11, color: colorScheme.onSurfaceVariant),
                                 textDirection: TextDirection.rtl,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -610,9 +616,9 @@ class _DhikirStatRow extends StatelessWidget {
                           Text(
                             '${stat.count}',
                             style: GoogleFonts.playfairDisplay(
-                                fontSize: 18, fontWeight: FontWeight.w700, color: stat.count > 0 ? const Color(0xFF2D3748) : const Color(0xFFCBD5E0)),
+                                fontSize: 18, fontWeight: FontWeight.w700, color: stat.count > 0 ? colorScheme.onSurface : colorScheme.outline),
                           ),
-                          Text('$pct%', style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFFA0AEC0))),
+                          Text('$pct%', style: GoogleFonts.inter(fontSize: 10, color: colorScheme.onSurfaceVariant)),
                         ],
                       ),
                     ),
@@ -628,9 +634,9 @@ class _DhikirStatRow extends StatelessWidget {
                             style: GoogleFonts.inter(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: stat.sessions > 0 ? const Color(0xFF4A5568) : const Color(0xFFCBD5E0)),
+                                color: stat.sessions > 0 ? colorScheme.primary : colorScheme.outline),
                           ),
-                          Text(l10n.colDays, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFFA0AEC0))),
+                          Text(l10n.colDays, style: GoogleFonts.inter(fontSize: 10, color: colorScheme.onSurfaceVariant)),
                         ],
                       ),
                     ),
@@ -646,7 +652,7 @@ class _DhikirStatRow extends StatelessWidget {
                             height: 6,
                             width: 50,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF0EEEB),
+                              color: colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -655,7 +661,7 @@ class _DhikirStatRow extends StatelessWidget {
                             height: 6,
                             width: 50 * barWidth,
                             decoration: BoxDecoration(
-                              color: stat.count > 0 ? const Color(0xFF4A5568) : Colors.transparent,
+                              color: stat.count > 0 ? colorScheme.primary : Colors.transparent,
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -669,9 +675,9 @@ class _DhikirStatRow extends StatelessWidget {
           ),
         ),
         if (!isLast)
-          const Padding(
-            padding: EdgeInsets.only(top: 10),
-            child: Divider(height: 1, color: Color(0xFFF6F4F1)),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Divider(height: 1, color: colorScheme.outlineVariant),
           ),
       ],
     );
@@ -697,9 +703,10 @@ class _DailyBreakdownCardState extends State<_DailyBreakdownCard> {
     final entries = context.watch<AnalyticsProvider>().buildDayEntries(widget.period);
     final shown = _expanded ? entries : entries.take(5).toList();
 
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 14, offset: const Offset(0, 4))],
       ),
@@ -712,16 +719,16 @@ class _DailyBreakdownCardState extends State<_DailyBreakdownCard> {
               children: [
                 Text(
                   l10n.dayByDayLogSection,
-                  style: GoogleFonts.playfairDisplay(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748)),
+                  style: GoogleFonts.playfairDisplay(fontSize: 15, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
                 ),
                 Text(
                   widget.period == AnalyticsPeriod.weekly ? l10n.last7Days : l10n.last30Days,
-                  style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096)),
+                  style: GoogleFonts.inter(fontSize: 12, color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFF0EEEB)),
+          Divider(height: 1, color: colorScheme.outlineVariant),
           ...shown.map((e) => _DayLogRow(entry: e)),
           if (entries.length > 5)
             GestureDetector(
@@ -733,13 +740,13 @@ class _DailyBreakdownCardState extends State<_DailyBreakdownCard> {
                   children: [
                     Text(
                       _expanded ? l10n.showLess : l10n.showAllDays(entries.length),
-                      style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF4A5568)),
+                      style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: colorScheme.primary),
                     ),
                     const SizedBox(width: 4),
                     Icon(
                       _expanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
                       size: 16,
-                      color: const Color(0xFF4A5568),
+                      color: colorScheme.primary,
                     ),
                   ],
                 ),
@@ -775,6 +782,8 @@ class _DayLogRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
+    final brightness = Theme.of(context).brightness;
     final combined = context.watch<AnalyticsProvider>().combined;
     final sorted = entry.byDhikir.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
 
@@ -791,10 +800,10 @@ class _DayLogRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(_dateLabel(context), style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF2D3748))),
+                    Text(_dateLabel(context), style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: colorScheme.onSurface)),
                     Text(
                       '${entry.date.day}/${entry.date.month}/${entry.date.year}',
-                      style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFFA0AEC0)),
+                      style: GoogleFonts.inter(fontSize: 10, color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -802,17 +811,19 @@ class _DayLogRow extends StatelessWidget {
               // Dhikir chips
               Expanded(
                 child: entry.total == 0
-                    ? Text(l10n.noCountsRecorded, style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFFCBD5E0), fontStyle: FontStyle.italic))
+                    ? Text(l10n.noCountsRecorded, style: GoogleFonts.inter(fontSize: 12, color: colorScheme.outline, fontStyle: FontStyle.italic))
                     : Wrap(
                         spacing: 6,
                         runSpacing: 6,
                         children: sorted.map((e) {
                           final dhikir = combined.firstWhere((d) => d.id == e.key, orElse: () => combined.first);
-                          final color = Color(int.parse(dhikir.colorHex.replaceFirst('#', 'FF'), radix: 16));
+                          final rawColor = Color(int.parse(dhikir.colorHex.replaceFirst('#', 'FF'), radix: 16));
+                          final chipColor = adjustForBrightness(rawColor, brightness);
+                          final onChip = onColorFor(chipColor);
                           return Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: color,
+                              color: chipColor,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -822,7 +833,7 @@ class _DayLogRow extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Text(
                                   '${e.value}×',
-                                  style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748)),
+                                  style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: onChip),
                                 ),
                               ],
                             ),
@@ -836,13 +847,13 @@ class _DayLogRow extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 8),
                   child: Text(
                     '${entry.total}',
-                    style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748)),
+                    style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: colorScheme.onSurface),
                   ),
                 ),
             ],
           ),
         ),
-        const Divider(height: 1, color: Color(0xFFF6F4F1)),
+        Divider(height: 1, color: colorScheme.outlineVariant),
       ],
     );
   }
@@ -856,14 +867,21 @@ class _AllTimeTotals extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final brightness = Theme.of(context).brightness;
+    final colorScheme = Theme.of(context).colorScheme;
     final stats = context.watch<AnalyticsProvider>().buildAllTime();
     final grandTotal = stats.fold(0, (s, e) => s + e.count);
+    // A deliberately inverted accent card in light mode; in dark mode the
+    // scaffold is already dark, so this needs its own lighter accent to
+    // still read as a highlight rather than blending into the background.
+    final cardColor = brightness == Brightness.dark ? colorScheme.primary : const Color(0xFF2D3748);
+    final onCard = onColorFor(cardColor);
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2D3748),
+        color: cardColor,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: const Color(0xFF2D3748).withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 6))],
+        boxShadow: [BoxShadow(color: cardColor.withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 6))],
       ),
       child: Column(
         children: [
@@ -872,23 +890,24 @@ class _AllTimeTotals extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(l10n.allTimeTotalsSection, style: GoogleFonts.playfairDisplay(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+                Text(l10n.allTimeTotalsSection, style: GoogleFonts.playfairDisplay(fontSize: 15, fontWeight: FontWeight.w700, color: onCard)),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
+                    color: onCard.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     l10n.grandTotalLabel(grandTotal),
-                    style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white70),
+                    style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: onCard.withValues(alpha: 0.7)),
                   ),
                 ),
               ],
             ),
           ),
           ...stats.where((s) => s.count > 0).map((stat) {
-            final color = Color(int.parse(stat.dhikir.colorHex.replaceFirst('#', 'FF'), radix: 16));
+            final rawColor = Color(int.parse(stat.dhikir.colorHex.replaceFirst('#', 'FF'), radix: 16));
+            final color = adjustForBrightness(rawColor, brightness);
             final pct = grandTotal > 0 ? stat.count / grandTotal : 0.0;
             return Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
@@ -907,9 +926,9 @@ class _AllTimeTotals extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(localizedDhikirTitle(context, stat.dhikir.id) ?? stat.dhikir.title,
-                            style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.white)),
+                            style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: onCard)),
                       ),
-                      Text('${stat.count}', style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white)),
+                      Text('${stat.count}', style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: onCard)),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -918,7 +937,7 @@ class _AllTimeTotals extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: pct,
                       minHeight: 4,
-                      backgroundColor: Colors.white.withValues(alpha: 0.1),
+                      backgroundColor: onCard.withValues(alpha: 0.1),
                       valueColor: AlwaysStoppedAnimation<Color>(color),
                     ),
                   ),
@@ -931,7 +950,7 @@ class _AllTimeTotals extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
               child: Text(
                 l10n.allTimeEmptyState,
-                style: GoogleFonts.inter(fontSize: 13, color: Colors.white38, fontStyle: FontStyle.italic),
+                style: GoogleFonts.inter(fontSize: 13, color: onCard.withValues(alpha: 0.38), fontStyle: FontStyle.italic),
               ),
             ),
           const SizedBox(height: 4),

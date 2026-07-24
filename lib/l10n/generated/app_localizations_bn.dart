@@ -142,6 +142,21 @@ class AppLocalizationsBn extends AppLocalizations {
   String get settingsLanguageDialogTitle => 'ভাষা নির্বাচন করুন';
 
   @override
+  String get themeSettingsRowLabel => 'থিম';
+
+  @override
+  String get themeSettingsDialogTitle => 'থিম নির্বাচন করুন';
+
+  @override
+  String get themeSettingsSystem => 'সিস্টেম ডিফল্ট';
+
+  @override
+  String get themeSettingsLight => 'লাইট';
+
+  @override
+  String get themeSettingsDark => 'ডার্ক';
+
+  @override
   String get qiblaTitle => 'কিবলা কম্পাস';
 
   @override
@@ -249,12 +264,6 @@ class AppLocalizationsBn extends AppLocalizations {
   String duaRepeatLabel(Object count) {
     return '×$count বার পাঠ';
   }
-
-  @override
-  String get themeToggleSwitchToLight => 'লাইট মোডে যান';
-
-  @override
-  String get themeToggleSwitchToDark => 'ডার্ক মোডে যান';
 
   @override
   String get resetTodayCountBody =>

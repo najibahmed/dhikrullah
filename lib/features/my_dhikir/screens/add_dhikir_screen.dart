@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/features/my_dhikir/providers/my_dhikir_provider.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/l10n/generated/app_localizations.dart';
@@ -167,15 +168,18 @@ class _AddDhikirViewState extends State<_AddDhikirView>
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
+    final brightness = Theme.of(context).brightness;
+    final displayAccent = adjustForBrightness(_accentColor, brightness);
+    final onAccent = onColorFor(displayAccent);
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F4F1),
       body: CustomScrollView(
         slivers: [
           // ── App Bar ────────────────────────────────────────────────
           SliverAppBar(
             pinned: true,
             expandedHeight: 140,
-            backgroundColor: _accentColor,
+            backgroundColor: displayAccent,
             surfaceTintColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
@@ -184,8 +188,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                 decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(10)),
-                child: const Icon(Icons.close_rounded,
-                    size: 18, color: Color(0xFF2D3748)),
+                child: Icon(Icons.close_rounded, size: 18, color: onAccent),
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -201,7 +204,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                     decoration: BoxDecoration(
                       color: _saving
                           ? Colors.white.withValues(alpha: 0.4)
-                          : const Color(0xFF2D3748),
+                          : colorScheme.primary,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -209,7 +212,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: _saving ? onAccent : colorScheme.onPrimary,
                       ),
                     ),
                   ),
@@ -218,7 +221,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                color: _accentColor,
+                color: displayAccent,
                 padding: const EdgeInsets.fromLTRB(24, 90, 24, 16),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -239,7 +242,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                               style: GoogleFonts.playfairDisplay(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
-                                color: const Color(0xFF2D3748),
+                                color: onAccent,
                               ),
                             ),
                             Text(
@@ -248,7 +251,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                                   : l10n.addDhikirNewSubtitle,
                               style: GoogleFonts.inter(
                                 fontSize: 12,
-                                color: const Color(0xFF4A5568),
+                                color: onAccent.withValues(alpha: 0.75),
                               ),
                             ),
                           ],
@@ -275,7 +278,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
@@ -304,12 +307,12 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                               duration: const Duration(milliseconds: 150),
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? _accentColor
-                                    : const Color(0xFFF6F4F1),
+                                    ? displayAccent
+                                    : colorScheme.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(10),
                                 border: selected
                                     ? Border.all(
-                                        color: const Color(0xFF4A5568),
+                                        color: colorScheme.primary,
                                         width: 1.5)
                                     : null,
                               ),
@@ -331,7 +334,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
@@ -353,27 +356,29 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                         itemCount: _colorOptions.length,
                         itemBuilder: (_, i) {
                           final hex = _colorOptions[i];
-                          final color = Color(int.parse(
+                          final rawColor = Color(int.parse(
                               hex.replaceFirst('#', 'FF'),
                               radix: 16));
+                          final swatchColor = adjustForBrightness(rawColor, brightness);
+                          final onSwatch = onColorFor(swatchColor);
                           final selected = hex == _selectedColor;
                           return GestureDetector(
                             onTap: () => setState(() => _selectedColor = hex),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 150),
                               decoration: BoxDecoration(
-                                color: color,
+                                color: swatchColor,
                                 borderRadius: BorderRadius.circular(10),
                                 border: selected
                                     ? Border.all(
-                                        color: const Color(0xFF2D3748),
+                                        color: colorScheme.primary,
                                         width: 2)
                                     : Border.all(
                                         color: Colors.transparent, width: 2),
                                 boxShadow: selected
                                     ? [
                                         BoxShadow(
-                                            color: color.withValues(alpha: 0.5),
+                                            color: swatchColor.withValues(alpha: 0.5),
                                             blurRadius: 8,
                                             spreadRadius: 1)
                                       ]
@@ -383,15 +388,15 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   if (selected)
-                                    const Icon(Icons.check_rounded,
-                                        size: 12, color: Color(0xFF2D3748)),
+                                    Icon(Icons.check_rounded,
+                                        size: 12, color: onSwatch),
                                   if (selected) const SizedBox(width: 4),
                                   Text(
                                     _colorLabel(l10n, i),
                                     style: GoogleFonts.inter(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF4A5568),
+                                      color: onSwatch,
                                     ),
                                   ),
                                 ],
@@ -410,7 +415,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
@@ -427,7 +432,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                             maxLines: 2,
                             hint: l10n.titleFieldHint,
                             icon: Icons.title_rounded,
-                            accentColor: _accentColor,
+                            accentColor: displayAccent,
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
                                 return l10n.titleRequiredError;
@@ -447,7 +452,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                             label: l10n.arabicTextFieldLabel,
                             hint: l10n.arabicTextFieldHint,
                             icon: Icons.text_fields_rounded,
-                            accentColor: _accentColor,
+                            accentColor: displayAccent,
                             textAlign: TextAlign.right,
                             textDirection: TextDirection.rtl,
                             fontFamily: 'Amiri',
@@ -466,7 +471,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                             label: l10n.transliterationFieldLabel,
                             hint: l10n.transliterationFieldHint,
                             icon: Icons.translate_rounded,
-                            accentColor: _accentColor,
+                            accentColor: displayAccent,
                             maxLines: 4,
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
@@ -481,7 +486,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                             label: l10n.meaningFieldLabel,
                             hint: l10n.meaningFieldHint,
                             icon: Icons.menu_book_rounded,
-                            accentColor: _accentColor,
+                            accentColor: displayAccent,
                             maxLines: 4,
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
@@ -513,7 +518,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                           ? l10n.previewDefaultTransliteration
                           : _translitCtrl.text,
                       icon: _selectedIcon,
-                      color: _accentColor,
+                      color: displayAccent,
                     ),
 
                     const SizedBox(height: 20),
@@ -527,12 +532,12 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                         height: 56,
                         decoration: BoxDecoration(
                           color: _saving
-                              ? const Color(0xFF718096)
-                              : const Color(0xFF2D3748),
+                              ? colorScheme.onSurfaceVariant
+                              : colorScheme.primary,
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF2D3748)
+                              color: colorScheme.primary
                                   .withValues(alpha: 0.3),
                               blurRadius: 14,
                               offset: const Offset(0, 5),
@@ -541,12 +546,12 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                         ),
                         child: Center(
                           child: _saving
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 22,
                                   height: 22,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2.5,
-                                    color: Colors.white,
+                                    color: colorScheme.surface,
                                   ),
                                 )
                               : Row(
@@ -562,7 +567,7 @@ class _AddDhikirViewState extends State<_AddDhikirView>
                                       style: GoogleFonts.inter(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,
-                                        color: Colors.white,
+                                        color: colorScheme.onPrimary,
                                       ),
                                     ),
                                   ],
@@ -596,7 +601,7 @@ class _SectionLabel extends StatelessWidget {
       style: GoogleFonts.playfairDisplay(
         fontSize: 15,
         fontWeight: FontWeight.w700,
-        color: const Color(0xFF2D3748),
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }
@@ -631,19 +636,20 @@ class _FormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(icon, size: 14, color: const Color(0xFF718096)),
+            Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
             const SizedBox(width: 6),
             Text(
               label,
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF718096),
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -656,18 +662,18 @@ class _FormField extends StatelessWidget {
           maxLines: maxLines,
           style: fontFamily == 'Amiri'
               ? GoogleFonts.amiri(
-                  fontSize: fontSize, color: const Color(0xFF2D3748))
+                  fontSize: fontSize, color: colorScheme.onSurface)
               : GoogleFonts.inter(
-                  fontSize: fontSize, color: const Color(0xFF2D3748)),
+                  fontSize: fontSize, color: colorScheme.onSurface),
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.inter(
               fontSize: fontSize,
-              color: const Color(0xFFCBD5E0),
+              color: colorScheme.outline,
             ),
             filled: true,
-            fillColor: const Color(0xFFF6F4F1),
+            fillColor: colorScheme.surfaceContainerHighest,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -713,6 +719,7 @@ class _PreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onColor = onColorFor(color);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -749,7 +756,7 @@ class _PreviewCard extends StatelessWidget {
                   style: GoogleFonts.amiri(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF2D3748),
+                    color: onColor,
                   ),
                   textDirection: TextDirection.rtl,
                   textAlign: TextAlign.right,
@@ -762,7 +769,7 @@ class _PreviewCard extends StatelessWidget {
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF2D3748),
+                    color: onColor,
                   ),
                 ),
                 Text(
@@ -770,7 +777,7 @@ class _PreviewCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontStyle: FontStyle.italic,
-                    color: const Color(0xFF718096),
+                    color: onColor.withValues(alpha: 0.75),
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),

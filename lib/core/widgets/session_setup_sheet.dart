@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/data/dhikir_localizations.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
 class SessionSetupSheet extends StatefulWidget {
@@ -39,10 +40,12 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
+    final brightness = Theme.of(context).brightness;
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(
         child: Padding(
@@ -56,7 +59,7 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
                   width: 40,
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(color: const Color(0xFFE2E8F0), borderRadius: BorderRadius.circular(2)),
+                  decoration: BoxDecoration(color: colorScheme.outlineVariant, borderRadius: BorderRadius.circular(2)),
                 ),
               ),
               Row(
@@ -64,23 +67,23 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
                   Container(
                     width: 40,
                     height: 40,
-                    decoration: BoxDecoration(color: const Color(0xFF2D3748), borderRadius: BorderRadius.circular(12)),
-                    child: const Icon(Icons.play_circle_rounded, size: 22, color: Colors.white),
+                    decoration: BoxDecoration(color: colorScheme.primary, borderRadius: BorderRadius.circular(12)),
+                    child: Icon(Icons.play_circle_rounded, size: 22, color: colorScheme.onPrimary),
                   ),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(l10n.setupSheetTitle,
-                          style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
+                          style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
                       Text(l10n.setupSheetSubtitle(widget.dhikirList.length),
-                          style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096))),
+                          style: GoogleFonts.inter(fontSize: 12, color: colorScheme.onSurfaceVariant)),
                     ],
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              Text(l10n.setupGoalPerDhikir, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
+              Text(l10n.setupGoalPerDhikir, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant)),
               const SizedBox(height: 8),
               Row(
                 children: _goals.map((g) {
@@ -93,9 +96,9 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
                         margin: const EdgeInsets.only(right: 6),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFF2D3748) : const Color(0xFFF6F4F1),
+                          color: isSelected ? colorScheme.primary : colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(12),
-                          border: isSelected ? null : Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                          border: isSelected ? null : Border.all(color: colorScheme.outlineVariant, width: 1),
                         ),
                         child: Column(
                           children: [
@@ -104,14 +107,14 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
                               style: GoogleFonts.playfairDisplay(
                                 fontSize: g == -1 ? 18 : 16,
                                 fontWeight: FontWeight.w700,
-                                color: isSelected ? Colors.white : const Color(0xFF2D3748),
+                                color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
                               ),
                             ),
                             Text(
                               _descFor(l10n, g),
                               style: GoogleFonts.inter(
                                 fontSize: 8,
-                                color: isSelected ? Colors.white60 : const Color(0xFF718096),
+                                color: isSelected ? colorScheme.onPrimary.withValues(alpha: 0.7) : colorScheme.onSurfaceVariant,
                               ),
                               textAlign: TextAlign.center,
                               maxLines: 2,
@@ -125,23 +128,24 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
               ),
               const SizedBox(height: 16),
               // Dhikir preview chips
-              Text(l10n.setupSessionIncludes, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
+              Text(l10n.setupSessionIncludes, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
                 children: widget.dhikirList.map((d) {
-                  final color = d.color;
+                  final chipColor = adjustForBrightness(d.color, brightness);
+                  final onChip = onColorFor(chipColor);
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(color: chipColor, borderRadius: BorderRadius.circular(8)),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(d.icon, style: const TextStyle(fontSize: 12)),
                         const SizedBox(width: 4),
                         Text(localizedDhikirTitle(context, d.id) ?? d.title,
-                            style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF2D3748))),
+                            style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: onChip)),
                       ],
                     ),
                   );
@@ -156,12 +160,12 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF6F4F1),
+                          color: colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+                          border: Border.all(color: colorScheme.outlineVariant, width: 1.5),
                         ),
                         child: Center(
-                          child: Text(l10n.commonCancel, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF718096))),
+                          child: Text(l10n.commonCancel, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant)),
                         ),
                       ),
                     ),
@@ -174,20 +178,20 @@ class SessionSetupSheetState extends State<SessionSetupSheet> {
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2D3748),
+                          color: colorScheme.primary,
                           borderRadius: BorderRadius.circular(14),
-                          boxShadow: [BoxShadow(color: const Color(0xFF2D3748).withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
+                          boxShadow: [BoxShadow(color: colorScheme.primary.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18),
+                            Icon(Icons.play_arrow_rounded, color: colorScheme.onPrimary, size: 18),
                             const SizedBox(width: 6),
                             Text(
                               _goal == -1
                                   ? l10n.setupStartUnlimited
                                   : l10n.setupStartGoal(_labels[_goal]!),
-                              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
+                              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: colorScheme.onPrimary),
                             ),
                           ],
                         ),

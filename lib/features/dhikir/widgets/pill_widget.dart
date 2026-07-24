@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:dhikir_app/core/theme/theme_colors.dart';
+
 class Pill extends StatelessWidget {
   final String label;
   final Color color;
@@ -11,7 +13,7 @@ class Pill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)),
-      child: Text(label, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF4A5568))),
+      child: Text(label, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: onColorFor(color))),
     );
   }
 }
@@ -24,6 +26,7 @@ class LegendDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Container(
@@ -32,11 +35,11 @@ class LegendDot extends StatelessWidget {
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(3),
-            border: bordered ? Border.all(color: const Color(0xFFCBD5E0), width: 1) : null,
+            border: bordered ? Border.all(color: colorScheme.outline, width: 1) : null,
           ),
         ),
         const SizedBox(width: 5),
-        Text(label, style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF718096))),
+        Text(label, style: GoogleFonts.inter(fontSize: 11, color: colorScheme.onSurfaceVariant)),
       ],
     );
   }

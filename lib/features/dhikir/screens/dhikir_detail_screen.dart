@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:dhikir_app/core/routing/app_routes.dart';
 import 'package:dhikir_app/core/routing/route_names.dart';
 import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/core/widgets/counter_button.dart';
 import 'package:dhikir_app/features/dhikir/providers/dhikir_detail_provider.dart';
 import 'package:dhikir_app/features/dhikir/widgets/goal_pick_sheet.dart';
@@ -132,7 +133,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.commonCancel)),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF4A5568), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                backgroundColor: Theme.of(context).colorScheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(l10n.commonReset),
           ),
@@ -176,7 +177,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.commonCancel)),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF4A5568), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                backgroundColor: Theme.of(context).colorScheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(l10n.commonReset),
           ),
@@ -197,7 +198,9 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
     final localizedTransliteration =
         localizedDhikirTransliteration(context, widget.dhikir.id) ?? widget.dhikir.transliteration;
     final localizedMeaning = localizedDhikirMeaning(context, widget.dhikir.id) ?? widget.dhikir.englishMeaning;
-    final bgColor = _accent;
+    final colorScheme = Theme.of(context).colorScheme;
+    final bgColor = adjustForBrightness(_accent, Theme.of(context).brightness);
+    final onBg = onColorFor(bgColor);
     final today = provider.today;
     final year = today.year;
     final month = today.month;
@@ -210,7 +213,6 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
     final progress = provider.progressRatio;
     final isFavourite = provider.isFavourite;
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F4F1),
       body: CustomScrollView(
         slivers: [
           // ── App Bar ────────────────────────────────────────────────
@@ -224,7 +226,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
               icon: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(10)),
-                child: const Icon(Icons.arrow_back_ios_new, size: 16, color: Color(0xFF2D3748)),
+                child: Icon(Icons.arrow_back_ios_new, size: 16, color: onBg),
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -236,7 +238,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                   child: Icon(
                     isFavourite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                     size: 18,
-                    color: isFavourite ? const Color(0xFFFC8181) : const Color(0xFFCBD5E0),
+                    color: isFavourite ? const Color(0xFFFC8181) : onBg.withValues(alpha: 0.4),
                   ),
                 ),
                 onPressed: () => context.read<DhikirDetailProvider>().toggleFavourite(),
@@ -245,7 +247,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                 icon: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(10)),
-                  child: const Icon(Icons.calendar_month_rounded, size: 18, color: Color(0xFF4A5568)),
+                  child: Icon(Icons.calendar_month_rounded, size: 18, color: onBg),
                 ),
                 onPressed: () async {
                   await Navigator.pushNamed(
@@ -259,7 +261,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                 icon: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(10)),
-                  child: const Icon(Icons.refresh_rounded, size: 18, color: Color(0xFF4A5568)),
+                  child: Icon(Icons.refresh_rounded, size: 18, color: onBg),
                 ),
                 onPressed: _resetMonth,
               ),
@@ -282,14 +284,14 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(localizedTitle,
-                                  style: GoogleFonts.playfairDisplay(fontSize: 24, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
+                                  style: GoogleFonts.playfairDisplay(fontSize: 24, fontWeight: FontWeight.w700, color: onBg)),
                               const SizedBox(height: 2),
                               Wrap(
                                 children: [
                                   Text(localizedTransliteration,
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 4,
-                                      style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF718096), fontStyle: FontStyle.italic)),
+                                      style: GoogleFonts.inter(fontSize: 13, color: onBg.withValues(alpha: 0.75), fontStyle: FontStyle.italic)),
                                 ],
                               ),
                             ],
@@ -320,22 +322,22 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                             value: daysInMonth > 0 ? completed / daysInMonth : 0,
                             minHeight: 8,
                             backgroundColor: Colors.white.withValues(alpha: 0.6),
-                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4A5568)),
+                            valueColor: AlwaysStoppedAnimation<Color>(onBg),
                           ),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Text(l10n.daysCompletedLabel(completed, daysInMonth),
-                          style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF4A5568))),
+                          style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: onBg)),
                     ],
                   ),
                 ),
 
                 Container(
                   height: 24,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF6F4F1),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
                   ),
                 ),
 
@@ -346,7 +348,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 4))],
                     ),
@@ -356,13 +358,13 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                         const SizedBox(height: 16),
                         Text(
                           widget.dhikir.arabicText,
-                          style: GoogleFonts.amiri(fontSize: 32, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748), height: 1.6),
+                          style: GoogleFonts.amiri(fontSize: 32, fontWeight: FontWeight.w700, color: colorScheme.onSurface, height: 1.6),
                           textAlign: TextAlign.center,
                           textDirection: TextDirection.rtl,
                         ),
                         const SizedBox(height: 12),
                         Text(localizedTransliteration,
-                            style: GoogleFonts.inter(fontSize: 15, fontStyle: FontStyle.italic, color: const Color(0xFF718096)),
+                            style: GoogleFonts.inter(fontSize: 15, fontStyle: FontStyle.italic, color: colorScheme.onSurfaceVariant),
                             textAlign: TextAlign.center),
                       ],
                     ),
@@ -378,7 +380,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 4))],
                     ),
@@ -387,7 +389,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                       children: [
                         Pill(label: l10n.pillMeaning, color: bgColor),
                         const SizedBox(height: 14),
-                        Text(localizedMeaning, style: GoogleFonts.inter(fontSize: 14.5, color: const Color(0xFF4A5568), height: 1.7)),
+                        Text(localizedMeaning, style: GoogleFonts.inter(fontSize: 14.5, color: colorScheme.onSurfaceVariant, height: 1.7)),
                       ],
                     ),
                   ),
@@ -404,7 +406,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                     width: double.infinity,
                     padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 16, offset: const Offset(0, 5))],
                     ),
@@ -423,16 +425,16 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF2D3748),
+                                      color: colorScheme.primary,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Row(
                                       children: [
-                                        const Icon(Icons.flag_rounded, size: 12, color: Colors.white),
+                                        Icon(Icons.flag_rounded, size: 12, color: colorScheme.onPrimary),
                                         const SizedBox(width: 4),
                                         Text(
                                           isUnlimited ? l10n.goalUnlimited : l10n.goalTarget(target),
-                                          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white),
+                                          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: colorScheme.onPrimary),
                                         ),
                                       ],
                                     ),
@@ -445,14 +447,14 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF6F4F1),
+                                      color: colorScheme.surfaceContainerHighest,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Row(
                                       children: [
-                                        const Icon(Icons.refresh_rounded, size: 12, color: Color(0xFF718096)),
+                                        Icon(Icons.refresh_rounded, size: 12, color: colorScheme.onSurfaceVariant),
                                         const SizedBox(width: 4),
-                                        Text(l10n.commonReset, style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF718096))),
+                                        Text(l10n.commonReset, style: GoogleFonts.inter(fontSize: 11, color: colorScheme.onSurfaceVariant)),
                                       ],
                                     ),
                                   ),
@@ -493,14 +495,14 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.auto_awesome_rounded, size: 16, color: Color(0xFF2D3748)),
+                                      Icon(Icons.auto_awesome_rounded, size: 16, color: onBg),
                                       const SizedBox(width: 8),
                                       Text(
                                         l10n.goalReachedBannerDetail(target),
                                         style: GoogleFonts.inter(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF2D3748),
+                                          color: onBg,
                                         ),
                                       ),
                                     ],
@@ -513,7 +515,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                     isUnlimited ? l10n.tapNoLimit : l10n.remainingCount(target - todayCount),
                                     style: GoogleFonts.inter(
                                       fontSize: 13,
-                                      color: const Color(0xFF718096),
+                                      color: colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ),
@@ -543,7 +545,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 4))],
                       ),
@@ -565,14 +567,14 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF4A5568),
+                                    color: colorScheme.primary,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.calendar_month_rounded, size: 12, color: Colors.white),
+                                      Icon(Icons.calendar_month_rounded, size: 12, color: colorScheme.onPrimary),
                                       const SizedBox(width: 4),
-                                      Text(l10n.historyButton, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white)),
+                                      Text(l10n.historyButton, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: colorScheme.onPrimary)),
                                     ],
                                   ),
                                 ),
@@ -603,31 +605,31 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                   duration: const Duration(milliseconds: 200),
                                   decoration: BoxDecoration(
                                     color: isDone
-                                        ? const Color(0xFF4A5568)
+                                        ? colorScheme.primary
                                         : isFuture
-                                            ? const Color(0xFFF8F8F8)
+                                            ? colorScheme.surfaceContainerHighest
                                             : bgColor.withValues(alpha: 0.5),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
                                       color: isToday && !isDone
-                                          ? const Color(0xFF4A5568)
+                                          ? colorScheme.primary
                                           : isDone
-                                              ? const Color(0xFF4A5568)
+                                              ? colorScheme.primary
                                               : isFuture
-                                                  ? const Color(0xFFE2E8F0)
+                                                  ? colorScheme.outlineVariant
                                                   : bgColor,
                                       width: isToday ? 2 : 1.5,
                                     ),
                                   ),
                                   child: Center(
                                     child: isDone
-                                        ? const Icon(Icons.check_rounded, size: 14, color: Colors.white)
+                                        ? Icon(Icons.check_rounded, size: 14, color: colorScheme.onPrimary)
                                         : Text(
                                             '$day',
                                             style: GoogleFonts.inter(
                                               fontSize: 11,
                                               fontWeight: isToday ? FontWeight.w700 : FontWeight.w600,
-                                              color: isFuture ? const Color(0xFFCBD5E0) : const Color(0xFF718096),
+                                              color: isFuture ? colorScheme.outline : colorScheme.onSurfaceVariant,
                                             ),
                                           ),
                                   ),
@@ -638,11 +640,11 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                           const SizedBox(height: 12),
                           Row(
                             children: [
-                              LegendDot(color: const Color(0xFF4A5568), label: l10n.legendDone),
+                              LegendDot(color: colorScheme.primary, label: l10n.legendDone),
                               const SizedBox(width: 14),
                               LegendDot(color: bgColor, label: l10n.legendPending),
                               const SizedBox(width: 14),
-                              LegendDot(color: const Color(0xFFF8F8F8), label: l10n.legendFuture, bordered: true),
+                              LegendDot(color: colorScheme.surfaceContainerHighest, label: l10n.legendFuture, bordered: true),
                             ],
                           ),
                         ],

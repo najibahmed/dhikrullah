@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:dhikir_app/core/theme/app_colors.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/core/routing/app_routes.dart';
 import 'package:dhikir_app/core/routing/route_names.dart';
 import 'package:dhikir_app/core/widgets/session_setup_sheet.dart';
@@ -56,11 +56,7 @@ class _CounterScreenState extends State<CounterScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
         title: Text(l10n.quickActionTasbih),
       ),
       body: SafeArea(child: CounterTab(onStartSession: _showSessionSetup)),
@@ -109,7 +105,7 @@ class _CounterActionBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-          border: const Border(top: BorderSide(color: AppColors.mintBorder)),
+          border: Border(top: BorderSide(color: mintAccentBorder(context))),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -162,12 +158,16 @@ class _CounterActionButton extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: AppColors.dark, size: 22),
+            Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 22),
             const SizedBox(height: 4),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.dark),
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ],
         ),

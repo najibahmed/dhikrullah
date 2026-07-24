@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dhikir_app/core/theme/app_colors.dart';
 import 'package:dhikir_app/core/providers/favorites_provider.dart';
 import 'package:dhikir_app/features/my_dhikir/screens/my_dhikir_screen.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
@@ -84,17 +83,18 @@ class _SessionStartButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         decoration: BoxDecoration(
-          color: AppColors.dark,
+          color: colorScheme.primary,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppColors.dark.withValues(alpha: 0.3),
+              color: colorScheme.primary.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -103,11 +103,11 @@ class _SessionStartButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.play_circle_rounded, color: Colors.white, size: 20),
+            Icon(Icons.play_circle_rounded, color: colorScheme.onPrimary, size: 20),
             const SizedBox(width: 8),
             Text(
               label,
-              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
+              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: colorScheme.onPrimary),
             ),
           ],
         ),

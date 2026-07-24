@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/providers/font_size_provider.dart';
-import 'package:dhikir_app/core/theme/app_colors.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/core/widgets/font_size_settings_dialog.dart';
 import 'package:dhikir_app/features/allah_names/models/allah_name.dart';
 import 'package:dhikir_app/features/allah_names/services/allah_names_service.dart';
@@ -47,19 +47,15 @@ class _AllahNamesScreenState extends State<AllahNamesScreen> {
     return ChangeNotifierProvider.value(
       value: _fontSizeProvider,
       child: Scaffold(
-        backgroundColor: AppColors.background,
         appBar: AppBar(
-          backgroundColor: AppColors.background,
-          elevation: 0,
           title: Text(
             context.l10n.names99ScreenTitle,
             style: GoogleFonts.playfairDisplay(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: AppColors.dark,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          iconTheme: const IconThemeData(color: AppColors.dark),
           actions: [
             Builder(
               builder: (context) => IconButton(
@@ -100,13 +96,14 @@ class _HeaderBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.accentMint,
+        color: mintAccentBackground(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.mintBorder),
+        border: Border.all(color: mintAccentBorder(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +113,7 @@ class _HeaderBanner extends StatelessWidget {
             style: GoogleFonts.playfairDisplay(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: AppColors.dark,
+              color: colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
@@ -125,7 +122,7 @@ class _HeaderBanner extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 13,
               height: 1.4,
-              color: AppColors.medium,
+              color: colorScheme.primary,
             ),
           ),
           const SizedBox(height: 12),
@@ -135,7 +132,7 @@ class _HeaderBanner extends StatelessWidget {
               fontSize: 12,
               height: 1.4,
               fontStyle: FontStyle.italic,
-              color: AppColors.subtle,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
@@ -144,7 +141,7 @@ class _HeaderBanner extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: AppColors.subtle,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],

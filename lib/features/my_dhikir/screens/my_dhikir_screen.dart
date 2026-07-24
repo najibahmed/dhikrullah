@@ -6,6 +6,7 @@ import 'package:dhikir_app/core/routing/app_routes.dart';
 import 'package:dhikir_app/core/routing/route_names.dart';
 import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
 import 'package:dhikir_app/core/providers/favorites_provider.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/core/widgets/session_setup_sheet.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'package:dhikir_app/features/my_dhikir/providers/my_dhikir_provider.dart';
@@ -105,25 +106,22 @@ class _MyDhikirViewState extends State<_MyDhikirView> with SingleTickerProviderS
     final l10n = context.l10n;
     final customItems = context.watch<MyDhikirProvider>().items;
 
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F4F1),
       body: CustomScrollView(
         slivers: [
           // ── App Bar ─────────────────────────────────────────────────
           SliverAppBar(
             pinned: true,
             expandedHeight: 140,
-            backgroundColor: const Color(0xFFF6F4F1),
-            surfaceTintColor: Colors.transparent,
-            elevation: 0,
             leading: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 6, offset: const Offset(0, 2))]),
-                child: const Icon(Icons.arrow_back_ios_new, size: 16, color: Color(0xFF2D3748)),
+                child: Icon(Icons.arrow_back_ios_new, size: 16, color: colorScheme.onSurface),
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -160,7 +158,7 @@ class _MyDhikirViewState extends State<_MyDhikirView> with SingleTickerProviderS
                     style: GoogleFonts.playfairDisplay(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF2D3748),
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -169,7 +167,7 @@ class _MyDhikirViewState extends State<_MyDhikirView> with SingleTickerProviderS
                 alignment: Alignment.bottomLeft,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 24, bottom: 18),
-                  child: Text(l10n.myDhikirCountSubtitle(customItems.length), style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096))),
+                  child: Text(l10n.myDhikirCountSubtitle(customItems.length), style: GoogleFonts.inter(fontSize: 12, color: colorScheme.onSurfaceVariant)),
                 ),
               ),
             ),
@@ -211,6 +209,7 @@ class _CustomDhikirTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
     if (items.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(40),
@@ -221,10 +220,10 @@ class _CustomDhikirTab extends StatelessWidget {
             const Text('📿', style: TextStyle(fontSize: 48)),
             const SizedBox(height: 16),
             Text(l10n.myDhikirEmptyTitle,
-                style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
+                style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
             const SizedBox(height: 8),
             Text(l10n.myDhikirEmptySubtitle,
-                style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF718096), height: 1.5), textAlign: TextAlign.center),
+                style: GoogleFonts.inter(fontSize: 13, color: colorScheme.onSurfaceVariant, height: 1.5), textAlign: TextAlign.center),
           ],
         ),
       );
@@ -243,17 +242,17 @@ class _CustomDhikirTab extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
               decoration: BoxDecoration(
-                color: const Color(0xFF2D3748),
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: const Color(0xFF2D3748).withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
+                boxShadow: [BoxShadow(color: colorScheme.primary.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.play_circle_rounded, color: Colors.white, size: 20),
+                  Icon(Icons.play_circle_rounded, color: colorScheme.onPrimary, size: 20),
                   const SizedBox(width: 8),
                   Text(l10n.myDhikirStartSession(items.length),
-                      style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+                      style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: colorScheme.onPrimary)),
                 ],
               ),
             ),
@@ -287,11 +286,13 @@ class _CustomCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // Read favourite state from provider (rebuilds automatically on change).
     final isFav = context.watch<FavoritesProvider>().isFavorite(item.id);
+    final colorScheme = Theme.of(context).colorScheme;
+    final badgeColor = adjustForBrightness(_color, Theme.of(context).brightness);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3))],
       ),
@@ -305,7 +306,7 @@ class _CustomCard extends StatelessWidget {
                 Container(
                   width: 52,
                   height: 52,
-                  decoration: BoxDecoration(color: _color, borderRadius: BorderRadius.circular(14)),
+                  decoration: BoxDecoration(color: badgeColor, borderRadius: BorderRadius.circular(14)),
                   child: Center(child: Text(item.icon, style: const TextStyle(fontSize: 24))),
                 ),
                 const SizedBox(width: 14),
@@ -317,18 +318,18 @@ class _CustomCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(item.title,
-                                style: GoogleFonts.playfairDisplay(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748))),
+                                style: GoogleFonts.playfairDisplay(fontSize: 15, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
                           ),
                           if (isFav) const Icon(Icons.favorite_rounded, size: 14, color: Color(0xFFFC8181)),
                         ],
                       ),
                       const SizedBox(height: 2),
                       Text(item.arabicText,
-                          style: GoogleFonts.amiri(fontSize: 16, color: const Color(0xFF4A5568)),
+                          style: GoogleFonts.amiri(fontSize: 16, color: colorScheme.primary),
                           textDirection: TextDirection.rtl,
                           overflow: TextOverflow.ellipsis),
                       Text(item.transliteration,
-                          style: GoogleFonts.inter(fontSize: 11, fontStyle: FontStyle.italic, color: const Color(0xFF718096)),
+                          style: GoogleFonts.inter(fontSize: 11, fontStyle: FontStyle.italic, color: colorScheme.onSurfaceVariant),
                           overflow: TextOverflow.ellipsis),
                     ],
                   ),
@@ -338,21 +339,21 @@ class _CustomCard extends StatelessWidget {
           ),
           // Action row
           Container(
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: Color(0xFFF6F4F1), width: 1)),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: colorScheme.outlineVariant, width: 1)),
             ),
             child: Row(
               children: [
                 _ActionBtn(
                   icon: isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                   label: isFav ? context.l10n.unfavAction : context.l10n.favouriteAction,
-                  color: isFav ? const Color(0xFFFC8181) : const Color(0xFF718096),
+                  color: isFav ? const Color(0xFFFC8181) : colorScheme.onSurfaceVariant,
                   onTap: () => context.read<FavoritesProvider>().toggle(item.id),
                 ),
                 _ActionBtn(
                   icon: Icons.edit_rounded,
                   label: context.l10n.commonEdit,
-                  color: const Color(0xFF718096),
+                  color: colorScheme.onSurfaceVariant,
                   onTap: () => Navigator.pushNamed(
                     context,
                     RouteNames.addDhikir,
@@ -362,7 +363,7 @@ class _CustomCard extends StatelessWidget {
                 _ActionBtn(
                   icon: Icons.play_arrow_rounded,
                   label: context.l10n.navCounter,
-                  color: const Color(0xFF4A5568),
+                  color: colorScheme.primary,
                   onTap: onSessionSingle,
                 ),
                 _ActionBtn(
