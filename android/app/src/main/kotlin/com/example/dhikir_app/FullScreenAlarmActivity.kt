@@ -35,6 +35,7 @@ class FullScreenAlarmActivity : Activity() {
             ?: intent.getStringExtra(EXTRA_PRAYER_ID)
             ?: "Prayer"
         findViewById<TextView>(R.id.tvPrayerName).text = label
+        findViewById<TextView>(R.id.tvSubtitle).text = "It's time for $label"
         findViewById<Button>(R.id.btnStop).setOnClickListener { stopAlarmAndFinish() }
     }
 
