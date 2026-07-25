@@ -232,6 +232,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickActionTasbih => 'Tasbih';
 
   @override
+  String get splashAppName => 'Dhikir App';
+
+  @override
+  String get splashTagline => 'Remember Allah, every day';
+
+  @override
   String get counterAddCustomDhikir => 'Add Custom Dhikir';
 
   @override

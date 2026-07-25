@@ -512,6 +512,18 @@ abstract class AppLocalizations {
   /// **'Tasbih'**
   String get quickActionTasbih;
 
+  /// No description provided for @splashAppName.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhikir App'**
+  String get splashAppName;
+
+  /// No description provided for @splashTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember Allah, every day'**
+  String get splashTagline;
+
   /// No description provided for @counterAddCustomDhikir.
   ///
   /// In en, this message translates to:

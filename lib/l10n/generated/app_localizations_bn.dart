@@ -232,6 +232,12 @@ class AppLocalizationsBn extends AppLocalizations {
   String get quickActionTasbih => 'তসবিহ';
 
   @override
+  String get splashAppName => 'যিকির অ্যাপ';
+
+  @override
+  String get splashTagline => 'প্রতিদিন আল্লাহকে স্মরণ করুন';
+
+  @override
   String get counterAddCustomDhikir => 'কাস্টম যিকির যোগ করুন';
 
   @override

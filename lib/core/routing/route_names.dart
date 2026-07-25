@@ -6,6 +6,7 @@
 class RouteNames {
   RouteNames._();
 
+  static const String home = '/home';
   static const String sessionCounter = '/session-counter';
   static const String counter = '/counter';
   static const String favorites = '/favorites';
