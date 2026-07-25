@@ -34,6 +34,8 @@
   "goalSubtitleDailyCentury": "Daily century goal",
   "goalSubtitleNoLimit": "No limit — count freely",
 
+  "homeGreeting": "Assalamu Alaikum",
+  "settingsTooltip": "Settings",
   "aboutTitle": "About",
   "aboutAppName": "Daily Dhikir",
   "aboutVersion": "Version {version}",

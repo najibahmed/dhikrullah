@@ -100,6 +100,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goalSubtitleNoLimit => 'No limit — count freely';
 
   @override
+  String get homeGreeting => 'Assalamu Alaikum';
+
+  @override
+  String get settingsTooltip => 'Settings';
+
+  @override
   String get aboutTitle => 'About';
 
   @override

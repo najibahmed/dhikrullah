@@ -89,13 +89,26 @@ class _HomeWidgetState extends State<HomeWidget> {
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            padding: const EdgeInsets.symmetric(
+              vertical: 10.0,
+            ),
             child: Row(
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Text(
+                    l10n.homeGreeting,
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ),
                 const Spacer(),
                 IconButton(
-                  tooltip: l10n.aboutTitle,
-                  icon: Icon(Icons.info_outline, color: Theme.of(context).colorScheme.onSurface),
+                  tooltip: l10n.settingsTooltip,
+                  icon: Icon(Icons.settings_outlined, color: Theme.of(context).colorScheme.onSurface),
                   onPressed: () => Navigator.pushNamed(context, RouteNames.about),
                 ),
                 const SizedBox(width: 8)

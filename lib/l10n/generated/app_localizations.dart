@@ -260,6 +260,18 @@ abstract class AppLocalizations {
   /// **'No limit — count freely'**
   String get goalSubtitleNoLimit;
 
+  /// No description provided for @homeGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Assalamu Alaikum'**
+  String get homeGreeting;
+
+  /// No description provided for @settingsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTooltip;
+
   /// No description provided for @aboutTitle.
   ///
   /// In en, this message translates to:

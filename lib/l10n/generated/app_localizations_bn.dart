@@ -100,6 +100,12 @@ class AppLocalizationsBn extends AppLocalizations {
   String get goalSubtitleNoLimit => 'কোনো সীমা নেই — স্বাধীনভাবে গণনা করুন';
 
   @override
+  String get homeGreeting => 'আসসালামু আলাইকুম';
+
+  @override
+  String get settingsTooltip => 'সেটিংস';
+
+  @override
   String get aboutTitle => 'সম্পর্কে';
 
   @override

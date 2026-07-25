@@ -29,6 +29,8 @@
   "goalSubtitleDailyCentury": "দৈনিক ১০০ লক্ষ্য",
   "goalSubtitleNoLimit": "কোনো সীমা নেই — স্বাধীনভাবে গণনা করুন",
 
+  "homeGreeting": "আসসালামু আলাইকুম",
+  "settingsTooltip": "সেটিংস",
   "aboutTitle": "সম্পর্কে",
   "aboutAppName": "Daily Dhikir",
   "aboutVersion": "সংস্করণ {version}",
