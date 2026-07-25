@@ -118,19 +118,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutDescription =>
-      'A daily dhikir tracker app with 30-day tracking';
+      'Track your daily dhikir, prayer times, and stay consistent — one day at a time.';
 
   @override
   String get aboutDeveloper => 'Developer';
 
   @override
-  String get aboutDeveloperNamePlaceholder => 'Developer name — TODO';
+  String get aboutDeveloperNamePlaceholder => 'Najib Ahmed';
 
   @override
-  String get aboutBioPlaceholder => 'Short bio — TODO';
+  String get aboutContactPlaceholder => 'najibahmed50@gmail.com';
 
   @override
-  String get aboutContactPlaceholder => 'Contact — TODO';
+  String get aboutSadaqahMessage =>
+      'This app is a sadaqah jariah for the Muslim ummah.';
 
   @override
   String get settingsLanguage => 'Language';
