@@ -314,24 +314,25 @@ class PrayerTimeProvider extends ChangeNotifier {
   /// cycle for [times]'s calendar date. [yesterday] (if available) supplies
   /// the leading Tahajjud window (last night's last-third-of-night -> this
   /// Fajr); the trailing Tahajjud window (tonight's last-third-of-night ->
-  /// tomorrow's Fajr) is always derived from [times] itself. Fajr's window
-  /// runs through to Ishraq's start (sunrise + 15min, matching the
-  /// existing Sunrise-forbidden window's end) rather than stopping at
-  /// sunrise, so there's never a "no current prayer" gap during that
-  /// forbidden window.
+  /// tomorrow's Fajr) is always derived from [times] itself.
   ///
-  /// Isha's own window still ends at middle-of-night (unchanged), while
-  /// Tahajjud doesn't start until last-third-of-night — there is an
-  /// intentional gap between the two with no covering window. Callers of
-  /// [currentPrayer]/[nextPrayerPeriod] must handle a `null` result during
-  /// that gap; the dashboard card hides itself then rather than crashing.
+  /// Fajr, Chasht, and Asr all stop short of the next forbidden window
+  /// (Sunrise, Zawal, Sunset respectively — see [forbiddenPeriods]) instead
+  /// of running through it, so no prayer window overlaps a forbidden one.
+  /// This — plus the existing Isha-end/Tahajjud-start gap — means
+  /// [currentPrayer]/[nextPrayerPeriod] can return `null` during a
+  /// forbidden window; callers must handle that (the dashboard card
+  /// already shows [PrayerStatus.forbidden] then instead of crashing).
   List<({String name, DateTime start, DateTime end})> _buildWindows(
       PrayerTimes times, PrayerTimes? yesterday) {
     final sunrise = times.sunrise.toLocal();
     final dhuhr = times.dhuhr.toLocal();
+    final sunset = times.sunset.toLocal();
     final ishraqStart = sunrise.add(const Duration(minutes: 15));
     final chashtStart = sunrise.add(
         Duration(microseconds: dhuhr.difference(sunrise).inMicroseconds ~/ 2));
+    final zawalStart = dhuhr.subtract(const Duration(minutes: 10));
+    final sunsetForbiddenStart = sunset.subtract(const Duration(minutes: 15));
     final ishaEnd = SunnahTimes(times).middleOfTheNight.toLocal();
     final tahajjudStart = SunnahTimes(times).lastThirdOfTheNight.toLocal();
 
@@ -342,11 +343,15 @@ class PrayerTimeProvider extends ChangeNotifier {
           start: SunnahTimes(yesterday).lastThirdOfTheNight.toLocal(),
           end: times.fajr.toLocal(),
         ),
-      (name: 'Fajr', start: times.fajr.toLocal(), end: ishraqStart),
+      (name: 'Fajr', start: times.fajr.toLocal(), end: sunrise),
       (name: 'Ishraq', start: ishraqStart, end: chashtStart),
-      (name: 'Chasht', start: chashtStart, end: dhuhr),
+      (name: 'Chasht', start: chashtStart, end: zawalStart),
       (name: 'Dhuhr', start: dhuhr, end: times.asr.toLocal()),
-      (name: 'Asr', start: times.asr.toLocal(), end: times.maghrib.toLocal()),
+      (
+        name: 'Asr',
+        start: times.asr.toLocal(),
+        end: sunsetForbiddenStart,
+      ),
       (
         name: 'Maghrib',
         start: times.maghrib.toLocal(),
