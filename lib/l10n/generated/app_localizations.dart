@@ -260,6 +260,18 @@ abstract class AppLocalizations {
   /// **'No limit — count freely'**
   String get goalSubtitleNoLimit;
 
+  /// No description provided for @homeGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Assalamu Alaikum'**
+  String get homeGreeting;
+
+  /// No description provided for @settingsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTooltip;
+
   /// No description provided for @aboutTitle.
   ///
   /// In en, this message translates to:
@@ -281,7 +293,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutDescription.
   ///
   /// In en, this message translates to:
-  /// **'A daily dhikir tracker app with 30-day tracking'**
+  /// **'Track your daily dhikir, prayer times, and stay consistent — one day at a time.'**
   String get aboutDescription;
 
   /// No description provided for @aboutDeveloper.
@@ -293,20 +305,20 @@ abstract class AppLocalizations {
   /// No description provided for @aboutDeveloperNamePlaceholder.
   ///
   /// In en, this message translates to:
-  /// **'Developer name — TODO'**
+  /// **'Najib Ahmed'**
   String get aboutDeveloperNamePlaceholder;
-
-  /// No description provided for @aboutBioPlaceholder.
-  ///
-  /// In en, this message translates to:
-  /// **'Short bio — TODO'**
-  String get aboutBioPlaceholder;
 
   /// No description provided for @aboutContactPlaceholder.
   ///
   /// In en, this message translates to:
-  /// **'Contact — TODO'**
+  /// **'najibahmed50@gmail.com'**
   String get aboutContactPlaceholder;
+
+  /// No description provided for @aboutSadaqahMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This app is a sadaqah jariah for the Muslim ummah.'**
+  String get aboutSadaqahMessage;
 
   /// No description provided for @settingsLanguage.
   ///
@@ -511,6 +523,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tasbih'**
   String get quickActionTasbih;
+
+  /// No description provided for @splashAppName.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhikir App'**
+  String get splashAppName;
+
+  /// No description provided for @splashTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember Allah, every day'**
+  String get splashTagline;
 
   /// No description provided for @counterAddCustomDhikir.
   ///

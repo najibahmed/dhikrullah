@@ -82,8 +82,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.qiblaTitle)),
       body: switch (_state) {
-        _LocationState.loading =>
-          const Center(child: CircularProgressIndicator()),
+        _LocationState.loading => const Center(child: CircularProgressIndicator()),
         _LocationState.denied => _DeniedView(onRetry: _resolveLocation),
         _LocationState.ready => _buildCompass(context),
       },
@@ -99,9 +98,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
       builder: (context, snapshot) {
         final heading = snapshot.data?.heading;
         if (heading == null) {
-          return snapshot.hasData
-              ? const _NoSensorView()
-              : const Center(child: CircularProgressIndicator());
+          return snapshot.hasData ? const _NoSensorView() : const Center(child: CircularProgressIndicator());
         }
         return _CompassView(
           heading: heading,
@@ -131,11 +128,8 @@ class _CompassView extends StatelessWidget {
 
     final diff = QiblaCalculator.difference(heading, bearing);
     final aligned = diff.abs() <= 5;
-    final statusText = aligned
-        ? l10n.qiblaFacing
-        : (diff < 0 ? l10n.qiblaTurnLeft : l10n.qiblaTurnRight);
-    final accent =
-        aligned ? theme.colorScheme.primary : theme.colorScheme.onSurface;
+    final statusText = aligned ? l10n.qiblaFacing : (diff < 0 ? l10n.qiblaTurnLeft : l10n.qiblaTurnRight);
+    final accent = aligned ? theme.colorScheme.primary : theme.colorScheme.onSurface;
 
     return Center(
       child: Column(
@@ -185,8 +179,7 @@ class _Dial extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final labelStyle = theme.textTheme.titleMedium
-        ?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+    final labelStyle = theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant);
 
     return Container(
       width: 260,
@@ -194,9 +187,7 @@ class _Dial extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: aligned
-              ? theme.colorScheme.primary
-              : theme.colorScheme.outlineVariant,
+          color: aligned ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
           width: 2,
         ),
         color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
@@ -204,12 +195,7 @@ class _Dial extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          for (final (angle, label) in [
-            (0, 'N'),
-            (90, 'E'),
-            (180, 'S'),
-            (270, 'W')
-          ])
+          for (final (angle, label) in [(0, 'N'), (90, 'E'), (180, 'S'), (270, 'W')])
             Transform.rotate(
               angle: angle * math.pi / 180,
               child: Align(
@@ -230,6 +216,7 @@ class _Dial extends StatelessWidget {
                     'assets/images/kibla_arrow.png',
                     width: 62,
                     height: 62,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : null,
                   )),
             ),
           ),
@@ -257,8 +244,7 @@ class _InfoTile extends StatelessWidget {
       children: [
         Text(
           label,
-          style: theme.textTheme.labelMedium
-              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
         const SizedBox(height: 4),
         Text(value, style: theme.textTheme.titleLarge),
@@ -283,8 +269,7 @@ class _DeniedView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.location_off_outlined,
-                size: 64, color: theme.colorScheme.primary),
+            Icon(Icons.location_off_outlined, size: 64, color: theme.colorScheme.primary),
             const SizedBox(height: 16),
             Text(
               l10n.locationDeniedMessage,
@@ -322,8 +307,7 @@ class _NoSensorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.explore_off_outlined,
-                size: 64, color: theme.colorScheme.primary),
+            Icon(Icons.explore_off_outlined, size: 64, color: theme.colorScheme.primary),
             const SizedBox(height: 16),
             Text(
               l10n.qiblaNoSensor,

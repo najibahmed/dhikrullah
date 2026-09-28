@@ -16,6 +16,7 @@ import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.d
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/l10n/prayer_localization.dart';
 import 'package:dhikir_app/core/utils/time_format.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 
 class PrayerScheduleSection extends StatefulWidget {
   const PrayerScheduleSection({super.key});
@@ -30,8 +31,7 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
   @override
   void initState() {
     super.initState();
-    _ticker =
-        Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
   }
 
   @override
@@ -79,8 +79,7 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
     );
   }
 
-  Widget _nextPrayerCard(BuildContext context, ThemeData theme,
-      ({String name, DateTime start, DateTime end, Duration startsIn}) next) {
+  Widget _nextPrayerCard(BuildContext context, ThemeData theme, ({String name, DateTime start, DateTime end, Duration startsIn}) next) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -94,8 +93,7 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
         children: [
           Text(
             context.l10n.nextPrayerSection,
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(color: theme.colorScheme.primary),
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.primary),
           ),
           const SizedBox(height: 8),
           Row(
@@ -103,8 +101,7 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
             children: [
               Text(
                 prayerDisplayName(context, next.name),
-                style: theme.textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w700),
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               Text(
                 '${formatClockTime(next.start)} – '
@@ -123,33 +120,23 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
     );
   }
 
-  Widget _sehriIftarCard(
-      BuildContext context,
-      ThemeData theme,
-      ({
-        bool isToday,
-        DateTime sehriEnd,
-        DateTime iftar,
-        Duration countdown
-      }) info) {
+  Widget _sehriIftarCard(BuildContext context, ThemeData theme, ({bool isToday, DateTime sehriEnd, DateTime iftar, Duration countdown}) info) {
     final l10n = context.l10n;
-    final fg = theme.colorScheme.onInverseSurface;
+    final fg = theme.colorScheme.onSurface;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.inverseSurface,
+        color: mintAccentBackground(context),
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: mintAccentBorder(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            info.isToday
-                ? l10n.todaysScheduleTitle
-                : l10n.tomorrowsScheduleTitle,
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(color: fg.withValues(alpha: 0.8)),
+            info.isToday ? l10n.todaysScheduleTitle : l10n.tomorrowsScheduleTitle,
+            style: theme.textTheme.bodyMedium?.copyWith(color: fg.withValues(alpha: 0.8)),
           ),
           const SizedBox(height: 10),
           Row(
@@ -159,11 +146,9 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _scheduleRow(
-                        theme, fg, l10n.sehriEndLabel, info.sehriEnd, context),
+                    _scheduleRow(theme, fg, l10n.sehriEndLabel, info.sehriEnd, context),
                     const SizedBox(height: 8),
-                    _scheduleRow(
-                        theme, fg, l10n.iftarLabel, info.iftar, context),
+                    _scheduleRow(theme, fg, l10n.iftarLabel, info.iftar, context),
                   ],
                 ),
               ),
@@ -173,14 +158,12 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
                   children: [
                     Text(
                       info.isToday ? l10n.iftarStartsIn : l10n.sehriEndsIn,
-                      style: theme.textTheme.bodySmall
-                          ?.copyWith(color: fg.withValues(alpha: 0.8)),
+                      style: theme.textTheme.bodySmall?.copyWith(color: fg.withValues(alpha: 0.8)),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       _formatClock(info.countdown),
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(color: fg, fontWeight: FontWeight.w700),
+                      style: theme.textTheme.titleMedium?.copyWith(color: fg, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -192,16 +175,14 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
     );
   }
 
-  Widget _scheduleRow(ThemeData theme, Color fg, String label, DateTime time,
-      BuildContext context) {
+  Widget _scheduleRow(ThemeData theme, Color fg, String label, DateTime time, BuildContext context) {
     return Row(
       children: [
         Text(label, style: theme.textTheme.bodyMedium?.copyWith(color: fg)),
         const SizedBox(width: 12),
         Text(
           formatClockTime(time),
-          style: theme.textTheme.bodyMedium
-              ?.copyWith(color: fg, fontWeight: FontWeight.w700),
+          style: theme.textTheme.bodyMedium?.copyWith(color: fg, fontWeight: FontWeight.w700),
         ),
       ],
     );

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import 'package:dhikir_app/core/models/custom_dhikir_model.dart';
 import 'package:dhikir_app/core/models/dhikir_model.dart';
+import 'package:dhikir_app/features/dhikir/screens/home_screen.dart';
 import 'package:dhikir_app/features/my_dhikir/screens/add_dhikir_screen.dart';
 import 'package:dhikir_app/features/analytics/screens/analytics_screen.dart';
 import 'package:dhikir_app/features/dhikir/screens/dhikir_calendar_screen.dart';
@@ -66,6 +67,12 @@ class AppRoutes {
 
   static Route<dynamic> generate(RouteSettings settings) {
     switch (settings.name) {
+      case RouteNames.home:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const HomeScreen(),
+        );
+
       case RouteNames.sessionCounter:
         final args = settings.arguments as SessionCounterArgs;
         return MaterialPageRoute(

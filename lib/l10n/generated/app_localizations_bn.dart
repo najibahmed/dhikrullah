@@ -100,6 +100,12 @@ class AppLocalizationsBn extends AppLocalizations {
   String get goalSubtitleNoLimit => 'কোনো সীমা নেই — স্বাধীনভাবে গণনা করুন';
 
   @override
+  String get homeGreeting => 'আসসালামু আলাইকুম';
+
+  @override
+  String get settingsTooltip => 'সেটিংস';
+
+  @override
   String get aboutTitle => 'সম্পর্কে';
 
   @override
@@ -111,20 +117,21 @@ class AppLocalizationsBn extends AppLocalizations {
   }
 
   @override
-  String get aboutDescription => '৩০ দিনের ট্র্যাকিংসহ একটি দৈনিক যিকির অ্যাপ';
+  String get aboutDescription =>
+      'প্রতিদিন যিকির করুন, নামাজের সময় জানুন, ধারাবাহিকতা ধরে রাখুন — একদিন একদিন করে।';
 
   @override
   String get aboutDeveloper => 'ডেভেলপার';
 
   @override
-  String get aboutDeveloperNamePlaceholder =>
-      'ডেভেলপারের নাম — শীঘ্রই যুক্ত হবে';
+  String get aboutDeveloperNamePlaceholder => 'নাজিব আহমেদ';
 
   @override
-  String get aboutBioPlaceholder => 'সংক্ষিপ্ত পরিচিতি — শীঘ্রই যুক্ত হবে';
+  String get aboutContactPlaceholder => 'najibahmed50@gmail.com';
 
   @override
-  String get aboutContactPlaceholder => 'যোগাযোগ — শীঘ্রই যুক্ত হবে';
+  String get aboutSadaqahMessage =>
+      'এই অ্যাপটি মুসলিম উম্মাহর জন্য সদকায়ে জারিয়া।';
 
   @override
   String get settingsLanguage => 'ভাষা';
@@ -230,6 +237,12 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get quickActionTasbih => 'তসবিহ';
+
+  @override
+  String get splashAppName => 'যিকির অ্যাপ';
+
+  @override
+  String get splashTagline => 'প্রতিদিন আল্লাহকে স্মরণ করুন';
 
   @override
   String get counterAddCustomDhikir => 'কাস্টম যিকির যোগ করুন';

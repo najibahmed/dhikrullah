@@ -36,8 +36,14 @@ class AboutScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Text(l10n.aboutDescription, style: theme.textTheme.bodyMedium),
           const SizedBox(height: 32),
-          Text(l10n.settingsLanguage,
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+          Row(
+            children: [
+              Icon(Icons.language, size: 20, color: theme.colorScheme.onSurface),
+              const SizedBox(width: 8),
+              Text(l10n.settingsLanguage,
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            ],
+          ),
           const SizedBox(height: 8),
           ListTile(
             contentPadding: EdgeInsets.zero,
@@ -46,8 +52,14 @@ class AboutScreen extends StatelessWidget {
             onTap: () => _showLanguageDialog(context),
           ),
           const SizedBox(height: 32),
-          Text(l10n.themeSettingsRowLabel,
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+          Row(
+            children: [
+              Icon(Icons.dark_mode_outlined, size: 20, color: theme.colorScheme.onSurface),
+              const SizedBox(width: 8),
+              Text(l10n.themeSettingsRowLabel,
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            ],
+          ),
           const SizedBox(height: 8),
           ListTile(
             contentPadding: EdgeInsets.zero,
@@ -61,9 +73,16 @@ class AboutScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(l10n.aboutDeveloperNamePlaceholder, style: theme.textTheme.bodyMedium),
           const SizedBox(height: 4),
-          Text(l10n.aboutBioPlaceholder, style: theme.textTheme.bodyMedium),
-          const SizedBox(height: 4),
           Text(l10n.aboutContactPlaceholder, style: theme.textTheme.bodyMedium),
+          const SizedBox(height: 40),
+          Text(
+            l10n.aboutSadaqahMessage,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontStyle: FontStyle.italic,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
         ],
       ),
     );

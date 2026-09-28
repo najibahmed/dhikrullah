@@ -22,6 +22,13 @@ Color mintAccentBorder(BuildContext context) {
       : const Color(0xFFC6E6C8);
 }
 
+/// Current-prayer card background on Home/PrayerTimeCard.
+Color currentPrayerCardBackground(BuildContext context) {
+  return Theme.of(context).brightness == Brightness.dark
+      ? const Color(0xFF15A190)
+      : const Color.fromARGB(255, 2, 117, 106);
+}
+
 /// Adjusts a stored per-dhikir/category data color for dark-mode surfaces.
 /// Most stored colors are light pastels chosen against a light background;
 /// on a dark background they need reduced lightness (so they don't glow)

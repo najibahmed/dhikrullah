@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/core/l10n/prayer_localization.dart';
 import 'package:dhikir_app/core/utils/time_format.dart';
 
@@ -79,7 +80,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             decoration: BoxDecoration(
               color: provider.status == PrayerStatus.normal
-                  ? const Color.fromARGB(255, 2, 117, 106)
+                  ? currentPrayerCardBackground(context)
                   : theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(18),
               border:
@@ -245,7 +246,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
     final next = provider.nextPrayer;
     final now = DateTime.now();
 
-    final onSecondary = theme.colorScheme.onSecondary;
+    final onCardColor = onColorFor(currentPrayerCardBackground(context));
 
     final isRamadan = HijriCalendar.fromDate(
           now.add(Duration(days: provider.hijriOffsetDays)),
@@ -258,7 +259,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         Text(
           context.l10n.currentPrayerSection,
           style: theme.textTheme.titleSmall
-              ?.copyWith(fontWeight: FontWeight.w700, color: onSecondary),
+              ?.copyWith(fontWeight: FontWeight.w700, color: onCardColor),
         ),
         const SizedBox(height: 10),
         Row(
@@ -266,19 +267,19 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
           children: [
             Row(
               children: [
-                Icon(Icons.mosque_outlined, color: onSecondary),
+                Icon(Icons.mosque_outlined, color: onCardColor),
                 const SizedBox(width: 12),
                 Text(
                   prayerDisplayName(context, current.name),
                   style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700, color: onSecondary),
+                      fontWeight: FontWeight.w700, color: onCardColor),
                 ),
               ],
             ),
             Text(
               '${formatClockTime(current.start)} – '
               '${formatClockTime(current.end)}',
-              style: theme.textTheme.bodyMedium?.copyWith(color: onSecondary),
+              style: theme.textTheme.bodyMedium?.copyWith(color: onCardColor),
             ),
             // Icon(Icons.chevron_right,
             //     color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
@@ -288,7 +289,7 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
         Text(
           _formatCountdown(context, current.end.difference(now)),
           style: theme.textTheme.bodyMedium
-              ?.copyWith(color: onSecondary.withValues(alpha: 0.8)),
+              ?.copyWith(color: onCardColor.withValues(alpha: 0.8)),
         ),
         const SizedBox(height: 10),
         ClipRRect(
@@ -296,8 +297,8 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
           child: LinearProgressIndicator(
             value: current.progress,
             minHeight: 4,
-            backgroundColor: onSecondary.withValues(alpha: 0.3),
-            valueColor: AlwaysStoppedAnimation<Color>(onSecondary),
+            backgroundColor: onCardColor.withValues(alpha: 0.3),
+            valueColor: AlwaysStoppedAnimation<Color>(onCardColor),
           ),
         ),
         // if (next != null) ...[

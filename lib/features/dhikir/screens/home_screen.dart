@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:upgrader/upgrader.dart';
 import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/core/routing/app_routes.dart';
 import 'package:dhikir_app/core/routing/route_names.dart';
@@ -38,8 +39,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: SafeArea(child: HomeWidget()),
+    return UpgradeAlert(
+      child: const Scaffold(
+        body: SafeArea(child: HomeWidget()),
+      ),
     );
   }
 }
@@ -86,13 +89,26 @@ class _HomeWidgetState extends State<HomeWidget> {
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            padding: const EdgeInsets.symmetric(
+              vertical: 10.0,
+            ),
             child: Row(
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Text(
+                    l10n.homeGreeting,
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ),
                 const Spacer(),
                 IconButton(
-                  tooltip: l10n.aboutTitle,
-                  icon: Icon(Icons.info_outline, color: Theme.of(context).colorScheme.onSurface),
+                  tooltip: l10n.settingsTooltip,
+                  icon: Icon(Icons.settings_outlined, color: Theme.of(context).colorScheme.onSurface),
                   onPressed: () => Navigator.pushNamed(context, RouteNames.about),
                 ),
                 const SizedBox(width: 8)
@@ -398,20 +414,20 @@ class _QuickActionTile extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 64,
-            height: 64,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: border,
-            ),
-            child: Image.asset(
-              cacheHeight: 64 * dpr.round(),
-              cacheWidth: 64 * dpr.round(),
-              imagePath,
-            ),
-          ),
+              width: 64,
+              height: 64,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: border,
+              ),
+              child: Image.asset(
+                imagePath,
+                cacheHeight: 64 * dpr.round(),
+                cacheWidth: 64 * dpr.round(),
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : null, // Original image colours in light mode
+              )),
           const SizedBox(height: 6),
           Text(
             label,

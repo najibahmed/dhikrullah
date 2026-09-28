@@ -17,7 +17,7 @@ import 'package:dhikir_app/core/providers/favorites_provider.dart';
 import 'package:dhikir_app/core/persistence/hive_service.dart';
 import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/theme/app_theme.dart';
-import 'package:dhikir_app/features/dhikir/screens/home_screen.dart';
+import 'package:dhikir_app/core/widgets/splash_screen.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
@@ -82,7 +82,7 @@ class DhikirApp extends StatelessWidget {
           child: child!,
         );
       },
-      home: const HomeScreen(),
+      home: const SplashScreen(),
       onGenerateRoute: AppRoutes.generate,
     );
   }
