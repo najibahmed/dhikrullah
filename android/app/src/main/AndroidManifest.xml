@@ -9,9 +9,9 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
     <application
-        android:label="Dhikrullah"
+        android:label="Dhikir E-Noor"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <receiver android:exported="false" android:name=".AlarmReceiver"/>
         <receiver android:exported="false" android:name=".BootReceiver">
             <intent-filter>

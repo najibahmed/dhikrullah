@@ -35,13 +35,22 @@ dev_dependencies:
   hive_generator: ^2.0.1
   build_runner: ^2.4.6
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: false
+  remove_alpha_ios: true
+  image_path: 'assets/images/logo.png'
+  adaptive_icon_foreground: 'assets/images/logo.png'
+  adaptive_icon_background: "#FFFFFF"
+  min_sdk_android: 21
 
 flutter:
   uses-material-design: true
   generate: true
   assets:
     - assets/images/
-    - assets/audio/adhan_makkah.mp3
     - assets/json/allah_names_en.json
     - assets/json/allah_names_bn.json
     - assets/json/all_dua_en.json

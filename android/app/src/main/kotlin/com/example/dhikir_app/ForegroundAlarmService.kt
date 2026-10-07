@@ -1,4 +1,4 @@
-package com.example.dhikir_app
+package com.bitbirds.dhikrullah
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -24,8 +24,8 @@ class ForegroundAlarmService : Service() {
 
     companion object {
         private const val TAG = "ForegroundAlarmService"
-        const val ACTION_DISMISS = "com.example.dhikir_app.action.DISMISS_ALARM"
-        const val ACTION_ALARM_STOPPED = "com.example.dhikir_app.action.ALARM_STOPPED"
+        const val ACTION_DISMISS = "com.bitbirds.dhikrullah.action.DISMISS_ALARM"
+        const val ACTION_ALARM_STOPPED = "com.bitbirds.dhikrullah.action.ALARM_STOPPED"
         private const val CHANNEL_ID = "alarm_playback_channel"
         private const val NOTIFICATION_ID = 1001
         private const val PREFS_NAME = "FlutterSharedPreferences"

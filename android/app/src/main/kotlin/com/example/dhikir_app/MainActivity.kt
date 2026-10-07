@@ -1,4 +1,4 @@
-package com.example.dhikir_app
+package com.bitbirds.dhikrullah
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine

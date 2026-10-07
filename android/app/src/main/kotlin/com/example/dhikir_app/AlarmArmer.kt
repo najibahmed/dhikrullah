@@ -1,4 +1,4 @@
-package com.example.dhikir_app
+package com.bitbirds.dhikrullah
 
 import android.app.AlarmManager
 import android.app.PendingIntent

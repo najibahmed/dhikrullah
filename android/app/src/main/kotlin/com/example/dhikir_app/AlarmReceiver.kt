@@ -1,4 +1,4 @@
-package com.example.dhikir_app
+package com.bitbirds.dhikrullah
 
 import android.content.BroadcastReceiver
 import android.content.Context

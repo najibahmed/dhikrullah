@@ -1,4 +1,4 @@
-package com.example.dhikir_app
+package com.bitbirds.dhikrullah
 
 import android.app.Activity
 import io.flutter.plugin.common.BinaryMessenger
