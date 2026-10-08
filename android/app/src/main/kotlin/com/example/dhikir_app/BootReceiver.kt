@@ -1,4 +1,4 @@
-package com.bitbirds.dhikrullah
+package com.bitbirds.simplymuslim
 
 import android.content.BroadcastReceiver
 import android.content.Context

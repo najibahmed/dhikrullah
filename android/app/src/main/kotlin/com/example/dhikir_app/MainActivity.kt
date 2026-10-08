@@ -1,4 +1,4 @@
-package com.bitbirds.dhikrullah
+package com.bitbirds.simplymuslim
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine

@@ -15,21 +15,63 @@
         android:layout_height="match_parent"
         android:background="@drawable/full_screen_alarm_gradient" />
 
+    <!-- Card: time + prayer name + subtitle -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="140dp"
+        android:layout_marginTop="120dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/full_screen_alarm_card_bg"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:paddingStart="32dp"
-        android:paddingEnd="32dp">
+        android:paddingTop="32dp"
+        android:paddingBottom="32dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp">
+
+        <!-- Current time: big "4:15" + small "AM" on the same baseline -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="true">
+
+            <TextClock
+                android:id="@+id/tcTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="h:mm"
+                android:format24Hour="h:mm"
+                android:textSize="76sp"
+                android:fontFamily="sans-serif-light"
+                android:textColor="#FFFFFF"
+                android:includeFontPadding="false"
+                android:shadowColor="#80000000"
+                android:shadowDx="0"
+                android:shadowDy="2"
+                android:shadowRadius="8" />
+
+            <TextClock
+                android:id="@+id/tcAmPm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:format12Hour="a"
+                android:format24Hour="a"
+                android:textSize="22sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="#E6FFFFFF"
+                android:includeFontPadding="false" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvPrayerName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="40sp"
+            android:layout_marginTop="16dp"
+            android:textSize="36sp"
             android:textStyle="bold"
             android:textAllCaps="true"
             android:textColor="#FFFFFF"
@@ -44,11 +86,11 @@
             android:id="@+id/tvSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:text="It is time to pray"
             android:textSize="16sp"
             android:fontFamily="sans-serif-light"
-            android:textColor="#B3FFFFFF"
+            android:textColor="#CCFFFFFF"
             android:gravity="center" />
 
     </LinearLayout>
