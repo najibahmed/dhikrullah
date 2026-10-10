@@ -428,13 +428,13 @@ class _QuickActionTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: border,
+                // border: border,
               ),
               child: Image.asset(
                 imagePath,
                 cacheHeight: 64 * dpr.round(),
                 cacheWidth: 64 * dpr.round(),
-                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : null, // Original image colours in light mode
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.teal, // Original image colours in light mode
               )),
           const SizedBox(height: 6),
           Text(

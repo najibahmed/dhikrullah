@@ -195,8 +195,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
     final provider = context.watch<DhikirDetailProvider>();
     final l10n = context.l10n;
     final localizedTitle = localizedDhikirTitle(context, widget.dhikir.id) ?? widget.dhikir.title;
-    final localizedTransliteration =
-        localizedDhikirTransliteration(context, widget.dhikir.id) ?? widget.dhikir.transliteration;
+    final localizedTransliteration = localizedDhikirTransliteration(context, widget.dhikir.id) ?? widget.dhikir.transliteration;
     final localizedMeaning = localizedDhikirMeaning(context, widget.dhikir.id) ?? widget.dhikir.englishMeaning;
     final colorScheme = Theme.of(context).colorScheme;
     final bgColor = adjustForBrightness(_accent, Theme.of(context).brightness);
@@ -283,8 +282,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(localizedTitle,
-                                  style: GoogleFonts.playfairDisplay(fontSize: 24, fontWeight: FontWeight.w700, color: onBg)),
+                              Text(localizedTitle, style: GoogleFonts.playfairDisplay(fontSize: 24, fontWeight: FontWeight.w700, color: onBg)),
                               const SizedBox(height: 2),
                               Wrap(
                                 children: [
@@ -574,7 +572,8 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                                     children: [
                                       Icon(Icons.calendar_month_rounded, size: 12, color: colorScheme.onPrimary),
                                       const SizedBox(width: 4),
-                                      Text(l10n.historyButton, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: colorScheme.onPrimary)),
+                                      Text(l10n.historyButton,
+                                          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: colorScheme.onPrimary)),
                                     ],
                                   ),
                                 ),

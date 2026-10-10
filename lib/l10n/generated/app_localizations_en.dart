@@ -218,14 +218,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qiblaHeadingLabel => 'Heading';
 
   @override
-  String get qiblaInstruction =>
-      'Align the two arrows to face towards the Kaaba Sharif.';
-
-  @override
   String get qiblaBearingLabel => 'Qibla';
 
   @override
   String get qiblaNoSensor => 'Compass sensor is not available on this device.';
+
+  @override
+  String get qiblaInstruction =>
+      'Align the two arrows to face towards the Kaaba Sharif.';
 
   @override
   String get favoritesScreenTitle => 'Favourites';
@@ -755,10 +755,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prayerNameChasht => 'Chasht';
 
   @override
-  String get todaysScheduleTitle => 'Today’s Schedule';
+  String get todaysScheduleTitle => 'Today’s Sehri & Iftar Times';
 
   @override
-  String get tomorrowsScheduleTitle => 'Tomorrow’s Schedule';
+  String get tomorrowsScheduleTitle => 'Tomorrow’s Sehri & Iftar Times';
 
   @override
   String get iftarStartsIn => 'Iftar starts in';

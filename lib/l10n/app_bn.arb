@@ -67,9 +67,9 @@
   "qiblaTurnLeft": "বামে ঘুরুন",
   "qiblaTurnRight": "ডানে ঘুরুন",
   "qiblaHeadingLabel": "দিক",
-  "qiblaInstruction": "কাবা শরীফের দিকে মুখ করতে তীর দুটি মুখোমুখি করুন",
   "qiblaBearingLabel": "কিবলা",
   "qiblaNoSensor": "এই ডিভাইসে কম্পাস সেন্সর নেই।",
+  "qiblaInstruction": "কাবা শরীফের দিকে মুখ করতে তীর দুটি মুখোমুখি করুন",
 
   "favoritesScreenTitle": "প্রিয়",
   "favoritesEmptyTitle": "এখনও কোনো প্রিয় যিকির নেই",
@@ -242,8 +242,8 @@
   "prayerNameIshraq": "ইশরাক",
   "prayerNameChasht": "চাশত",
 
-  "todaysScheduleTitle": "আজকের সময়সূচী",
-  "tomorrowsScheduleTitle": "আগামীকালের সময়সূচী",
+  "todaysScheduleTitle": "আজকের সাহরি ও ইফতারের সময়",
+  "tomorrowsScheduleTitle": "আগামীকালের সাহরি ও ইফতারের সময়",
   "iftarStartsIn": "ইফতার শুরু হবে",
   "sehriEndsIn": "সেহরি শেষ হবে",
 

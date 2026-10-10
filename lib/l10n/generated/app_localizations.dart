@@ -482,12 +482,6 @@ abstract class AppLocalizations {
   /// **'Heading'**
   String get qiblaHeadingLabel;
 
-  /// No description provided for @qiblaInstruction.
-  ///
-  /// In en, this message translates to:
-  /// **'Align the two arrows to face towards the Kaaba Sharif.'**
-  String get qiblaInstruction;
-
   /// No description provided for @qiblaBearingLabel.
   ///
   /// In en, this message translates to:
@@ -499,6 +493,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Compass sensor is not available on this device.'**
   String get qiblaNoSensor;
+
+  /// No description provided for @qiblaInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Align the two arrows to face towards the Kaaba Sharif.'**
+  String get qiblaInstruction;
 
   /// No description provided for @favoritesScreenTitle.
   ///
@@ -1451,13 +1451,13 @@ abstract class AppLocalizations {
   /// No description provided for @todaysScheduleTitle.
   ///
   /// In en, this message translates to:
-  /// **'Today’s Schedule'**
+  /// **'Today’s Sehri & Iftar Times'**
   String get todaysScheduleTitle;
 
   /// No description provided for @tomorrowsScheduleTitle.
   ///
   /// In en, this message translates to:
-  /// **'Tomorrow’s Schedule'**
+  /// **'Tomorrow’s Sehri & Iftar Times'**
   String get tomorrowsScheduleTitle;
 
   /// No description provided for @iftarStartsIn.

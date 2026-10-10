@@ -218,14 +218,14 @@ class AppLocalizationsBn extends AppLocalizations {
   String get qiblaHeadingLabel => 'দিক';
 
   @override
-  String get qiblaInstruction =>
-      'কাবা শরীফের দিকে মুখ করতে তীর দুটি মুখোমুখি করুন';
-
-  @override
   String get qiblaBearingLabel => 'কিবলা';
 
   @override
   String get qiblaNoSensor => 'এই ডিভাইসে কম্পাস সেন্সর নেই।';
+
+  @override
+  String get qiblaInstruction =>
+      'কাবা শরীফের দিকে মুখ করতে তীর দুটি মুখোমুখি করুন';
 
   @override
   String get favoritesScreenTitle => 'প্রিয়';
@@ -755,10 +755,10 @@ class AppLocalizationsBn extends AppLocalizations {
   String get prayerNameChasht => 'চাশত';
 
   @override
-  String get todaysScheduleTitle => 'আজকের সময়সূচী';
+  String get todaysScheduleTitle => 'আজকের সাহরি ও ইফতারের সময়';
 
   @override
-  String get tomorrowsScheduleTitle => 'আগামীকালের সময়সূচী';
+  String get tomorrowsScheduleTitle => 'আগামীকালের সাহরি ও ইফতারের সময়';
 
   @override
   String get iftarStartsIn => 'ইফতার শুরু হবে';

@@ -35,8 +35,7 @@ class DateHeaderRow extends StatelessWidget {
     this.onHijriTap,
   });
 
-  Widget _sunRow(
-      BuildContext context, IconData icon, Color color, DateTime time) {
+  Widget _sunRow(BuildContext context, IconData icon, Color color, DateTime time) {
     final theme = Theme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -72,8 +71,7 @@ class DateHeaderRow extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                        '${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear}${context.l10n.hijriEraSuffix}',
+                    Text('${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear}${context.l10n.hijriEraSuffix}',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         )),
@@ -81,8 +79,10 @@ class DateHeaderRow extends StatelessWidget {
                       const SizedBox(width: 4),
                       GestureDetector(
                         onTap: onHijriTap,
-                        child: const Icon(Icons.link_outlined,
-                            size: 18, color: Colors.black54),
+                        child: const Icon(
+                          Icons.arrow_outward,
+                          size: 18,
+                        ),
                       ),
                     ]
                   ],
@@ -101,11 +101,9 @@ class DateHeaderRow extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _sunRow(
-                    context, Icons.wb_sunny_outlined, Colors.amber, sunrise!),
+                _sunRow(context, Icons.wb_sunny_outlined, Colors.amber, sunrise!),
                 const SizedBox(height: 4),
-                _sunRow(context, Icons.nightlight_round, Colors.deepOrange,
-                    sunset!),
+                _sunRow(context, Icons.nightlight_round, Colors.deepOrange, sunset!),
               ],
             ),
         ],

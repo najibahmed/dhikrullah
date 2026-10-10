@@ -42,7 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
             Image.asset('assets/images/logo.png', width: 140, height: 140),
             const SizedBox(height: 24),
             Text(
-              l10n.splashAppName,
+              'Simply Muslim',
               style: GoogleFonts.playfairDisplay(
                 fontSize: 26,
                 fontWeight: FontWeight.w700,

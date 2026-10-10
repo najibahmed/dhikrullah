@@ -74,9 +74,9 @@
   "qiblaTurnLeft": "Turn left",
   "qiblaTurnRight": "Turn right",
   "qiblaHeadingLabel": "Heading",
-  "qiblaInstruction": "Align the two arrows to face towards the Kaaba Sharif.",
   "qiblaBearingLabel": "Qibla",
   "qiblaNoSensor": "Compass sensor is not available on this device.",
+  "qiblaInstruction": "Align the two arrows to face towards the Kaaba Sharif.",
 
   "favoritesScreenTitle": "Favourites",
   "favoritesEmptyTitle": "No favorite dhikir yet",
@@ -271,8 +271,8 @@
   "prayerNameIshraq": "Ishraq",
   "prayerNameChasht": "Chasht",
 
-  "todaysScheduleTitle": "Today’s Schedule",
-  "tomorrowsScheduleTitle": "Tomorrow’s Schedule",
+  "todaysScheduleTitle": "Today’s Sehri & Iftar Times",
+  "tomorrowsScheduleTitle": "Tomorrow’s Sehri & Iftar Times",
   "iftarStartsIn": "Iftar starts in",
   "sehriEndsIn": "Sehri ends in",
 
