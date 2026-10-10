@@ -25,13 +25,11 @@ class SessionSetupSheet extends StatefulWidget {
 class SessionSetupSheetState extends State<SessionSetupSheet> {
   int _goal = 100;
 
-  static const _goals = [33, 34, 99, 100, -1];
-  static const _labels = {33: '33', 34: '34', 99: '99', 100: '100', -1: '∞'};
+  static const _goals = [33, 100, -1];
+  static const _labels = {33: '33', 100: '100', -1: '∞'};
 
   String _descFor(AppLocalizations l10n, int g) => switch (g) {
         33 => l10n.setupGoalDescSubhanallah,
-        34 => l10n.setupGoalDescAlhamdulillah,
-        99 => l10n.goalSubtitleNamesOfAllah,
         100 => l10n.setupGoalDescCenturyGoal,
         -1 => l10n.setupGoalDescNoLimit,
         _ => '',

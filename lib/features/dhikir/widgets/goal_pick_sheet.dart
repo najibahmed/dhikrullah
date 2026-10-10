@@ -28,8 +28,6 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
 
   static const _labels = {
     33: '33',
-    34: '34',
-    99: '99',
     100: '100',
     -1: '∞',
   };
@@ -44,8 +42,6 @@ class _GoalPickerSheetState extends State<GoalPickerSheet> {
 
   String _subtitle(AppLocalizations l10n, int v) => switch (v) {
         33 => l10n.goalSubtitleTasbihSubhanallah,
-        34 => l10n.goalSubtitleTasbihAlhamdulillah,
-        99 => l10n.goalSubtitleNamesOfAllah,
         100 => l10n.goalSubtitleDailyCentury,
         -1 => l10n.goalSubtitleNoLimit,
         _ => '',

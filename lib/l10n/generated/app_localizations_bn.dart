@@ -88,12 +88,6 @@ class AppLocalizationsBn extends AppLocalizations {
   String get goalSubtitleTasbihSubhanallah => 'তাসবীহ — সুবহানাল্লাহ';
 
   @override
-  String get goalSubtitleTasbihAlhamdulillah => 'তাসবীহ — আলহামদুলিল্লাহ';
-
-  @override
-  String get goalSubtitleNamesOfAllah => 'আল্লাহর নাম';
-
-  @override
   String get goalSubtitleDailyCentury => 'দৈনিক ১০০ লক্ষ্য';
 
   @override
@@ -462,9 +456,6 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get setupGoalDescSubhanallah => 'সুবহানাল্লাহ তাসবীহ';
-
-  @override
-  String get setupGoalDescAlhamdulillah => 'আলহামদুলিল্লাহ তাসবীহ';
 
   @override
   String get setupGoalDescCenturyGoal => '১০০ লক্ষ্য';

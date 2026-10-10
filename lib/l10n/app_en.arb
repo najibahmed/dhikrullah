@@ -29,8 +29,6 @@
   "setGoalButton": "Set Goal: {label}",
   "@setGoalButton": {"placeholders": {"label": {}}},
   "goalSubtitleTasbihSubhanallah": "Tasbih — SubhanAllah",
-  "goalSubtitleTasbihAlhamdulillah": "Tasbih — Alhamdulillah",
-  "goalSubtitleNamesOfAllah": "Names of Allah",
   "goalSubtitleDailyCentury": "Daily century goal",
   "goalSubtitleNoLimit": "No limit — count freely",
 
@@ -166,7 +164,6 @@
   "sessionGoalSheetSubtitle": "Applies to all dhikir in this session",
 
   "setupGoalDescSubhanallah": "SubhanAllah tasbih",
-  "setupGoalDescAlhamdulillah": "Alhamdulillah tasbih",
   "setupGoalDescCenturyGoal": "Century goal",
   "setupGoalDescNoLimit": "No limit",
   "setupSheetTitle": "Setup Session",

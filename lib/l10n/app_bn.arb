@@ -24,8 +24,6 @@
   "setUnlimitedButton": "সীমাহীন নির্ধারণ করুন",
   "setGoalButton": "লক্ষ্য নির্ধারণ করুন: {label}",
   "goalSubtitleTasbihSubhanallah": "তাসবীহ — সুবহানাল্লাহ",
-  "goalSubtitleTasbihAlhamdulillah": "তাসবীহ — আলহামদুলিল্লাহ",
-  "goalSubtitleNamesOfAllah": "আল্লাহর নাম",
   "goalSubtitleDailyCentury": "দৈনিক ১০০ লক্ষ্য",
   "goalSubtitleNoLimit": "কোনো সীমা নেই — স্বাধীনভাবে গণনা করুন",
 
@@ -145,7 +143,6 @@
   "sessionGoalSheetSubtitle": "এই সেশনের সব যিকিরে প্রযোজ্য",
 
   "setupGoalDescSubhanallah": "সুবহানাল্লাহ তাসবীহ",
-  "setupGoalDescAlhamdulillah": "আলহামদুলিল্লাহ তাসবীহ",
   "setupGoalDescCenturyGoal": "১০০ লক্ষ্য",
   "setupGoalDescNoLimit": "কোনো সীমা নেই",
   "setupSheetTitle": "সেশন সেটআপ করুন",

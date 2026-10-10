@@ -236,18 +236,6 @@ abstract class AppLocalizations {
   /// **'Tasbih — SubhanAllah'**
   String get goalSubtitleTasbihSubhanallah;
 
-  /// No description provided for @goalSubtitleTasbihAlhamdulillah.
-  ///
-  /// In en, this message translates to:
-  /// **'Tasbih — Alhamdulillah'**
-  String get goalSubtitleTasbihAlhamdulillah;
-
-  /// No description provided for @goalSubtitleNamesOfAllah.
-  ///
-  /// In en, this message translates to:
-  /// **'Names of Allah'**
-  String get goalSubtitleNamesOfAllah;
-
   /// No description provided for @goalSubtitleDailyCentury.
   ///
   /// In en, this message translates to:
@@ -901,12 +889,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'SubhanAllah tasbih'**
   String get setupGoalDescSubhanallah;
-
-  /// No description provided for @setupGoalDescAlhamdulillah.
-  ///
-  /// In en, this message translates to:
-  /// **'Alhamdulillah tasbih'**
-  String get setupGoalDescAlhamdulillah;
 
   /// No description provided for @setupGoalDescCenturyGoal.
   ///

@@ -16,7 +16,7 @@ class DhikirDetailProvider extends ChangeNotifier {
   final DhikirItem dhikir;
   final DateTime today;
 
-  static const List<int> goalOptions = [33, 34, 99, 100, -1];
+  static const List<int> goalOptions = [33, 100, -1];
 
   DhikirDetailProvider(this.dhikir) : today = DateTime.now() {
     _progress = HiveService.getProgress(dhikir.id);
