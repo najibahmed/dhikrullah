@@ -302,17 +302,101 @@ abstract class AppLocalizations {
   /// **'Developer'**
   String get aboutDeveloper;
 
-  /// No description provided for @aboutDeveloperNamePlaceholder.
+  /// No description provided for @aboutDeveloperName.
   ///
   /// In en, this message translates to:
   /// **'Najib Ahmed'**
-  String get aboutDeveloperNamePlaceholder;
+  String get aboutDeveloperName;
 
-  /// No description provided for @aboutContactPlaceholder.
+  /// No description provided for @aboutDeveloperTitle.
   ///
   /// In en, this message translates to:
-  /// **'najibahmed50@gmail.com'**
-  String get aboutContactPlaceholder;
+  /// **'About the Developer'**
+  String get aboutDeveloperTitle;
+
+  /// No description provided for @aboutDeveloperRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Flutter Developer · Bitbirds'**
+  String get aboutDeveloperRole;
+
+  /// No description provided for @aboutDeveloperBio.
+  ///
+  /// In en, this message translates to:
+  /// **'I build simple, ad-free tools to help Muslims stay consistent in their daily worship. Your feedback and duas are always welcome.'**
+  String get aboutDeveloperBio;
+
+  /// No description provided for @aboutDeveloperEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get aboutDeveloperEmail;
+
+  /// No description provided for @aboutDeveloperWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get aboutDeveloperWebsite;
+
+  /// No description provided for @supportSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Support & Info'**
+  String get supportSectionTitle;
+
+  /// No description provided for @rateUsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Us'**
+  String get rateUsTitle;
+
+  /// No description provided for @rateUsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate the app on Play Store'**
+  String get rateUsSubtitle;
+
+  /// No description provided for @shareAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share App'**
+  String get shareAppTitle;
+
+  /// No description provided for @shareAppSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share with family and friends'**
+  String get shareAppSubtitle;
+
+  /// No description provided for @shareAppMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Simply Muslim — daily dhikir, prayer times & more: {url}'**
+  String shareAppMessage(Object url);
+
+  /// No description provided for @feedbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback / Chat'**
+  String get feedbackTitle;
+
+  /// No description provided for @feedbackSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat with us on WhatsApp'**
+  String get feedbackSubtitle;
+
+  /// No description provided for @privacyPolicyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicyTitle;
+
+  /// No description provided for @linkOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the link.'**
+  String get linkOpenFailed;
 
   /// No description provided for @aboutSadaqahMessage.
   ///

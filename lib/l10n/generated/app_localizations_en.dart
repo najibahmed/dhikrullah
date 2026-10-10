@@ -124,10 +124,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutDeveloper => 'Developer';
 
   @override
-  String get aboutDeveloperNamePlaceholder => 'Najib Ahmed';
+  String get aboutDeveloperName => 'Najib Ahmed';
 
   @override
-  String get aboutContactPlaceholder => 'najibahmed50@gmail.com';
+  String get aboutDeveloperTitle => 'About the Developer';
+
+  @override
+  String get aboutDeveloperRole => 'Flutter Developer · Bitbirds';
+
+  @override
+  String get aboutDeveloperBio =>
+      'I build simple, ad-free tools to help Muslims stay consistent in their daily worship. Your feedback and duas are always welcome.';
+
+  @override
+  String get aboutDeveloperEmail => 'Email';
+
+  @override
+  String get aboutDeveloperWebsite => 'Website';
+
+  @override
+  String get supportSectionTitle => 'Support & Info';
+
+  @override
+  String get rateUsTitle => 'Rate Us';
+
+  @override
+  String get rateUsSubtitle => 'Rate the app on Play Store';
+
+  @override
+  String get shareAppTitle => 'Share App';
+
+  @override
+  String get shareAppSubtitle => 'Share with family and friends';
+
+  @override
+  String shareAppMessage(Object url) {
+    return 'Try Simply Muslim — daily dhikir, prayer times & more: $url';
+  }
+
+  @override
+  String get feedbackTitle => 'Feedback / Chat';
+
+  @override
+  String get feedbackSubtitle => 'Chat with us on WhatsApp';
+
+  @override
+  String get privacyPolicyTitle => 'Privacy Policy';
+
+  @override
+  String get linkOpenFailed => 'Couldn\'t open the link.';
 
   @override
   String get aboutSadaqahMessage =>

@@ -21,6 +21,7 @@ import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart'
 import 'package:dhikir_app/features/prayer_time/screens/prayer_time_screen.dart';
 import 'package:dhikir_app/features/prayer_time/screens/prayer_time_settings_screen.dart';
 import 'package:dhikir_app/features/prayer_time/screens/hijri_settings_screen.dart';
+import 'package:dhikir_app/features/about/screens/about_developer_screen.dart';
 import 'package:dhikir_app/features/about/screens/about_screen.dart';
 import 'package:dhikir_app/features/qibla/screens/qibla_screen.dart';
 import 'package:dhikir_app/features/allah_names/screens/allah_names_screen.dart';
@@ -151,6 +152,12 @@ class AppRoutes {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const AboutScreen(),
+        );
+
+      case RouteNames.aboutDeveloper:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const AboutDeveloperScreen(),
         );
 
       case RouteNames.qibla:

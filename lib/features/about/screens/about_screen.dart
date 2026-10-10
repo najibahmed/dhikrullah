@@ -2,8 +2,8 @@
 //
 // Static app-info page. Version is hardcoded to match pubspec.yaml's
 // `version:` field rather than pulling in package_info_plus for one
-// static string. Developer fields are placeholders — fill in before
-// shipping.
+// static string. Support tiles (rate, share, developer, feedback, privacy)
+// launch via support_actions.dart.
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +11,8 @@ import 'package:provider/provider.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/providers/locale_provider.dart';
 import 'package:dhikir_app/core/providers/theme_provider.dart';
+import 'package:dhikir_app/core/routing/route_names.dart';
+import 'package:dhikir_app/features/about/support_actions.dart';
 import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
 const _appVersion = '1.0.0';
@@ -30,7 +32,7 @@ class AboutScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          Text(l10n.aboutAppName, style: theme.textTheme.headlineSmall),
+          Text("Simply Muslim", style: theme.textTheme.headlineSmall),
           const SizedBox(height: 4),
           Text(l10n.aboutVersion(_appVersion), style: theme.textTheme.bodySmall),
           const SizedBox(height: 16),
@@ -40,8 +42,7 @@ class AboutScreen extends StatelessWidget {
             children: [
               Icon(Icons.language, size: 20, color: theme.colorScheme.onSurface),
               const SizedBox(width: 8),
-              Text(l10n.settingsLanguage,
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+              Text(l10n.settingsLanguage, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 8),
@@ -51,13 +52,12 @@ class AboutScreen extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showLanguageDialog(context),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 8),
           Row(
             children: [
               Icon(Icons.dark_mode_outlined, size: 20, color: theme.colorScheme.onSurface),
               const SizedBox(width: 8),
-              Text(l10n.themeSettingsRowLabel,
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+              Text(l10n.themeSettingsRowLabel, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 8),
@@ -68,12 +68,42 @@ class AboutScreen extends StatelessWidget {
             onTap: () => _showThemeDialog(context),
           ),
           const SizedBox(height: 32),
-          Text(l10n.aboutDeveloper,
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+          Row(
+            children: [
+              Icon(Icons.support_outlined, size: 20, color: theme.colorScheme.onSurface),
+              const SizedBox(width: 8),
+              Text(l10n.supportSectionTitle, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            ],
+          ),
           const SizedBox(height: 8),
-          Text(l10n.aboutDeveloperNamePlaceholder, style: theme.textTheme.bodyMedium),
-          const SizedBox(height: 4),
-          Text(l10n.aboutContactPlaceholder, style: theme.textTheme.bodyMedium),
+          _supportTile(
+            icon: Icons.star_rate_outlined,
+            title: l10n.rateUsTitle,
+            subtitle: l10n.rateUsSubtitle,
+            onTap: () => rateApp(context),
+          ),
+          _supportTile(
+            icon: Icons.share_outlined,
+            title: l10n.shareAppTitle,
+            subtitle: l10n.shareAppSubtitle,
+            onTap: () => shareApp(context),
+          ),
+          _supportTile(
+            icon: Icons.person_outline,
+            title: l10n.aboutDeveloperTitle,
+            onTap: () => Navigator.pushNamed(context, RouteNames.aboutDeveloper),
+          ),
+          _supportTile(
+            icon: Icons.chat_outlined,
+            title: l10n.feedbackTitle,
+            subtitle: l10n.feedbackSubtitle,
+            onTap: () => openFeedbackChat(context),
+          ),
+          _supportTile(
+            icon: Icons.privacy_tip_outlined,
+            title: l10n.privacyPolicyTitle,
+            onTap: () => openPrivacyPolicy(context),
+          ),
           const SizedBox(height: 40),
           Text(
             l10n.aboutSadaqahMessage,
@@ -85,6 +115,22 @@ class AboutScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _supportTile({
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon),
+      title: Text(title),
+      subtitle: subtitle == null ? null : Text(subtitle),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTap,
     );
   }
 

@@ -124,10 +124,55 @@ class AppLocalizationsBn extends AppLocalizations {
   String get aboutDeveloper => 'ডেভেলপার';
 
   @override
-  String get aboutDeveloperNamePlaceholder => 'নাজিব আহমেদ';
+  String get aboutDeveloperName => 'নাজিব আহমেদ';
 
   @override
-  String get aboutContactPlaceholder => 'najibahmed50@gmail.com';
+  String get aboutDeveloperTitle => 'ডেভেলপার সম্পর্কে';
+
+  @override
+  String get aboutDeveloperRole => 'ফ্লাটার ডেভেলপার · Bitbirds';
+
+  @override
+  String get aboutDeveloperBio =>
+      'মুসলিমদের দৈনিক ইবাদতে ধারাবাহিক থাকতে সাহায্য করার জন্য আমি সহজ, বিজ্ঞাপনমুক্ত অ্যাপ তৈরি করি। আপনার মতামত ও দোয়া সবসময় কাম্য।';
+
+  @override
+  String get aboutDeveloperEmail => 'ইমেইল';
+
+  @override
+  String get aboutDeveloperWebsite => 'ওয়েবসাইট';
+
+  @override
+  String get supportSectionTitle => 'সহায়তা ও তথ্য';
+
+  @override
+  String get rateUsTitle => 'রেটিং দিন';
+
+  @override
+  String get rateUsSubtitle => 'প্লে স্টোরে অ্যাপটি রেট করুন';
+
+  @override
+  String get shareAppTitle => 'অ্যাপ শেয়ার করুন';
+
+  @override
+  String get shareAppSubtitle => 'পরিবার ও বন্ধুদের সাথে শেয়ার করুন';
+
+  @override
+  String shareAppMessage(Object url) {
+    return 'Simply Muslim ব্যবহার করে দেখুন — দৈনিক যিকির, নামাজের সময় ও আরও অনেক কিছু: $url';
+  }
+
+  @override
+  String get feedbackTitle => 'মতামত / চ্যাট';
+
+  @override
+  String get feedbackSubtitle => 'হোয়াটসঅ্যাপে আমাদের সাথে চ্যাট করুন';
+
+  @override
+  String get privacyPolicyTitle => 'গোপনীয়তা নীতি';
+
+  @override
+  String get linkOpenFailed => 'লিংকটি খোলা যায়নি।';
 
   @override
   String get aboutSadaqahMessage =>

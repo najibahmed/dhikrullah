@@ -19,6 +19,7 @@ class RouteNames {
   static const String prayerTimeSettings = '/prayer-time-settings';
   static const String hijriSettings = '/hijri-settings';
   static const String about = '/about';
+  static const String aboutDeveloper = '/about-developer';
   static const String qibla = '/qibla';
   static const String allahNames = '/allah-names';
   static const String dua = '/dua';
