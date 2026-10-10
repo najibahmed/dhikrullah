@@ -69,6 +69,7 @@
   "qiblaTurnLeft": "বামে ঘুরুন",
   "qiblaTurnRight": "ডানে ঘুরুন",
   "qiblaHeadingLabel": "দিক",
+  "qiblaInstruction": "কাবা শরীফের দিকে মুখ করতে তীর দুটি মুখোমুখি করুন",
   "qiblaBearingLabel": "কিবলা",
   "qiblaNoSensor": "এই ডিভাইসে কম্পাস সেন্সর নেই।",
 

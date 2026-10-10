@@ -76,6 +76,7 @@
   "qiblaTurnLeft": "Turn left",
   "qiblaTurnRight": "Turn right",
   "qiblaHeadingLabel": "Heading",
+  "qiblaInstruction": "Align the two arrows to face towards the Kaaba Sharif.",
   "qiblaBearingLabel": "Qibla",
   "qiblaNoSensor": "Compass sensor is not available on this device.",
 

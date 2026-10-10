@@ -224,6 +224,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qiblaHeadingLabel => 'Heading';
 
   @override
+  String get qiblaInstruction =>
+      'Align the two arrows to face towards the Kaaba Sharif.';
+
+  @override
   String get qiblaBearingLabel => 'Qibla';
 
   @override

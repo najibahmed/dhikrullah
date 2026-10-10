@@ -224,6 +224,10 @@ class AppLocalizationsBn extends AppLocalizations {
   String get qiblaHeadingLabel => 'দিক';
 
   @override
+  String get qiblaInstruction =>
+      'কাবা শরীফের দিকে মুখ করতে তীর দুটি মুখোমুখি করুন';
+
+  @override
   String get qiblaBearingLabel => 'কিবলা';
 
   @override

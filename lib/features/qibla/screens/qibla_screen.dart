@@ -78,18 +78,39 @@ class _QiblaScreenState extends State<QiblaScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.qiblaTitle)),
-      body: switch (_state) {
-        _LocationState.loading => const Center(child: CircularProgressIndicator()),
-        _LocationState.denied => _DeniedView(onRetry: _resolveLocation),
-        _LocationState.ready => _buildCompass(context),
-      },
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: Text(l10n.qiblaTitle),
+        // backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset('assets/images/page_bg.png', fit: BoxFit.cover),
+          // The artwork is light; dim it in dark mode so text stays readable.
+          if (isDark) ColoredBox(color: Colors.black.withValues(alpha: 0.55)),
+          SafeArea(
+            child: switch (_state) {
+              _LocationState.loading => const Center(child: CircularProgressIndicator()),
+              _LocationState.denied => _DeniedView(onRetry: _resolveLocation),
+              _LocationState.ready => _buildCompass(context),
+            },
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildCompass(BuildContext context) {
+    double normalizeHeading(double heading) {
+      return (heading % 360 + 360) % 360;
+    }
+
     final stream = FlutterCompass.events;
     if (stream == null) return const _NoSensorView();
 
@@ -101,7 +122,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
           return snapshot.hasData ? const _NoSensorView() : const Center(child: CircularProgressIndicator());
         }
         return _CompassView(
-          heading: heading,
+          heading: normalizeHeading(heading),
           bearing: _bearing!,
           dialTurns: _turnsFor(heading),
         );
@@ -133,8 +154,18 @@ class _CompassView extends StatelessWidget {
 
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          const SizedBox(height: 32),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              l10n.qiblaInstruction,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 32),
           Text(
             statusText,
             style: theme.textTheme.titleLarge?.copyWith(
@@ -164,6 +195,7 @@ class _CompassView extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 32),
         ],
       ),
     );
@@ -195,14 +227,32 @@ class _Dial extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          for (final (angle, label) in [(0, 'N'), (90, 'E'), (180, 'S'), (270, 'W')])
+          // for (final (angle, label) in [(0, 'N'), (90, 'E'), (180, 'S'), (270, 'W')])
+          //   Transform.rotate(
+          //     angle: angle * math.pi / 180,
+          //     child: Align(
+          //       alignment: Alignment.topCenter,
+          //       child: Padding(
+          //         padding: const EdgeInsets.only(top: 12),
+          //         child: Text(label, style: labelStyle),
+          //       ),
+          //     ),
+          //   ),
+          // Cardinal directions
+          _label('N', top: 14),
+          _label('S', bottom: 14),
+          _label('E', right: 18),
+          _label('W', left: 18),
+          for (int i = 0; i < 36; i++)
             Transform.rotate(
-              angle: angle * math.pi / 180,
+              angle: i * math.pi / 12,
               child: Align(
                 alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: Text(label, style: labelStyle),
+                child: Container(
+                  margin: const EdgeInsets.only(top: 4),
+                  width: i % 3 == 0 ? 3 : 1,
+                  height: i % 3 == 0 ? 12 : 6,
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
             ),
@@ -229,6 +279,29 @@ class _Dial extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _label(
+  String text, {
+  double? top,
+  double? bottom,
+  double? left,
+  double? right,
+}) {
+  return Positioned(
+    top: top,
+    bottom: bottom,
+    left: left,
+    right: right,
+    child: Text(
+      text,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: text == 'N' ? Colors.red : Colors.grey,
+      ),
+    ),
+  );
 }
 
 class _InfoTile extends StatelessWidget {

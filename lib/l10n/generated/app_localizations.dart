@@ -494,6 +494,12 @@ abstract class AppLocalizations {
   /// **'Heading'**
   String get qiblaHeadingLabel;
 
+  /// No description provided for @qiblaInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Align the two arrows to face towards the Kaaba Sharif.'**
+  String get qiblaInstruction;
+
   /// No description provided for @qiblaBearingLabel.
   ///
   /// In en, this message translates to:
