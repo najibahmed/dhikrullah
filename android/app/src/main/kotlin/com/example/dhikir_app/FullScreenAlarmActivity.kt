@@ -1,7 +1,6 @@
 package com.bitbirds.simplymuslim
 
 import android.app.Activity
-import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -55,18 +54,18 @@ class FullScreenAlarmActivity : Activity() {
         super.onPause()
     }
 
+    /** Draws over the lock screen without dismissing the keyguard, so Stop
+     * works while locked (no PIN prompt) and the phone stays locked after. */
     private fun showOverLockScreen() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
-            getSystemService(KeyguardManager::class.java)?.requestDismissKeyguard(this, null)
         } else {
             @Suppress("DEPRECATION")
             window.addFlags(
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
             )
         }
     }
