@@ -1,7 +1,8 @@
 // lib/features/dua/screens/dua_screen.dart
 //
 // Dua category list — landing page for the Dua feature. Loads
-// all_dua_en.json/all_dua_bn.json (picked per app locale by DuaService)
+// all_dua_en.json/all_dua_bn.json (app locale by default, switchable via
+// the AppBar language toggle)
 // and shows one tile per category; tapping a category pushes DuaListScreen
 // with that category's duas. No "All duas" bypass, no filter/bottom sheet —
 // the user always picks a category first.
@@ -25,7 +26,27 @@ class DuaScreen extends StatefulWidget {
 
 class _DuaScreenState extends State<DuaScreen> {
   final _service = const DuaService();
-  late final Future<DuaData> _future = _service.load(context);
+
+  // Screen-local content language; starts from the app locale each visit
+  // and is toggled from the AppBar without changing the app's language.
+  String? _languageCode;
+  Future<DuaData>? _future;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_languageCode == null) {
+      _languageCode = Localizations.localeOf(context).languageCode == 'bn' ? 'bn' : 'en';
+      _future = _service.load(_languageCode!);
+    }
+  }
+
+  void _toggleLanguage() {
+    setState(() {
+      _languageCode = _languageCode == 'bn' ? 'en' : 'bn';
+      _future = _service.load(_languageCode!);
+    });
+  }
 
   void _openCategory(DuaData data, DuaCategory category) {
     final duas = data.duas.where((d) => d.category == category.id).toList();
@@ -49,6 +70,12 @@ class _DuaScreenState extends State<DuaScreen> {
             color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
+        actions: [
+          TextButton(
+            onPressed: _toggleLanguage,
+            child: Text(_languageCode == 'bn' ? l10n.settingsLanguageEnglish : l10n.settingsLanguageBangla),
+          ),
+        ],
       ),
       body: FutureBuilder<DuaData>(
         future: _future,

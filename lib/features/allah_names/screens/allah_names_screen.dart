@@ -32,9 +32,29 @@ class AllahNamesScreen extends StatefulWidget {
 
 class _AllahNamesScreenState extends State<AllahNamesScreen> {
   final _service = const AllahNamesService();
-  late final Future<AllahNamesData> _future = _service.load(context);
   late final FontSizeProvider _fontSizeProvider =
       FontSizeProvider(_allahNamesFontSizeConfig)..hydrate();
+
+  // Screen-local content language; starts from the app locale each visit
+  // and is toggled from the AppBar without changing the app's language.
+  String? _languageCode;
+  Future<AllahNamesData>? _future;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_languageCode == null) {
+      _languageCode = Localizations.localeOf(context).languageCode == 'bn' ? 'bn' : 'en';
+      _future = _service.load(_languageCode!);
+    }
+  }
+
+  void _toggleLanguage() {
+    setState(() {
+      _languageCode = _languageCode == 'bn' ? 'en' : 'bn';
+      _future = _service.load(_languageCode!);
+    });
+  }
 
   @override
   void dispose() {
@@ -57,6 +77,12 @@ class _AllahNamesScreenState extends State<AllahNamesScreen> {
             ),
           ),
           actions: [
+            TextButton(
+              onPressed: _toggleLanguage,
+              child: Text(
+                _languageCode == 'bn' ? context.l10n.settingsLanguageEnglish : context.l10n.settingsLanguageBangla,
+              ),
+            ),
             Builder(
               builder: (context) => IconButton(
                 icon: const Icon(Icons.tune_rounded),
