@@ -21,6 +21,7 @@ import 'package:dhikir_app/features/alarm/services/alarm_scheduler.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_service.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_settings_repository.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/features/prayer_time/services/location_service.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_time_card.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_schedule_cards.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/forbidden_times_card.dart';
@@ -94,18 +95,25 @@ class _HomeWidgetState extends State<HomeWidget> {
             ),
             child: Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Text(
-                    l10n.homeGreeting,
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).colorScheme.onSurface,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.homeGreeting,
+                          style: GoogleFonts.playfairDisplay(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        const _PlaceLabel(),
+                      ],
                     ),
                   ),
                 ),
-                const Spacer(),
                 IconButton(
                   tooltip: l10n.settingsTooltip,
                   icon: Icon(Icons.settings_outlined, color: Theme.of(context).colorScheme.onSurface),
@@ -435,6 +443,64 @@ class _QuickActionTile extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Place label ──────────────────────────────────────────────────────────────
+
+/// "Area, City" under the greeting, reverse-geocoded from the prayer-time
+/// coordinates. Re-fetches only when the coordinates or app language change.
+class _PlaceLabel extends StatefulWidget {
+  const _PlaceLabel();
+
+  @override
+  State<_PlaceLabel> createState() => _PlaceLabelState();
+}
+
+class _PlaceLabelState extends State<_PlaceLabel> {
+  String? _placeName;
+  String? _lookupKey;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final coords = context.watch<PrayerTimeProvider>().coordinates;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    if (coords == null) return;
+
+    final key = '${coords.latitude},${coords.longitude},$languageCode';
+    if (key == _lookupKey) return;
+    _lookupKey = key;
+
+    LocationService.getPlaceName(coords.latitude, coords.longitude, languageCode).then((name) {
+      if (mounted && key == _lookupKey) setState(() => _placeName = name);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final name = _placeName;
+    if (name == null) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.onSurfaceVariant;
+    return Padding(
+      padding: const EdgeInsets.only(top: 2),
+      child: Row(
+        children: [
+          Icon(Icons.location_on_outlined, size: 16, color: color),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(color: color),
             ),
           ),
         ],

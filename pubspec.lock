@@ -177,6 +177,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  cross_file:
+    dependency: transitive
+    description:
+      name: cross_file
+      sha256: f141ea4f277af142a0356955707f6556f37b03947d39d55585981a06ca437bd6
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.5+5"
   crypto:
     dependency: transitive
     description:
@@ -357,6 +365,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.1"
+  geocoding:
+    dependency: "direct main"
+    description:
+      name: geocoding
+      sha256: "40f845e0a5505d4b47da991057f2ab25cd1c68bc4570255c7d4cfbb03a952063"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0"
+  geocoding_android:
+    dependency: transitive
+    description:
+      name: geocoding_android
+      sha256: c4f49a08f1761a3d078f35969b20f50445ff023b861c00316ac01554f0786942
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.2"
+  geocoding_darwin:
+    dependency: transitive
+    description:
+      name: geocoding_darwin
+      sha256: "97552aa24f1453defc17e4d8e40b13ddf097e669c2edfa17ed86349cacdbc1ae"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
+  geocoding_platform_interface:
+    dependency: transitive
+    description:
+      name: geocoding_platform_interface
+      sha256: "5164b8871705af7573698b3aa0746337faf818d72b488988741bcc7aeedd2f6e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0"
   geolocator:
     dependency: "direct main"
     description:
@@ -781,6 +821,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
+  share_plus:
+    dependency: "direct main"
+    description:
+      name: share_plus
+      sha256: db40767f130189d53f3ae8a6393c217ff4a492da1baff718a9873679c0c00224
+      url: "https://pub.dev"
+    source: hosted
+    version: "13.3.1"
+  share_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: share_plus_platform_interface
+      sha256: "365ef7379fc22507256adda3385152942ffce08935452bc972c2e52a0bebae41"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.2.0"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -963,7 +1019,7 @@ packages:
     source: hosted
     version: "13.6.0"
   url_launcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: url_launcher
       sha256: f6a7e5c4835bb4e3026a04793a4199ca2d14c739ec378fdfe23fc8075d0439f8

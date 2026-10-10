@@ -5,11 +5,14 @@
 // show instantly on relaunch while a fresh GPS fix is acquired.
 
 import 'package:adhan_dart/adhan_dart.dart';
+import 'package:flutter/widgets.dart' show Locale;
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _kLastLatKey = 'prayer_last_lat';
 const _kLastLngKey = 'prayer_last_lng';
+const _kLastPlaceKey = 'prayer_last_place';
 
 class LocationService {
   LocationService._();
@@ -57,6 +60,34 @@ class LocationService {
     final lng = prefs.getDouble(_kLastLngKey);
     if (lat == null || lng == null) return null;
     return Coordinates(lat, lng);
+  }
+
+  /// Reverse-geocodes [lat]/[lng] to "Area, City" in the app language.
+  /// Falls back to the last cached name when offline or the lookup fails.
+  static Future<String?> getPlaceName(double lat, double lng, String languageCode) async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      // Language-only locale: geocoding_android passes Locale.toString()
+      // ("en_US") to Java's Locale.forLanguageTag, which rejects the
+      // underscore and silently falls back to local-language results.
+      final locale = Locale(languageCode == 'bn' ? 'bn' : 'en');
+      final marks = await Geocoding().placemarkFromCoordinates(lat, lng, locale: locale);
+      if (marks.isNotEmpty) {
+        final p = marks.first;
+        final city = (p.locality ?? '').isNotEmpty ? p.locality : p.subAdministrativeArea;
+        // Set dedupes when the area and city names are the same.
+        final parts = <String>{
+          if ((p.subLocality ?? '').isNotEmpty) p.subLocality!,
+          if ((city ?? '').isNotEmpty) city!,
+        };
+        if (parts.isNotEmpty) {
+          final name = parts.join(', ');
+          await prefs.setString(_kLastPlaceKey, name);
+          return name;
+        }
+      }
+    } catch (_) {}
+    return prefs.getString(_kLastPlaceKey);
   }
 
   static Future<void> _cacheCoordinates(double lat, double lng) async {
