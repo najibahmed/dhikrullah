@@ -241,9 +241,10 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
     final isUnlimited = provider.isUnlimited;
     final isGoalMet = provider.isGoalMet;
     final total = dhikirList.length;
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A202C),
+      backgroundColor: cs.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -257,15 +258,15 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
                     onTap: () => Navigator.pop(context),
                     child: Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-                      child: const Icon(Icons.close_rounded, color: Colors.white, size: 18),
+                      decoration: BoxDecoration(color: cs.onSurface.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                      child: Icon(Icons.close_rounded, color: cs.onSurface, size: 18),
                     ),
                   ),
                   Column(
                     children: [
                       Text(
                         l10n.counterProgressLabel(currentIndex + 1, total),
-                        style: GoogleFonts.inter(fontSize: 12, color: Colors.white54),
+                        style: GoogleFonts.inter(fontSize: 12, color: cs.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -279,11 +280,11 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
                           border: Border.all(color: dhikir.color.withValues(alpha: 0.6), width: 1)),
                       child: Row(
                         children: [
-                          const Icon(Icons.flag_rounded, size: 12, color: Colors.white),
+                          Icon(Icons.flag_rounded, size: 12, color: cs.onSurface),
                           const SizedBox(width: 4),
                           Text(
                             isUnlimited ? '∞' : '$goal',
-                            style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
+                            style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: cs.onSurface),
                           ),
                         ],
                       ),
@@ -315,8 +316,8 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
                           color: done
                               ? d.color
                               : isCurrent
-                                  ? Colors.white
-                                  : Colors.white24,
+                                  ? cs.onSurface
+                                  : cs.onSurface.withValues(alpha: 0.24),
                         ),
                         child: done && !isCurrent ? const Icon(Icons.check_rounded, size: 6, color: Colors.white) : null,
                       ),
@@ -324,7 +325,83 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
                   }),
                 ),
               ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+              child: Row(
+                children: [
+                  // Previous
+                  GestureDetector(
+                    onTap: currentIndex > 0 ? () => _navigateTo(currentIndex - 1) : null,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: currentIndex > 0 ? cs.onSurface.withValues(alpha: 0.12) : cs.onSurface.withValues(alpha: 0.04),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: currentIndex > 0 ? cs.onSurface.withValues(alpha: 0.24) : cs.onSurface.withValues(alpha: 0.06), width: 1),
+                      ),
+                      child: Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        size: 18,
+                        color: currentIndex > 0 ? cs.onSurface : cs.onSurface.withValues(alpha: 0.24),
+                      ),
+                    ),
+                  ),
 
+                  const SizedBox(width: 10),
+
+                  // Center: reset + info
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: _resetCurrent,
+                      child: Container(
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: cs.onSurface.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: cs.onSurface.withValues(alpha: 0.12), width: 1),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.refresh_rounded, size: 16, color: cs.onSurfaceVariant),
+                            const SizedBox(width: 6),
+                            Text(
+                              l10n.counterResetHint(count),
+                              style: GoogleFonts.inter(fontSize: 12, color: cs.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  // Next
+                  GestureDetector(
+                    onTap: currentIndex < total - 1 ? () => _navigateTo(currentIndex + 1) : null,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.3) : cs.onSurface.withValues(alpha: 0.04),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                            color: currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.6) : cs.onSurface.withValues(alpha: 0.06), width: 1),
+                      ),
+                      child: Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 18,
+                        color: currentIndex < total - 1 ? cs.onSurface : cs.onSurface.withValues(alpha: 0.24),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             // ── PageView with dhikir cards ─────────────────────────────
             Expanded(
               child: PageView.builder(
@@ -356,83 +433,83 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
             ),
 
             // ── Bottom nav bar ─────────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-              child: Row(
-                children: [
-                  // Previous
-                  GestureDetector(
-                    onTap: currentIndex > 0 ? () => _navigateTo(currentIndex - 1) : null,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 52,
-                      height: 52,
-                      decoration: BoxDecoration(
-                        color: currentIndex > 0 ? Colors.white.withValues(alpha: 0.12) : Colors.white.withValues(alpha: 0.04),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: currentIndex > 0 ? Colors.white24 : Colors.white.withValues(alpha: 0.06), width: 1),
-                      ),
-                      child: Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        size: 18,
-                        color: currentIndex > 0 ? Colors.white : Colors.white24,
-                      ),
-                    ),
-                  ),
+            // Container(
+            //   padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+            //   child: Row(
+            //     children: [
+            //       // Previous
+            //       GestureDetector(
+            //         onTap: currentIndex > 0 ? () => _navigateTo(currentIndex - 1) : null,
+            //         child: AnimatedContainer(
+            //           duration: const Duration(milliseconds: 200),
+            //           width: 52,
+            //           height: 52,
+            //           decoration: BoxDecoration(
+            //             color: currentIndex > 0 ? Colors.white.withValues(alpha: 0.12) : Colors.white.withValues(alpha: 0.04),
+            //             borderRadius: BorderRadius.circular(16),
+            //             border: Border.all(color: currentIndex > 0 ? Colors.white24 : Colors.white.withValues(alpha: 0.06), width: 1),
+            //           ),
+            //           child: Icon(
+            //             Icons.arrow_back_ios_new_rounded,
+            //             size: 18,
+            //             color: currentIndex > 0 ? Colors.white : Colors.white24,
+            //           ),
+            //         ),
+            //       ),
 
-                  const SizedBox(width: 10),
+            //       const SizedBox(width: 10),
 
-                  // Center: reset + info
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: _resetCurrent,
-                      child: Container(
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white12, width: 1),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.refresh_rounded, size: 16, color: Colors.white.withValues(alpha: 0.6)),
-                            const SizedBox(width: 6),
-                            Text(
-                              l10n.counterResetHint(count),
-                              style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.6)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+            //       // Center: reset + info
+            //       Expanded(
+            //         child: GestureDetector(
+            //           onTap: _resetCurrent,
+            //           child: Container(
+            //             height: 52,
+            //             decoration: BoxDecoration(
+            //               color: Colors.white.withValues(alpha: 0.08),
+            //               borderRadius: BorderRadius.circular(16),
+            //               border: Border.all(color: Colors.white12, width: 1),
+            //             ),
+            //             child: Row(
+            //               mainAxisAlignment: MainAxisAlignment.center,
+            //               children: [
+            //                 Icon(Icons.refresh_rounded, size: 16, color: Colors.white.withValues(alpha: 0.6)),
+            //                 const SizedBox(width: 6),
+            //                 Text(
+            //                   l10n.counterResetHint(count),
+            //                   style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.6)),
+            //                 ),
+            //               ],
+            //             ),
+            //           ),
+            //         ),
+            //       ),
 
-                  const SizedBox(width: 10),
+            //       const SizedBox(width: 10),
 
-                  // Next
-                  GestureDetector(
-                    onTap: currentIndex < total - 1 ? () => _navigateTo(currentIndex + 1) : null,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 52,
-                      height: 52,
-                      decoration: BoxDecoration(
-                        color: currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.04),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                            color: currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.06), width: 1),
-                      ),
-                      child: Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        size: 18,
-                        color: currentIndex < total - 1 ? Colors.white : Colors.white24,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            //       // Next
+            //       GestureDetector(
+            //         onTap: currentIndex < total - 1 ? () => _navigateTo(currentIndex + 1) : null,
+            //         child: AnimatedContainer(
+            //           duration: const Duration(milliseconds: 200),
+            //           width: 52,
+            //           height: 52,
+            //           decoration: BoxDecoration(
+            //             color: currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.04),
+            //             borderRadius: BorderRadius.circular(16),
+            //             border: Border.all(
+            //                 color: currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.06), width: 1),
+            //           ),
+            //           child: Icon(
+            //             Icons.arrow_forward_ios_rounded,
+            //             size: 18,
+            //             color: currentIndex < total - 1 ? Colors.white : Colors.white24,
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -471,8 +548,10 @@ class _DhikirPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final localizedTitle = localizedDhikirTitle(context, dhikir.id) ?? dhikir.title;
-    final localizedTransliteration =
-        localizedDhikirTransliteration(context, dhikir.id) ?? dhikir.transliteration;
+    final localizedTransliteration = localizedDhikirTransliteration(context, dhikir.id) ?? dhikir.transliteration;
+    final cs = Theme.of(context).colorScheme;
+    final accent = adjustForBrightness(dhikir.color, Theme.of(context).brightness);
+    final onAccent = onColorFor(accent);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -485,9 +564,9 @@ class _DhikirPage extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: dhikir.color,
+              color: accent,
               borderRadius: BorderRadius.circular(24),
-              boxShadow: [BoxShadow(color: dhikir.color.withValues(alpha: 0.5), blurRadius: 20, offset: const Offset(0, 6))],
+              boxShadow: [BoxShadow(color: accent.withValues(alpha: 0.5), blurRadius: 20, offset: const Offset(0, 6))],
             ),
             child: Column(
               children: [
@@ -504,7 +583,7 @@ class _DhikirPage extends StatelessWidget {
                             style: GoogleFonts.playfairDisplay(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              color: const Color(0xFF2D3748),
+                              color: onAccent,
                             ),
                           ),
                           Text(
@@ -512,7 +591,7 @@ class _DhikirPage extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontStyle: FontStyle.italic,
-                              color: const Color(0xFF718096),
+                              color: onAccent.withValues(alpha: 0.7),
                             ),
                           ),
                         ],
@@ -521,10 +600,10 @@ class _DhikirPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2D3748),
+                        color: onAccent,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.check_rounded, size: 14, color: Colors.white),
+                      child: Icon(Icons.check_rounded, size: 14, color: accent),
                     ),
                   ],
                 ),
@@ -534,7 +613,7 @@ class _DhikirPage extends StatelessWidget {
                   style: GoogleFonts.amiri(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF2D3748),
+                    color: onAccent,
                     height: 1.6,
                   ),
                   textAlign: TextAlign.center,
@@ -547,8 +626,8 @@ class _DhikirPage extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 6,
-                    backgroundColor: Colors.white.withValues(alpha: 0.5),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4A5568)),
+                    backgroundColor: onAccent.withValues(alpha: 0.2),
+                    valueColor: AlwaysStoppedAnimation<Color>(onAccent),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -556,7 +635,7 @@ class _DhikirPage extends StatelessWidget {
                   isUnlimited ? l10n.counterCountedUnlimited(count) : '$count / $goal',
                   style: GoogleFonts.inter(
                     fontSize: 11,
-                    color: const Color(0xFF4A5568),
+                    color: onAccent,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -589,17 +668,17 @@ class _DhikirPage extends StatelessWidget {
                     key: const ValueKey('done'),
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     decoration: BoxDecoration(
-                      color: dhikir.color,
+                      color: accent,
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.auto_awesome_rounded, size: 14, color: Color(0xFF2D3748)),
+                        Icon(Icons.auto_awesome_rounded, size: 14, color: onAccent),
                         const SizedBox(width: 6),
                         Text(
                           l10n.counterGoalReachedBanner,
-                          style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF2D3748)),
+                          style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: onAccent),
                         ),
                       ],
                     ),
@@ -607,7 +686,7 @@ class _DhikirPage extends StatelessWidget {
                 : Text(
                     key: const ValueKey('remaining'),
                     isUnlimited ? l10n.tapNoLimit : l10n.remainingCount(goal - count),
-                    style: GoogleFonts.inter(fontSize: 13, color: Colors.white54),
+                    style: GoogleFonts.inter(fontSize: 13, color: cs.onSurfaceVariant),
                   ),
           ),
 
@@ -631,7 +710,7 @@ class _DhikirPage extends StatelessWidget {
                   height: reached ? 14 : 8,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: reached ? dhikir.color : Colors.white.withValues(alpha: 0.15),
+                    color: reached ? dhikir.color : cs.onSurface.withValues(alpha: 0.15),
                   ),
                   child: reached ? const Icon(Icons.check_rounded, size: 8, color: Colors.white) : null,
                 );
@@ -863,7 +942,8 @@ class _GoalSheetState extends State<_GoalSheet> {
                           border: Border.all(color: colorScheme.outlineVariant, width: 1.5),
                         ),
                         child: Center(
-                          child: Text(l10n.commonCancel, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant)),
+                          child: Text(l10n.commonCancel,
+                              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant)),
                         ),
                       ),
                     ),
@@ -881,9 +961,7 @@ class _GoalSheetState extends State<_GoalSheet> {
                         ),
                         child: Center(
                           child: Text(
-                            _selected == -1
-                                ? l10n.setUnlimitedButton
-                                : l10n.setGoalButton(_labels[_selected]!),
+                            _selected == -1 ? l10n.setUnlimitedButton : l10n.setGoalButton(_labels[_selected]!),
                             style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: colorScheme.onPrimary),
                           ),
                         ),
