@@ -49,6 +49,7 @@ class HijriSettingsScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     l10n.hijriInfoBanner,
+                    textAlign: TextAlign.justify,
                     style: theme.textTheme.bodyMedium?.copyWith(color: Colors.amber.shade900),
                   ),
                 ),

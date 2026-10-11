@@ -337,6 +337,7 @@ class _QuickActionsSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: _QuickActionTile(
@@ -382,6 +383,7 @@ class _QuickActionsSection extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _QuickActionTile(
               imagePath: 'assets/images/dua.png',
@@ -439,6 +441,8 @@ class _QuickActionTile extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -500,7 +504,9 @@ class _PlaceLabelState extends State<_PlaceLabel> {
               name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall?.copyWith(color: color),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: color,
+              ),
             ),
           ),
         ],
