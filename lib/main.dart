@@ -73,12 +73,17 @@ class DhikirApp extends StatelessWidget {
         final resolvedBrightness = themeProvider.themeMode == ThemeMode.system
             ? MediaQuery.platformBrightnessOf(context)
             : (themeProvider.themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light);
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: resolvedBrightness == Brightness.dark ? Brightness.light : Brightness.dark,
+        // Cap the OS font scale so large system font sizes don't break
+        // fixed layouts; shrinking still follows the phone setting.
+        return MediaQuery.withClampedTextScaling(
+          maxScaleFactor: 1.0,
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: resolvedBrightness == Brightness.dark ? Brightness.light : Brightness.dark,
+            ),
+            child: child!,
           ),
-          child: child!,
         );
       },
       home: const SplashScreen(),
