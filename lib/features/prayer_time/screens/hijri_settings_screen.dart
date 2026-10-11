@@ -49,51 +49,44 @@ class HijriSettingsScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     l10n.hijriInfoBanner,
-                    style: theme.textTheme.bodyMedium
-                        ?.copyWith(color: Colors.amber.shade900),
+                    style: theme.textTheme.bodyMedium?.copyWith(color: Colors.amber.shade900),
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 24),
-          Text(l10n.hijriAdjustmentSection,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w700)),
+          Text(l10n.hijriAdjustmentSection, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
             decoration: BoxDecoration(
-              border: Border.all(
-                  color: theme.dividerColor.withValues(alpha: 0.4)),
+              border: Border.all(color: theme.dividerColor.withValues(alpha: 0.4)),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               children: [
                 Text(
                   '${hijri.hDay} ${hijri.longMonthName} ${hijri.hYear}',
-                  style: theme.textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     OutlinedButton(
-                      onPressed: () =>
-                          provider.setHijriOffset(provider.hijriOffsetDays - 1),
+                      onPressed:
+                          provider.hijriOffsetDays <= -kMaxHijriOffsetDays ? null : () => provider.setHijriOffset(provider.hijriOffsetDays - 1),
                       style: OutlinedButton.styleFrom(
                         shape: const CircleBorder(),
                         padding: const EdgeInsets.all(12),
                         side: BorderSide(color: theme.colorScheme.secondary),
                       ),
-                      child: Icon(Icons.remove,
-                          color: theme.colorScheme.secondary),
+                      child: Icon(Icons.remove, color: theme.colorScheme.secondary),
                     ),
                     Text(offsetLabel, style: theme.textTheme.bodyMedium),
                     OutlinedButton(
-                      onPressed: () =>
-                          provider.setHijriOffset(provider.hijriOffsetDays + 1),
+                      onPressed: provider.hijriOffsetDays >= kMaxHijriOffsetDays ? null : () => provider.setHijriOffset(provider.hijriOffsetDays + 1),
                       style: OutlinedButton.styleFrom(
                         shape: const CircleBorder(),
                         padding: const EdgeInsets.all(12),
@@ -107,9 +100,7 @@ class HijriSettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          Text(l10n.hijriDayStartSection,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w700)),
+          Text(l10n.hijriDayStartSection, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           _dayStartOption(
             context,
@@ -145,14 +136,10 @@ class HijriSettingsScreen extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: selected
-              ? theme.colorScheme.secondary.withValues(alpha: 0.15)
-              : null,
+          color: selected ? theme.colorScheme.secondary.withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected
-                ? theme.colorScheme.secondary
-                : theme.dividerColor.withValues(alpha: 0.4),
+            color: selected ? theme.colorScheme.secondary : theme.dividerColor.withValues(alpha: 0.4),
             width: selected ? 1.5 : 1,
           ),
         ),

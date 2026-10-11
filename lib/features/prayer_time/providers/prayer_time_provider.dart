@@ -20,6 +20,9 @@ const _kSoundPrefixKey = 'prayer_sound_';
 const _kMadhabKey = 'prayer_madhab';
 const _kHijriDayStartKey = 'prayer_hijri_day_start';
 
+/// Manual Hijri date adjustment limit, in days, either direction.
+const kMaxHijriOffsetDays = 3;
+
 /// Max number of non-today dates kept in [PrayerTimeProvider._dateCache],
 /// evicted oldest-first once exceeded — bounds memory while keeping
 /// prev/next navigation around the selected date instant.
@@ -66,8 +69,7 @@ class PrayerTimeProvider extends ChangeNotifier {
 
   /// Per-prayer notification sound choice: `'default'` or `'silent'`.
   final Map<String, String> prayerSoundChoice = {
-    for (final label in [...prayerLabels, ...optionalNotificationLabels])
-      label: 'default',
+    for (final label in [...prayerLabels, ...optionalNotificationLabels]) label: 'default',
   };
 
   PrayerTimes? _today;
@@ -107,8 +109,7 @@ class PrayerTimeProvider extends ChangeNotifier {
     final granted = await LocationService.checkAndRequestPermission();
     locationGranted = granted;
     if (!granted) {
-      permissionPermanentlyDenied =
-          await LocationService.isPermissionDeniedForever();
+      permissionPermanentlyDenied = await LocationService.isPermissionDeniedForever();
       _loading = false;
       notifyListeners();
       return;
@@ -129,22 +130,16 @@ class PrayerTimeProvider extends ChangeNotifier {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     hijriOffsetDays = prefs.getInt(_kHijriOffsetKey) ?? 0;
-    madhab =
-        prefs.getString(_kMadhabKey) == 'shafi' ? Madhab.shafi : Madhab.hanafi;
-    hijriDayStart = prefs.getString(_kHijriDayStartKey) == 'sunset'
-        ? HijriDayStart.sunset
-        : HijriDayStart.midnight;
+    madhab = prefs.getString(_kMadhabKey) == 'shafi' ? Madhab.shafi : Madhab.hanafi;
+    hijriDayStart = prefs.getString(_kHijriDayStartKey) == 'sunset' ? HijriDayStart.sunset : HijriDayStart.midnight;
     for (final label in prayerLabels) {
-      prayerNotificationsEnabled[label] =
-          prefs.getBool('$_kNotifyPrefixKey$label') ?? false;
+      prayerNotificationsEnabled[label] = prefs.getBool('$_kNotifyPrefixKey$label') ?? false;
     }
     for (final label in optionalNotificationLabels) {
-      prayerNotificationsEnabled[label] =
-          prefs.getBool('$_kNotifyPrefixKey$label') ?? false;
+      prayerNotificationsEnabled[label] = prefs.getBool('$_kNotifyPrefixKey$label') ?? false;
     }
     for (final label in [...prayerLabels, ...optionalNotificationLabels]) {
-      prayerSoundChoice[label] =
-          prefs.getString('$_kSoundPrefixKey$label') ?? 'default';
+      prayerSoundChoice[label] = prefs.getString('$_kSoundPrefixKey$label') ?? 'default';
     }
   }
 
@@ -155,10 +150,8 @@ class PrayerTimeProvider extends ChangeNotifier {
   /// a background timer).
   PrayerTimes? get today {
     final now = DateTime.now();
-    final isStale = _cachedForDate == null ||
-        _cachedForDate!.year != now.year ||
-        _cachedForDate!.month != now.month ||
-        _cachedForDate!.day != now.day;
+    final isStale =
+        _cachedForDate == null || _cachedForDate!.year != now.year || _cachedForDate!.month != now.month || _cachedForDate!.day != now.day;
     if (isStale && coordinates != null) _recompute();
     return _today;
   }
@@ -169,9 +162,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   int get displayHijriOffsetDays {
     var offset = hijriOffsetDays;
     final maghrib = today?.maghrib.toLocal();
-    if (hijriDayStart == HijriDayStart.sunset &&
-        maghrib != null &&
-        DateTime.now().isAfter(maghrib)) {
+    if (hijriDayStart == HijriDayStart.sunset && maghrib != null && DateTime.now().isAfter(maghrib)) {
       offset += 1;
     }
     return offset;
@@ -179,8 +170,7 @@ class PrayerTimeProvider extends ChangeNotifier {
 
   PrayerTimes? _prayerTimesFor(DateTime date) {
     if (coordinates == null) return null;
-    final params = CalculationMethodParameters.muslimWorldLeague()
-      ..madhab = madhab;
+    final params = CalculationMethodParameters.muslimWorldLeague()..madhab = madhab;
     return PrayerTimes(
       date: date,
       coordinates: coordinates!,
@@ -194,11 +184,9 @@ class PrayerTimeProvider extends ChangeNotifier {
     _cachedForDate = now;
   }
 
-  bool _isSameDate(DateTime a, DateTime b) =>
-      a.year == b.year && a.month == b.month && a.day == b.day;
+  bool _isSameDate(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
 
-  String _dateKey(DateTime d) =>
-      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  String _dateKey(DateTime d) => '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
   /// Prayer times for an arbitrary date (past, today, or future), backed
   /// by a small bounded cache so repeated prev/next taps around the
@@ -239,12 +227,10 @@ class PrayerTimeProvider extends ChangeNotifier {
   }
 
   /// [displayPrayerWindows], generalized to any date.
-  List<({String name, DateTime start, DateTime end})> windowsForDate(
-      DateTime date) {
+  List<({String name, DateTime start, DateTime end})> windowsForDate(DateTime date) {
     final times = prayerTimesForDate(date);
     if (times == null) return const [];
-    final yesterday =
-        prayerTimesForDate(date.subtract(const Duration(days: 1)));
+    final yesterday = prayerTimesForDate(date.subtract(const Duration(days: 1)));
     return _buildWindows(times, yesterday);
   }
 
@@ -252,8 +238,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   /// always resolves to the trailing (upcoming) instance — same instance
   /// AlarmScheduler.computeUpcoming arms — since [windowsForDate] always
   /// ends with that date's own Tahajjud window.
-  ({DateTime start, DateTime end})? windowForLabel(String label,
-      {DateTime? date}) {
+  ({DateTime start, DateTime end})? windowForLabel(String label, {DateTime? date}) {
     final windows = windowsForDate(date ?? DateTime.now());
     if (windows.isEmpty) return null;
     if (label == 'Tahajjud') {
@@ -268,8 +253,7 @@ class PrayerTimeProvider extends ChangeNotifier {
 
   /// [displayPrayerWindows], generalized to any date — Tahajjud appears
   /// once (that date's morning instance), no trailing duplicate.
-  List<({String name, DateTime start, DateTime end})>
-      displayPrayerWindowsForDate(DateTime date) {
+  List<({String name, DateTime start, DateTime end})> displayPrayerWindowsForDate(DateTime date) {
     final windows = windowsForDate(date);
     if (windows.isEmpty) return windows;
     return windows.sublist(0, windows.length - 1);
@@ -323,14 +307,12 @@ class PrayerTimeProvider extends ChangeNotifier {
   /// [currentPrayer]/[nextPrayerPeriod] can return `null` during a
   /// forbidden window; callers must handle that (the dashboard card
   /// already shows [PrayerStatus.forbidden] then instead of crashing).
-  List<({String name, DateTime start, DateTime end})> _buildWindows(
-      PrayerTimes times, PrayerTimes? yesterday) {
+  List<({String name, DateTime start, DateTime end})> _buildWindows(PrayerTimes times, PrayerTimes? yesterday) {
     final sunrise = times.sunrise.toLocal();
     final dhuhr = times.dhuhr.toLocal();
     final sunset = times.sunset.toLocal();
     final ishraqStart = sunrise.add(const Duration(minutes: 15));
-    final chashtStart = sunrise.add(
-        Duration(microseconds: dhuhr.difference(sunrise).inMicroseconds ~/ 2));
+    final chashtStart = sunrise.add(Duration(microseconds: dhuhr.difference(sunrise).inMicroseconds ~/ 2));
     final zawalStart = dhuhr.subtract(const Duration(minutes: 10));
     final sunsetForbiddenStart = sunset.subtract(const Duration(minutes: 15));
     final ishaEnd = SunnahTimes(times).middleOfTheNight.toLocal();
@@ -352,11 +334,7 @@ class PrayerTimeProvider extends ChangeNotifier {
         start: times.asr.toLocal(),
         end: sunsetForbiddenStart,
       ),
-      (
-        name: 'Maghrib',
-        start: times.maghrib.toLocal(),
-        end: times.isha.toLocal()
-      ),
+      (name: 'Maghrib', start: times.maghrib.toLocal(), end: times.isha.toLocal()),
       (name: 'Isha', start: times.isha.toLocal(), end: ishaEnd),
       (name: 'Tahajjud', start: tahajjudStart, end: times.fajrAfter.toLocal()),
     ];
@@ -365,8 +343,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   List<({String name, DateTime start, DateTime end})> get _prayerWindows {
     final times = today;
     if (times == null) return const [];
-    final yesterday =
-        _prayerTimesFor(DateTime.now().subtract(const Duration(days: 1)));
+    final yesterday = _prayerTimesFor(DateTime.now().subtract(const Duration(days: 1)));
     return _buildWindows(times, yesterday);
   }
 
@@ -389,17 +366,14 @@ class PrayerTimeProvider extends ChangeNotifier {
 
   /// The prayer period we're currently inside — name, its start/end time,
   /// and how far through it we are (0.0-1.0).
-  ({String name, DateTime start, DateTime end, double progress})?
-      get currentPrayer {
+  ({String name, DateTime start, DateTime end, double progress})? get currentPrayer {
     final windows = _prayerWindows;
     final now = DateTime.now();
     for (final w in windows) {
       if (!now.isBefore(w.start) && now.isBefore(w.end)) {
         final totalSeconds = w.end.difference(w.start).inSeconds;
         final elapsedSeconds = now.difference(w.start).inSeconds;
-        final progress = totalSeconds > 0
-            ? (elapsedSeconds / totalSeconds).clamp(0.0, 1.0)
-            : 0.0;
+        final progress = totalSeconds > 0 ? (elapsedSeconds / totalSeconds).clamp(0.0, 1.0) : 0.0;
         return (name: w.name, start: w.start, end: w.end, progress: progress);
       }
     }
@@ -461,8 +435,7 @@ class PrayerTimeProvider extends ChangeNotifier {
 
   /// Next prayer's own start/end window and time remaining until it
   /// starts, or null if location hasn't been resolved yet.
-  ({String name, DateTime start, DateTime end, Duration startsIn})?
-      get nextPrayerPeriod {
+  ({String name, DateTime start, DateTime end, Duration startsIn})? get nextPrayerPeriod {
     final windows = _prayerWindows;
     final now = DateTime.now();
     for (final w in windows) {
@@ -484,12 +457,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   /// `isToday` distinguishes "Today's Schedule" (countdown to Iftar) from
   /// "Tomorrow's Schedule" (countdown to Sehri end) — display strings are
   /// resolved by the widget via l10n, this getter stays locale-agnostic.
-  ({
-    bool isToday,
-    DateTime sehriEnd,
-    DateTime iftar,
-    Duration countdown
-  })? get sehriIftarInfo {
+  ({bool isToday, DateTime sehriEnd, DateTime iftar, Duration countdown})? get sehriIftarInfo {
     final times = today;
     if (times == null) return null;
     final now = DateTime.now();
@@ -521,9 +489,7 @@ class PrayerTimeProvider extends ChangeNotifier {
     if (!gpsServiceEnabled) return PrayerStatus.gpsDisabled;
     if (!locationGranted) return PrayerStatus.permissionRequired;
     if (coordinates == null) {
-      return locationError
-          ? PrayerStatus.locationUnavailable
-          : PrayerStatus.loading;
+      return locationError ? PrayerStatus.locationUnavailable : PrayerStatus.loading;
     }
     if (today == null) return PrayerStatus.error;
     if (isForbiddenTime) return PrayerStatus.forbidden;
@@ -538,7 +504,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   Future<void> openLocationSettings() => LocationService.openAppSettings();
 
   Future<void> setHijriOffset(int offset) async {
-    hijriOffsetDays = offset.clamp(-1, 1);
+    hijriOffsetDays = offset.clamp(-kMaxHijriOffsetDays, kMaxHijriOffsetDays);
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_kHijriOffsetKey, hijriOffsetDays);
@@ -548,8 +514,7 @@ class PrayerTimeProvider extends ChangeNotifier {
     hijriDayStart = value;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kHijriDayStartKey,
-        value == HijriDayStart.sunset ? 'sunset' : 'midnight');
+    await prefs.setString(_kHijriDayStartKey, value == HijriDayStart.sunset ? 'sunset' : 'midnight');
   }
 
   Future<void> setMadhab(Madhab value, {required Locale locale}) async {
@@ -557,13 +522,11 @@ class PrayerTimeProvider extends ChangeNotifier {
     _recompute();
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-        _kMadhabKey, value == Madhab.shafi ? 'shafi' : 'hanafi');
+    await prefs.setString(_kMadhabKey, value == Madhab.shafi ? 'shafi' : 'hanafi');
     await _rescheduleNotifications(locale);
   }
 
-  Future<void> setPrayerNotification(String label, bool enabled,
-      {required Locale locale}) async {
+  Future<void> setPrayerNotification(String label, bool enabled, {required Locale locale}) async {
     prayerNotificationsEnabled[label] = enabled;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
@@ -571,8 +534,7 @@ class PrayerTimeProvider extends ChangeNotifier {
     await _rescheduleNotifications(locale);
   }
 
-  Future<void> setPrayerSound(String label, String value,
-      {required Locale locale}) async {
+  Future<void> setPrayerSound(String label, String value, {required Locale locale}) async {
     prayerSoundChoice[label] = value;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
@@ -582,14 +544,11 @@ class PrayerTimeProvider extends ChangeNotifier {
 
   Future<void> _rescheduleNotifications(Locale locale) async {
     final todayTimes = today;
-    final tomorrowTimes =
-        _prayerTimesFor(DateTime.now().add(const Duration(days: 1)));
+    final tomorrowTimes = _prayerTimesFor(DateTime.now().add(const Duration(days: 1)));
     if (todayTimes == null || tomorrowTimes == null) return;
-    final todayWindows = _buildWindows(todayTimes,
-        _prayerTimesFor(DateTime.now().subtract(const Duration(days: 1))));
+    final todayWindows = _buildWindows(todayTimes, _prayerTimesFor(DateTime.now().subtract(const Duration(days: 1))));
     final tomorrowWindows = _buildWindows(tomorrowTimes, todayTimes);
-    DateTime? find(
-        List<({String name, DateTime start, DateTime end})> ws, String name) {
+    DateTime? find(List<({String name, DateTime start, DateTime end})> ws, String name) {
       for (final w in ws) {
         if (w.name == name) return w.start;
       }
