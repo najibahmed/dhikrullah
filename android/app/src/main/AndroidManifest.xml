@@ -18,6 +18,7 @@
         <receiver android:exported="false" android:name=".BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED"/>
             </intent-filter>
         </receiver>
         <service android:exported="false" android:name=".ForegroundAlarmService" android:foregroundServiceType="mediaPlayback"/>

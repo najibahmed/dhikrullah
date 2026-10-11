@@ -41,6 +41,7 @@ BOOT_COMPLETED
 → BootReceiver reads `alarm_scheduled_times` from FlutterSharedPreferences
 → Re-arm future timestamps only
 → No prayer calculation natively — persisted timestamps are the only source
+→ Same restore also runs on SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED (exact alarm granted from Settings)
 
 ## Error Handling
 - Permission denied → explicit status, never crash

@@ -6,8 +6,10 @@ import android.content.Intent
 import android.util.Log
 import org.json.JSONArray
 
-/** BOOT_COMPLETED -> re-arm future alarms from the timestamps Dart already
- * persisted. Never calculates prayer times natively — persisted
+/** BOOT_COMPLETED, or SCHEDULE_EXACT_ALARM granted from system Settings
+ * (Android 12+) -> re-arm future alarms from the timestamps Dart already
+ * persisted, so alarms enabled before the grant work without reopening
+ * the app. Never calculates prayer times natively — persisted
  * `alarm_scheduled_times` is the only source (per alarm_api_contract.md). */
 class BootReceiver : BroadcastReceiver() {
 
@@ -15,10 +17,17 @@ class BootReceiver : BroadcastReceiver() {
         private const val TAG = "BootReceiver"
         private const val PREFS_NAME = "FlutterSharedPreferences"
         private const val KEY_SCHEDULED_TIMES = "flutter.alarm_scheduled_times"
+
+        // AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED
+        // (API 31) as a literal so minSdk 24 compiles without a version check.
+        private const val ACTION_EXACT_ALARM_PERMISSION_CHANGED =
+            "android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
+            intent.action != ACTION_EXACT_ALARM_PERMISSION_CHANGED
+        ) return
 
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val raw = prefs.getString(KEY_SCHEDULED_TIMES, null) ?: return
