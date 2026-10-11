@@ -4,6 +4,8 @@
 // last-known coordinates in SharedPreferences so the UI has something to
 // show instantly on relaunch while a fresh GPS fix is acquired.
 
+import 'dart:async';
+
 import 'package:adhan_dart/adhan_dart.dart';
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:geocoding/geocoding.dart';
@@ -44,11 +46,23 @@ class LocationService {
 
   static Future<void> openAppSettings() => Geolocator.openAppSettings();
 
-  /// Fetches a fresh GPS fix and persists it as the last-known location.
+  /// Fetches a fresh location fix and persists it as the last-known location.
+  /// Approximate accuracy is plenty for prayer times and Qibla; on a slow
+  /// fix it falls back to the OS's last known position after 15s.
   static Future<Coordinates> getCurrentCoordinates() async {
-    final position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-    );
+    Position position;
+    try {
+      position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.low,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+    } on TimeoutException {
+      final last = await Geolocator.getLastKnownPosition();
+      if (last == null) rethrow;
+      position = last;
+    }
     await _cacheCoordinates(position.latitude, position.longitude);
     return Coordinates(position.latitude, position.longitude);
   }
