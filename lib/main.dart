@@ -58,7 +58,7 @@ class DhikirApp extends StatelessWidget {
     final localeProvider = context.watch<LocaleProvider>();
 
     return MaterialApp(
-      title: 'Dhikrullah',
+      title: 'Simply Muslim',
       debugShowCheckedModeBanner: false,
       themeMode: themeProvider.themeMode,
       theme: AppTheme.light,
@@ -76,8 +76,7 @@ class DhikirApp extends StatelessWidget {
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
-            statusBarIconBrightness:
-                resolvedBrightness == Brightness.dark ? Brightness.light : Brightness.dark,
+            statusBarIconBrightness: resolvedBrightness == Brightness.dark ? Brightness.light : Brightness.dark,
           ),
           child: child!,
         );
