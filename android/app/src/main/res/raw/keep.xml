@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dart references the notification icon only by name
+     (AndroidInitializationSettings('notification_icon')), so release
+     resource shrinking can't see it — keep it explicitly. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/notification_icon,@drawable/notification_icon_background" />
