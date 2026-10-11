@@ -10,7 +10,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hijri/hijri_calendar.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
@@ -243,15 +242,9 @@ class _PrayerTimeCardState extends State<PrayerTimeCard> {
   Widget _normalRow(
       BuildContext context, ThemeData theme, PrayerTimeProvider provider) {
     final current = provider.currentPrayer!;
-    final next = provider.nextPrayer;
     final now = DateTime.now();
 
     final onCardColor = onColorFor(currentPrayerCardBackground(context));
-
-    final isRamadan = HijriCalendar.fromDate(
-          now.add(Duration(days: provider.hijriOffsetDays)),
-        ).hMonth ==
-        9;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

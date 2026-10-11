@@ -8,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dhikir_app/core/providers/favorites_provider.dart';
-import 'package:dhikir_app/features/my_dhikir/screens/my_dhikir_screen.dart';
 import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
 import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';

@@ -40,15 +40,6 @@ class _PrayerScheduleSectionState extends State<PrayerScheduleSection> {
     super.dispose();
   }
 
-  String _formatDuration(BuildContext context, Duration d) {
-    final l10n = context.l10n;
-    final positive = d.isNegative ? Duration.zero : d;
-    final hours = positive.inHours;
-    final minutes = positive.inMinutes % 60;
-    if (hours > 0) return l10n.durationHoursMinutes(hours, minutes);
-    return l10n.durationMinutes(minutes);
-  }
-
   String _formatClock(Duration d) {
     final positive = d.isNegative ? Duration.zero : d;
     final h = positive.inHours.toString().padLeft(2, '0');

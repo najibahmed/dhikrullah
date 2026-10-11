@@ -1,5 +1,4 @@
 // lib/features/counter/screens/session_counter_screen.dart
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -239,7 +238,6 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
     final count = provider.todayCount;
     final goal = provider.goal;
     final isUnlimited = provider.isUnlimited;
-    final isGoalMet = provider.isGoalMet;
     final total = dhikirList.length;
     final cs = Theme.of(context).colorScheme;
 
@@ -431,85 +429,6 @@ class _SessionCounterViewState extends State<_SessionCounterView> with TickerPro
                 },
               ),
             ),
-
-            // ── Bottom nav bar ─────────────────────────────────────────
-            // Container(
-            //   padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-            //   child: Row(
-            //     children: [
-            //       // Previous
-            //       GestureDetector(
-            //         onTap: currentIndex > 0 ? () => _navigateTo(currentIndex - 1) : null,
-            //         child: AnimatedContainer(
-            //           duration: const Duration(milliseconds: 200),
-            //           width: 52,
-            //           height: 52,
-            //           decoration: BoxDecoration(
-            //             color: currentIndex > 0 ? Colors.white.withValues(alpha: 0.12) : Colors.white.withValues(alpha: 0.04),
-            //             borderRadius: BorderRadius.circular(16),
-            //             border: Border.all(color: currentIndex > 0 ? Colors.white24 : Colors.white.withValues(alpha: 0.06), width: 1),
-            //           ),
-            //           child: Icon(
-            //             Icons.arrow_back_ios_new_rounded,
-            //             size: 18,
-            //             color: currentIndex > 0 ? Colors.white : Colors.white24,
-            //           ),
-            //         ),
-            //       ),
-
-            //       const SizedBox(width: 10),
-
-            //       // Center: reset + info
-            //       Expanded(
-            //         child: GestureDetector(
-            //           onTap: _resetCurrent,
-            //           child: Container(
-            //             height: 52,
-            //             decoration: BoxDecoration(
-            //               color: Colors.white.withValues(alpha: 0.08),
-            //               borderRadius: BorderRadius.circular(16),
-            //               border: Border.all(color: Colors.white12, width: 1),
-            //             ),
-            //             child: Row(
-            //               mainAxisAlignment: MainAxisAlignment.center,
-            //               children: [
-            //                 Icon(Icons.refresh_rounded, size: 16, color: Colors.white.withValues(alpha: 0.6)),
-            //                 const SizedBox(width: 6),
-            //                 Text(
-            //                   l10n.counterResetHint(count),
-            //                   style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.6)),
-            //                 ),
-            //               ],
-            //             ),
-            //           ),
-            //         ),
-            //       ),
-
-            //       const SizedBox(width: 10),
-
-            //       // Next
-            //       GestureDetector(
-            //         onTap: currentIndex < total - 1 ? () => _navigateTo(currentIndex + 1) : null,
-            //         child: AnimatedContainer(
-            //           duration: const Duration(milliseconds: 200),
-            //           width: 52,
-            //           height: 52,
-            //           decoration: BoxDecoration(
-            //             color: currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.04),
-            //             borderRadius: BorderRadius.circular(16),
-            //             border: Border.all(
-            //                 color: currentIndex < total - 1 ? dhikir.color.withValues(alpha: 0.6) : Colors.white.withValues(alpha: 0.06), width: 1),
-            //           ),
-            //           child: Icon(
-            //             Icons.arrow_forward_ios_rounded,
-            //             size: 18,
-            //             color: currentIndex < total - 1 ? Colors.white : Colors.white24,
-            //           ),
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -722,65 +641,6 @@ class _DhikirPage extends StatelessWidget {
       ),
     );
   }
-}
-
-// ─── Arc Painter ──────────────────────────────────────────────────────────────
-
-class _ArcPainter extends CustomPainter {
-  final double progress;
-  final Color color;
-  final bool isGoalMet;
-
-  _ArcPainter({required this.progress, required this.color, required this.isGoalMet});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 8;
-    const strokeWidth = 8.0;
-    const startAngle = -math.pi / 2;
-
-    // Track
-    canvas.drawCircle(
-        center,
-        radius,
-        Paint()
-          ..color = Colors.white.withValues(alpha: 0.1)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = strokeWidth);
-
-    // Fill
-    if (progress > 0) {
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        2 * math.pi * progress,
-        false,
-        Paint()
-          ..color = isGoalMet ? color : Colors.white.withValues(alpha: 0.8)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = strokeWidth
-          ..strokeCap = StrokeCap.round,
-      );
-    }
-
-    // Tick marks every 10%
-    final tickPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.2)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-    for (int i = 1; i < 10; i++) {
-      final angle = startAngle + 2 * math.pi * (i / 10);
-      canvas.drawLine(
-        Offset(center.dx + (radius - 5) * math.cos(angle), center.dy + (radius - 5) * math.sin(angle)),
-        Offset(center.dx + (radius + 5) * math.cos(angle), center.dy + (radius + 5) * math.sin(angle)),
-        tickPaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(_ArcPainter old) => old.progress != progress || old.isGoalMet != isGoalMet;
 }
 
 // ─── Goal Sheet ───────────────────────────────────────────────────────────────

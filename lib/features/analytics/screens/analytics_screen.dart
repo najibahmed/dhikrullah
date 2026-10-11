@@ -1,12 +1,8 @@
 // lib/features/analytics/screens/analytics_screen.dart
-import 'dart:math' as math;
-import 'package:dhikir_app/features/counter/screens/session_counter_screen.dart';
-import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'package:provider/provider.dart';
-import 'package:dhikir_app/core/data/dhikir_data.dart';
 import 'package:dhikir_app/core/theme/theme_colors.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/data/dhikir_localizations.dart';
@@ -61,11 +57,9 @@ class _AnalyticsViewState extends State<_AnalyticsView> with SingleTickerProvide
     final l10n = context.l10n;
     final provider = context.watch<AnalyticsProvider>();
     final period = provider.period;
-    final bars = provider.buildBars();
     final (from, to) = provider.currentRange();
     final stats = provider.buildStats(from, to);
     final grandTotal = provider.grandTotal(stats);
-    final maxBar = bars.isEmpty ? 1 : bars.map((b) => b.total).reduce(math.max).clamp(1, 999999);
 
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
@@ -134,35 +128,6 @@ class _AnalyticsViewState extends State<_AnalyticsView> with SingleTickerProvide
 
                     const SizedBox(height: 20),
 
-                    // ── Bar chart ──────────────────────────────────────
-                    // Container(
-                    //   padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-                    //   decoration: BoxDecoration(
-                    //     color: Colors.white,
-                    //     borderRadius: BorderRadius.circular(24),
-                    //     boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 14, offset: const Offset(0, 4))],
-                    //   ),
-                    //   child: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: [
-                    //       Row(
-                    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //         children: [
-                    //           Text(
-                    //             _chartTitle(),
-                    //             style: GoogleFonts.playfairDisplay(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF2D3748)),
-                    //           ),
-                    //           Text(
-                    //             'Total: $grandTotal',
-                    //             style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF718096)),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //       const SizedBox(height: 20),
-                    //       _BarChart(bars: bars, maxVal: maxBar.toDouble()),
-                    //     ],
-                    //   ),
-                    // ),
 
                     const SizedBox(height: 20),
 
@@ -244,7 +209,7 @@ class _AnalyticsViewState extends State<_AnalyticsView> with SingleTickerProvide
                     ],
 
                     // ── All-time totals ────────────────────────────────
-                    _AllTimeTotals(),
+                    const _AllTimeTotals(),
                   ],
                 ),
               ),
@@ -396,113 +361,6 @@ class _SummaryCard extends StatelessWidget {
           Text(value, style: GoogleFonts.playfairDisplay(fontSize: 22, fontWeight: FontWeight.w700, color: onColor)),
           Text(label, style: GoogleFonts.inter(fontSize: 10, color: onColor.withValues(alpha: 0.75))),
         ],
-      ),
-    );
-  }
-}
-
-// ─── Bar Chart ────────────────────────────────────────────────────────────────
-
-// class _BarChart extends StatelessWidget {
-//   final List<PeriodBar> bars;
-//   final double maxVal;
-//   const _BarChart({required this.bars, required this.maxVal});
-//   @override
-//   Widget build(BuildContext context) {
-//     return SizedBox(
-//       height: 160,
-//       child: Row(
-//         crossAxisAlignment: CrossAxisAlignment.end,
-//         children: bars.asMap().entries.map((entry) {
-//           final bar = entry.value;
-//           final ratio = bar.total / maxVal;
-//           final isLast = entry.key == bars.length - 1;
-//           return Expanded(
-//             child: Padding(
-//               padding: EdgeInsets.only(right: isLast ? 0 : 6),
-//               child: Column(
-//                 mainAxisAlignment: MainAxisAlignment.end,
-//                 children: [
-//                   if (bar.total > 0)
-//                     Padding(
-//                       padding: const EdgeInsets.only(bottom: 4),
-//                       child: Text(
-//                         '${bar.total}',
-//                         style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w700, color: const Color(0xFF4A5568)),
-//                       ),
-//                     ),
-//                   Flexible(
-//                     child: FractionallySizedBox(
-//                       heightFactor: ratio.clamp(0.04, 1.0),
-//                       child: _StackedBar(
-//                         bar: bar,
-//                         maxVal: maxVal,
-//                         isHighlighted: isLast,
-//                       ),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 6),
-//                   Text(
-//                     bar.label,
-//                     style: GoogleFonts.inter(
-//                       fontSize: 9,
-//                       fontWeight: isLast ? FontWeight.w700 : FontWeight.w500,
-//                       color: isLast ? const Color(0xFF2D3748) : const Color(0xFFA0AEC0),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           );
-//         }).toList(),
-//       ),
-//     );
-//   }
-// }
-
-class _StackedBar extends StatelessWidget {
-  final PeriodBar bar;
-  final double maxVal;
-  final bool isHighlighted;
-
-  const _StackedBar({required this.bar, required this.maxVal, required this.isHighlighted});
-
-  @override
-  Widget build(BuildContext context) {
-    final builtInSession = dhikirList.map((d) => SessionDhikir.fromItem(d)).toList();
-    final customItems = CustomDhikirService.getAll();
-    final customSession = customItems.map((d) => SessionDhikir.fromCustom(d)).toList();
-    final combined = [...builtInSession, ...customSession];
-    if (bar.total == 0) {
-      return Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFF0EEEB),
-          borderRadius: BorderRadius.circular(6),
-        ),
-      );
-    }
-
-    // Build stacked segments per dhikir
-    final segments = <Widget>[];
-    final entries = bar.countsByDhikir.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
-
-    for (int i = 0; i < entries.length; i++) {
-      final entry = entries[i];
-      final dhikir = combined.firstWhere((d) => d.id == entry.key, orElse: () => combined.first);
-      final segColor = Color(int.parse(dhikir.colorHex.replaceFirst('#', 'FF'), radix: 16));
-      final flex = (entry.value * 100 / bar.total).round().clamp(1, 100);
-
-      segments.add(Flexible(
-        flex: flex,
-        child: Container(color: isHighlighted ? const Color(0xFF4A5568) : segColor),
-      ));
-    }
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: segments.reversed.toList(),
       ),
     );
   }

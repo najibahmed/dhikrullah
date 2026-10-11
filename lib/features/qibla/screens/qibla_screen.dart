@@ -91,7 +91,7 @@ class _QiblaScreenState extends State<QiblaScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset('assets/images/page_bg.png', fit: BoxFit.cover),
+          Image.asset('assets/images/page_bg.jpg', fit: BoxFit.cover),
           // The artwork is light; dim it in dark mode so text stays readable.
           if (isDark) ColoredBox(color: Colors.black.withValues(alpha: 0.55)),
           SafeArea(
@@ -211,7 +211,6 @@ class _Dial extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final labelStyle = theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant);
 
     return Container(
       width: 260,
