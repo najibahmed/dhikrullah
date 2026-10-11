@@ -22,6 +22,7 @@ import 'package:dhikir_app/features/alarm/services/alarm_service.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_settings_repository.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 import 'package:dhikir_app/features/prayer_time/services/location_service.dart';
+import 'package:dhikir_app/features/prayer_time/widgets/digital_clock.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_time_card.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_schedule_cards.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/forbidden_times_card.dart';
@@ -124,6 +125,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             ),
           ),
         ),
+        // const SliverToBoxAdapter(child: DigitalClock()),
         // ── Date + prayer time ───────────────────────────────────────────
         SliverToBoxAdapter(
           child: Padding(
@@ -136,6 +138,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             ),
           ),
         ),
+
         const SliverToBoxAdapter(child: PrayerTimeCard()),
         const SliverToBoxAdapter(child: PrayerScheduleSection()),
         SliverToBoxAdapter(
