@@ -5,6 +5,7 @@
 // tile (pushes CounterScreen), which itself exposes My Dhikir / Favorite /
 // Add Custom Dhikir via its own bottom action bar.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -39,9 +40,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // Checks the Play Store listing on launch and on resume; the optional
+  // update dialog (Update / Later / Ignore) reappears at most every 3 days.
+  // Country comes from the device, not the app locale — the app locale
+  // ('bn'/'en') carries no country, which would make upgrader query the
+  // US store listing. Dialog text follows the app locale (bn is built in).
+  final _upgrader = Upgrader(
+    countryCode: PlatformDispatcher.instance.locale.countryCode,
+    durationUntilAlertAgain: const Duration(days: 3),
+    debugLogging: kDebugMode,
+  );
+
   @override
   Widget build(BuildContext context) {
     return UpgradeAlert(
+      upgrader: _upgrader,
+      dialogStyle: UpgradeDialogStyle.material,
       child: const Scaffold(
         body: SafeArea(child: HomeWidget()),
       ),
