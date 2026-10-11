@@ -555,18 +555,22 @@ class PrayerTimeProvider extends ChangeNotifier {
       return null;
     }
 
-    await PrayerNotificationService.scheduleForDay(
-      today: todayTimes,
-      tomorrow: tomorrowTimes,
-      enabled: prayerNotificationsEnabled,
-      locale: locale,
-      soundChoice: prayerSoundChoice,
-      tahajjudToday: find(todayWindows, 'Tahajjud'),
-      tahajjudTomorrow: find(tomorrowWindows, 'Tahajjud'),
-      ishraqToday: find(todayWindows, 'Ishraq'),
-      ishraqTomorrow: find(tomorrowWindows, 'Ishraq'),
-      chashtToday: find(todayWindows, 'Chasht'),
-      chashtTomorrow: find(tomorrowWindows, 'Chasht'),
-    );
+    try {
+      await PrayerNotificationService.scheduleForDay(
+        today: todayTimes,
+        tomorrow: tomorrowTimes,
+        enabled: prayerNotificationsEnabled,
+        locale: locale,
+        soundChoice: prayerSoundChoice,
+        tahajjudToday: find(todayWindows, 'Tahajjud'),
+        tahajjudTomorrow: find(tomorrowWindows, 'Tahajjud'),
+        ishraqToday: find(todayWindows, 'Ishraq'),
+        ishraqTomorrow: find(tomorrowWindows, 'Ishraq'),
+        chashtToday: find(todayWindows, 'Chasht'),
+        chashtTomorrow: find(tomorrowWindows, 'Chasht'),
+      );
+    } catch (e) {
+      debugPrint('PrayerTimeProvider: notification scheduling failed: $e');
+    }
   }
 }

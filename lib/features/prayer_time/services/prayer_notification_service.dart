@@ -46,8 +46,15 @@ class PrayerNotificationService {
     if (_initialized) return;
 
     tz.initializeTimeZones();
-    final timeZoneName = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(timeZoneName));
+    try {
+      final timeZoneName = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(timeZoneName));
+    } catch (e) {
+      // Unknown zone name: fall back to UTC. Schedules are built with
+      // TZDateTime.from(instant), so they still fire at the right moment.
+      debugPrint('PrayerNotificationService: timezone lookup failed: $e');
+      tz.setLocalLocation(tz.UTC);
+    }
 
     const androidInit = AndroidInitializationSettings('notification_icon');
     await _plugin.initialize(

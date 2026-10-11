@@ -48,9 +48,14 @@ class AlarmService {
     DateTime? from,
     required Locale locale,
   }) async {
-    await methodChannel.cancelAllAlarms();
-    final alarms =
-        await scheduler.scheduleUpcoming(from: from, locale: locale);
+    final List<ScheduledAlarm> alarms;
+    try {
+      await methodChannel.cancelAllAlarms();
+      alarms = await scheduler.scheduleUpcoming(from: from, locale: locale);
+    } catch (e) {
+      debugPrint('AlarmService: reschedule failed: $e');
+      return const [];
+    }
     // alarms is sorted ascending by epochMillis and may contain both a
     // today and tomorrow occurrence for the same prayer — only arm the
     // nearest one, since AlarmArmer's PendingIntent identity is keyed by

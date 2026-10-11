@@ -55,6 +55,15 @@ class ForegroundAlarmService : Service() {
 
         val prayerId = intent?.getStringExtra(AlarmReceiver.EXTRA_PRAYER_ID)
         if (prayerId == null) {
+            // Started via startForegroundService, so startForeground must
+            // still be called before stopping or the OS crashes the app.
+            startForeground(NOTIFICATION_ID, buildNotification("", "Prayer alarm"))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                stopForeground(STOP_FOREGROUND_REMOVE)
+            } else {
+                @Suppress("DEPRECATION")
+                stopForeground(true)
+            }
             stopSelf(startId)
             return START_NOT_STICKY
         }
