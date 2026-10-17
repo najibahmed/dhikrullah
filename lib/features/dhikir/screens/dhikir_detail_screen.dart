@@ -204,6 +204,9 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
     final colorScheme = Theme.of(context).colorScheme;
     final bgColor = adjustForBrightness(_accent, Theme.of(context).brightness);
     final onBg = onColorFor(bgColor);
+    // Ring and milestone dots sit on the dark card surface, so they need the
+    // brighter accent variant rather than the muted background tone.
+    final ringColor = accentForBrightness(_accent, Theme.of(context).brightness);
     final today = provider.today;
     final year = today.year;
     final month = today.month;
@@ -451,7 +454,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                           progress: progress,
                           isGoalMet: isGoalMet,
                           isUnlimited: isUnlimited,
-                          accentColor: bgColor,
+                          accentColor: ringColor,
                           pulseAnim: _pulseAnim,
                           completionAnim: _completionAnim,
                           onTap: _onCounterTap,
@@ -506,7 +509,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                           MilestoneDots(
                             count: todayCount,
                             target: target,
-                            accentColor: bgColor,
+                            accentColor: ringColor,
                           ),
                       ],
                     ),

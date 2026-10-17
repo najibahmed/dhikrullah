@@ -25,14 +25,14 @@ Color currentPrayerCardBackground(BuildContext context) {
 
 /// Adjusts a stored per-dhikir/category data color for dark-mode surfaces.
 /// Most stored colors are light pastels chosen against a light background;
-/// on a dark background they need reduced lightness (so they don't glow)
-/// and a slight saturation boost (so they don't wash out), while keeping
-/// the same hue so each dhikir still reads as "its own color".
+/// on a dark background they become a "muted tonal" version: same hue (so
+/// each dhikir still reads as "its own color"), fixed deep lightness, and
+/// capped saturation. Pastels like #FFF8E1 are ~100% saturated in HSL, so
+/// keeping or boosting saturation turns them neon at low lightness.
 Color adjustForBrightness(Color base, Brightness brightness) {
   if (brightness == Brightness.light) return base;
   final hsl = HSLColor.fromColor(base);
-  final adjustedLightness = hsl.lightness > 0.35 ? 0.30 : hsl.lightness.clamp(0.25, 0.35);
-  return hsl.withLightness(adjustedLightness).withSaturation((hsl.saturation * 1.15).clamp(0.0, 1.0)).toColor();
+  return hsl.withLightness(0.22).withSaturation(hsl.saturation.clamp(0.0, 0.30)).toColor();
 }
 
 /// Picks a legible text/icon color to sit on top of [background], based on
@@ -40,4 +40,14 @@ Color adjustForBrightness(Color base, Brightness brightness) {
 /// fixed light/dark literal.
 Color onColorFor(Color background) {
   return ThemeData.estimateBrightnessForColor(background) == Brightness.dark ? Colors.white : const Color(0xFF2D3748);
+}
+
+/// Like [adjustForBrightness], but for a stored color used as a *highlight*
+/// drawn on a dark surface (progress ring, milestone dots) rather than as a
+/// background. In dark mode the muted tonal background would barely differ
+/// from the surface, so this returns a soft pastel of the same hue instead.
+Color accentForBrightness(Color base, Brightness brightness) {
+  if (brightness == Brightness.light) return base;
+  final hsl = HSLColor.fromColor(base);
+  return hsl.withLightness(0.60).withSaturation(hsl.saturation.clamp(0.0, 0.45)).toColor();
 }
