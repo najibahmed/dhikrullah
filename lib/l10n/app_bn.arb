@@ -411,5 +411,10 @@
   "recentJustNow": "এইমাত্র",
   "recentMinutesAgo": "{count, plural, other{{count} মিনিট আগে}}",
   "recentHoursAgo": "{count, plural, other{{count} ঘণ্টা আগে}}",
-  "recentDaysAgo": "{count, plural, other{{count} দিন আগে}}"
+  "recentDaysAgo": "{count, plural, other{{count} দিন আগে}}",
+
+  "prayerWidgetSection": "হোম স্ক্রিন উইজেট",
+  "prayerWidgetAddToHome": "হোম স্ক্রিনে উইজেট যোগ করুন",
+  "prayerWidgetAddSubtitle": "ফোনের হোম স্ক্রিনে আজকের নামাজের সময় দেখুন",
+  "prayerWidgetPinUnsupported": "হোম স্ক্রিনে দীর্ঘক্ষণ চাপুন → উইজেট → Simply Muslim"
 }

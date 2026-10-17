@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dhikir_app/features/prayer_time/models/forbidden_period.dart';
 import 'package:dhikir_app/features/prayer_time/services/location_service.dart';
 import 'package:dhikir_app/features/prayer_time/services/prayer_notification_service.dart';
+import 'package:dhikir_app/features/prayer_time/services/prayer_widget_service.dart';
 
 const _kHijriOffsetKey = 'prayer_hijri_offset_days';
 const _kNotifyPrefixKey = 'prayer_notify_';
@@ -524,6 +525,7 @@ class PrayerTimeProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_kMadhabKey, value == Madhab.shafi ? 'shafi' : 'hanafi');
     await _rescheduleNotifications(locale);
+    await PrayerWidgetService.sync(this, locale);
   }
 
   Future<void> setPrayerNotification(String label, bool enabled, {required Locale locale}) async {

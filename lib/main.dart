@@ -19,6 +19,7 @@ import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/theme/app_theme.dart';
 import 'package:dhikir_app/core/widgets/splash_screen.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/features/prayer_time/services/prayer_widget_channel.dart';
 import 'package:dhikir_app/features/recent/providers/recent_provider.dart';
 import 'package:dhikir_app/features/recent/services/recent_service.dart';
 import 'package:dhikir_app/l10n/generated/app_localizations.dart';
@@ -38,6 +39,9 @@ Future<void> main() async {
   // Load persisted theme + locale before first paint to avoid flash.
   final themeProvider = await ThemeProvider.load();
   final localeProvider = await LocaleProvider.load();
+
+  // Widget tapped while the app is already running.
+  PrayerWidgetChannel.listenOpenRoute(openWidgetRoute);
 
   runApp(
     MultiProvider(
@@ -90,6 +94,7 @@ class DhikirApp extends StatelessWidget {
           ),
         );
       },
+      navigatorKey: navigatorKey,
       home: const SplashScreen(),
       onGenerateRoute: AppRoutes.generate,
     );

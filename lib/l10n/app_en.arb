@@ -463,5 +463,10 @@
   "recentHoursAgo": "{count, plural, =1{1h ago} other{{count}h ago}}",
   "@recentHoursAgo": {"placeholders": {"count": {"type": "int"}}},
   "recentDaysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
-  "@recentDaysAgo": {"placeholders": {"count": {"type": "int"}}}
+  "@recentDaysAgo": {"placeholders": {"count": {"type": "int"}}},
+
+  "prayerWidgetSection": "Home screen widget",
+  "prayerWidgetAddToHome": "Add widget to Home screen",
+  "prayerWidgetAddSubtitle": "Show today's prayer times on your phone's Home screen",
+  "prayerWidgetPinUnsupported": "Long-press your Home screen → Widgets → Simply Muslim"
 }

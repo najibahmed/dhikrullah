@@ -1284,4 +1284,18 @@ class AppLocalizationsBn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get prayerWidgetSection => 'হোম স্ক্রিন উইজেট';
+
+  @override
+  String get prayerWidgetAddToHome => 'হোম স্ক্রিনে উইজেট যোগ করুন';
+
+  @override
+  String get prayerWidgetAddSubtitle =>
+      'ফোনের হোম স্ক্রিনে আজকের নামাজের সময় দেখুন';
+
+  @override
+  String get prayerWidgetPinUnsupported =>
+      'হোম স্ক্রিনে দীর্ঘক্ষণ চাপুন → উইজেট → Simply Muslim';
 }

@@ -1289,4 +1289,18 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get prayerWidgetSection => 'Home screen widget';
+
+  @override
+  String get prayerWidgetAddToHome => 'Add widget to Home screen';
+
+  @override
+  String get prayerWidgetAddSubtitle =>
+      'Show today\'s prayer times on your phone\'s Home screen';
+
+  @override
+  String get prayerWidgetPinUnsupported =>
+      'Long-press your Home screen → Widgets → Simply Muslim';
 }
