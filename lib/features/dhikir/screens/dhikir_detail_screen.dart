@@ -216,7 +216,8 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
         slivers: [
           // ── App Bar ────────────────────────────────────────────────
           SliverAppBar(
-            expandedHeight: 180,
+            // expandedHeight: 180,
+            title: Text(localizedTitle, style: GoogleFonts.playfairDisplay(fontSize: 18, fontWeight: FontWeight.w700, color: onBg)),
             pinned: true,
             backgroundColor: bgColor,
             surfaceTintColor: Colors.transparent,
@@ -332,7 +333,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                 ),
 
                 Container(
-                  height: 24,
+                  height: 12,
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -344,7 +345,7 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
@@ -370,31 +371,6 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                 ),
 
                 const SizedBox(height: 12),
-
-                // ── Meaning card ──────────────────────────────────────
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 4))],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Pill(label: l10n.pillMeaning, color: bgColor),
-                        const SizedBox(height: 14),
-                        Text(localizedMeaning, style: GoogleFonts.inter(fontSize: 14.5, color: colorScheme.onSurfaceVariant, height: 1.7)),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
                 // ═══════════════════════════════════════════════════════
                 // ── DHIKIR COUNTER CARD ─────────────────────────────────
                 // ═══════════════════════════════════════════════════════
@@ -532,11 +508,37 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
                     ),
                   ),
                 ),
+                const SizedBox(height: 12),
+
+                // ── Meaning card ──────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 4))],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Pill(label: l10n.pillMeaning, color: bgColor),
+                        const SizedBox(height: 14),
+                        Text(localizedMeaning, style: GoogleFonts.inter(fontSize: 14.5, color: colorScheme.onSurfaceVariant, height: 1.7)),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // const SizedBox(height: 20),
 
                 const SizedBox(height: 16),
 
                 // ── This Month tracker ──────────────────────────────────
                 SafeArea(
+                  top: false,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Container(
