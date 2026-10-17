@@ -14,6 +14,8 @@ import 'package:dhikir_app/features/dhikir/widgets/mile_stone_dot.dart';
 import 'package:dhikir_app/features/dhikir/widgets/pill_widget.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/data/dhikir_localizations.dart';
+import 'package:dhikir_app/features/recent/models/recent_item.dart';
+import 'package:dhikir_app/features/recent/providers/recent_provider.dart';
 
 class DhikirDetailScreen extends StatelessWidget {
   final DhikirItem dhikir;
@@ -50,7 +52,9 @@ class _DhikirDetailViewState extends State<_DhikirDetailView> with TickerProvide
   @override
   void initState() {
     super.initState();
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<RecentProvider>().record(RecentItem.dhikir(widget.dhikir.id));
+    });
     _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 120),

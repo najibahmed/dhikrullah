@@ -1234,4 +1234,59 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dhikirSalawatOnNabiMeaning =>
       'O Allah, send Your peace and blessings upon our Prophet Muhammad. Sending salawat brings blessings and closeness to the Prophet ﷺ.';
+
+  @override
+  String get recentTitle => 'Recently viewed';
+
+  @override
+  String get recentClear => 'Clear';
+
+  @override
+  String get recentClearConfirmTitle => 'Clear recently viewed?';
+
+  @override
+  String get recentClearConfirmBody =>
+      'This removes the list from Home. Your progress is not affected.';
+
+  @override
+  String get recentTypeDhikir => 'Dhikir';
+
+  @override
+  String get recentTypeDua => 'Dua';
+
+  @override
+  String get recentJustNow => 'Just now';
+
+  @override
+  String recentMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count min ago',
+      one: '1 min ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recentHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '${count}h ago',
+      one: '1h ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recentDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days ago',
+      one: '1 day ago',
+    );
+    return '$_temp0';
+  }
 }

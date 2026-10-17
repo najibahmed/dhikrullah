@@ -27,6 +27,7 @@ import 'package:dhikir_app/features/prayer_time/widgets/digital_clock.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_time_card.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_schedule_cards.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/forbidden_times_card.dart';
+import 'package:dhikir_app/features/recent/widgets/recent_section.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/data/dhikir_localizations.dart';
 
@@ -155,6 +156,7 @@ class _HomeWidgetState extends State<HomeWidget> {
 
         const SliverToBoxAdapter(child: PrayerTimeCard()),
         const SliverToBoxAdapter(child: PrayerScheduleSection()),
+        SliverToBoxAdapter(child: RecentSection(onReturn: () => setState(() {}))),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),

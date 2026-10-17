@@ -60,7 +60,10 @@ class AddDhikirArgs {
 class DuaListArgs {
   final String categoryName;
   final List<DuaItem> duas;
-  const DuaListArgs({required this.categoryName, required this.duas});
+
+  /// Dua to scroll to and briefly highlight on open (from Recently viewed).
+  final int? initialDuaId;
+  const DuaListArgs({required this.categoryName, required this.duas, this.initialDuaId});
 }
 
 class AppRoutes {
@@ -185,6 +188,7 @@ class AppRoutes {
           builder: (_) => DuaListScreen(
             categoryName: args.categoryName,
             duas: args.duas,
+            initialDuaId: args.initialDuaId,
           ),
         );
 

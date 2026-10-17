@@ -2257,6 +2257,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'O Allah, send Your peace and blessings upon our Prophet Muhammad. Sending salawat brings blessings and closeness to the Prophet ﷺ.'**
   String get dhikirSalawatOnNabiMeaning;
+
+  /// No description provided for @recentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently viewed'**
+  String get recentTitle;
+
+  /// No description provided for @recentClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get recentClear;
+
+  /// No description provided for @recentClearConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear recently viewed?'**
+  String get recentClearConfirmTitle;
+
+  /// No description provided for @recentClearConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This removes the list from Home. Your progress is not affected.'**
+  String get recentClearConfirmBody;
+
+  /// No description provided for @recentTypeDhikir.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhikir'**
+  String get recentTypeDhikir;
+
+  /// No description provided for @recentTypeDua.
+  ///
+  /// In en, this message translates to:
+  /// **'Dua'**
+  String get recentTypeDua;
+
+  /// No description provided for @recentJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get recentJustNow;
+
+  /// No description provided for @recentMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 min ago} other{{count} min ago}}'**
+  String recentMinutesAgo(int count);
+
+  /// No description provided for @recentHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1h ago} other{{count}h ago}}'**
+  String recentHoursAgo(int count);
+
+  /// No description provided for @recentDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day ago} other{{count} days ago}}'**
+  String recentDaysAgo(int count);
 }
 
 class _AppLocalizationsDelegate

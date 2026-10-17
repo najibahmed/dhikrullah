@@ -400,5 +400,16 @@
 
   "dhikirSalawatOnNabiTitle": "নবীজির ﷺ উপর দরুদ",
   "dhikirSalawatOnNabiTransliteration": "নবীজির ﷺ উপর দরুদ",
-  "dhikirSalawatOnNabiMeaning": "হে আল্লাহ, আমাদের নবী মুহাম্মদ ﷺ-এর উপর আপনার শান্তি ও রহমত বর্ষণ করুন। দরুদ পাঠ রহমত এবং নবীজি ﷺ-এর নৈকট্য বয়ে আনে।"
+  "dhikirSalawatOnNabiMeaning": "হে আল্লাহ, আমাদের নবী মুহাম্মদ ﷺ-এর উপর আপনার শান্তি ও রহমত বর্ষণ করুন। দরুদ পাঠ রহমত এবং নবীজি ﷺ-এর নৈকট্য বয়ে আনে।",
+
+  "recentTitle": "সম্প্রতি দেখা",
+  "recentClear": "মুছুন",
+  "recentClearConfirmTitle": "সম্প্রতি দেখা তালিকা মুছবেন?",
+  "recentClearConfirmBody": "এটি হোম থেকে তালিকাটি সরিয়ে দেবে। আপনার অগ্রগতি প্রভাবিত হবে না।",
+  "recentTypeDhikir": "যিকির",
+  "recentTypeDua": "দোয়া",
+  "recentJustNow": "এইমাত্র",
+  "recentMinutesAgo": "{count, plural, other{{count} মিনিট আগে}}",
+  "recentHoursAgo": "{count, plural, other{{count} ঘণ্টা আগে}}",
+  "recentDaysAgo": "{count, plural, other{{count} দিন আগে}}"
 }

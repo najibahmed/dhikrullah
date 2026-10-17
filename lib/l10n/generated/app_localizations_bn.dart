@@ -1232,4 +1232,56 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get dhikirSalawatOnNabiMeaning =>
       'হে আল্লাহ, আমাদের নবী মুহাম্মদ ﷺ-এর উপর আপনার শান্তি ও রহমত বর্ষণ করুন। দরুদ পাঠ রহমত এবং নবীজি ﷺ-এর নৈকট্য বয়ে আনে।';
+
+  @override
+  String get recentTitle => 'সম্প্রতি দেখা';
+
+  @override
+  String get recentClear => 'মুছুন';
+
+  @override
+  String get recentClearConfirmTitle => 'সম্প্রতি দেখা তালিকা মুছবেন?';
+
+  @override
+  String get recentClearConfirmBody =>
+      'এটি হোম থেকে তালিকাটি সরিয়ে দেবে। আপনার অগ্রগতি প্রভাবিত হবে না।';
+
+  @override
+  String get recentTypeDhikir => 'যিকির';
+
+  @override
+  String get recentTypeDua => 'দোয়া';
+
+  @override
+  String get recentJustNow => 'এইমাত্র';
+
+  @override
+  String recentMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count মিনিট আগে',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recentHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ঘণ্টা আগে',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recentDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count দিন আগে',
+    );
+    return '$_temp0';
+  }
 }

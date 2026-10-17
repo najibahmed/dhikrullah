@@ -449,5 +449,19 @@
 
   "dhikirSalawatOnNabiTitle": "Salawat on the Prophet ﷺ",
   "dhikirSalawatOnNabiTransliteration": "Allāhumma ṣalli wa sallim ʿalā nabiyyinā Muḥammad",
-  "dhikirSalawatOnNabiMeaning": "O Allah, send Your peace and blessings upon our Prophet Muhammad. Sending salawat brings blessings and closeness to the Prophet ﷺ."
+  "dhikirSalawatOnNabiMeaning": "O Allah, send Your peace and blessings upon our Prophet Muhammad. Sending salawat brings blessings and closeness to the Prophet ﷺ.",
+
+  "recentTitle": "Recently viewed",
+  "recentClear": "Clear",
+  "recentClearConfirmTitle": "Clear recently viewed?",
+  "recentClearConfirmBody": "This removes the list from Home. Your progress is not affected.",
+  "recentTypeDhikir": "Dhikir",
+  "recentTypeDua": "Dua",
+  "recentJustNow": "Just now",
+  "recentMinutesAgo": "{count, plural, =1{1 min ago} other{{count} min ago}}",
+  "@recentMinutesAgo": {"placeholders": {"count": {"type": "int"}}},
+  "recentHoursAgo": "{count, plural, =1{1h ago} other{{count}h ago}}",
+  "@recentHoursAgo": {"placeholders": {"count": {"type": "int"}}},
+  "recentDaysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
+  "@recentDaysAgo": {"placeholders": {"count": {"type": "int"}}}
 }

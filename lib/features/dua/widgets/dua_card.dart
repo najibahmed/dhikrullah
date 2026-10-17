@@ -13,20 +13,34 @@ import 'package:dhikir_app/features/dua/models/dua_item.dart';
 class DuaCard extends StatelessWidget {
   final DuaItem dua;
   final String categoryName;
+  final VoidCallback? onTap;
 
-  const DuaCard({super.key, required this.dua, required this.categoryName});
+  /// Draws a primary-colored border, e.g. when opened from Recently viewed.
+  final bool highlighted;
+
+  const DuaCard({
+    super.key,
+    required this.dua,
+    required this.categoryName,
+    this.onTap,
+    this.highlighted = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final fontSize = context.watch<FontSizeProvider>();
     final colorScheme = Theme.of(context).colorScheme;
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: highlighted ? colorScheme.primary : Colors.transparent,
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -35,96 +49,105 @@ class DuaCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            categoryName,
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  dua.title,
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.onSurface,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  categoryName,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-              ),
-              if (dua.repeat > 1) ...[
-                const SizedBox(width: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: mintAccentBackground(context),
-                    borderRadius: BorderRadius.circular(10),
+                const SizedBox(height: 4),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        dua.title,
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                    if (dua.repeat > 1) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: mintAccentBackground(context),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          l10n.duaRepeatLabel(dua.repeat),
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  dua.arabic,
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  style: GoogleFonts.amiri(
+                    fontSize: fontSize.arabicFontSize,
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurface,
+                    height: 1.8,
                   ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  dua.transliteration,
+                  style: GoogleFonts.inter(
+                    fontSize: fontSize.transliterationFontSize,
+                    fontStyle: FontStyle.italic,
+                    height: 1.4,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  dua.translation,
+                  style: GoogleFonts.inter(
+                    fontSize: fontSize.meaningFontSize,
+                    height: 1.45,
+                    color: colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
                   child: Text(
-                    l10n.duaRepeatLabel(dua.repeat),
+                    "— ${dua.source}",
                     style: GoogleFonts.inter(
-                      fontSize: 10,
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: colorScheme.primary,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
               ],
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            dua.arabic,
-            textDirection: TextDirection.rtl,
-            textAlign: TextAlign.right,
-            style: GoogleFonts.amiri(
-              fontSize: fontSize.arabicFontSize,
-              fontWeight: FontWeight.w700,
-              color: colorScheme.onSurface,
-              height: 1.8,
             ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            dua.transliteration,
-            style: GoogleFonts.inter(
-              fontSize: fontSize.transliterationFontSize,
-              fontStyle: FontStyle.italic,
-              height: 1.4,
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            dua.translation,
-            style: GoogleFonts.inter(
-              fontSize: fontSize.meaningFontSize,
-              height: 1.45,
-              color: colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              "— ${dua.source}",
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

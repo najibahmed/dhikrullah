@@ -19,6 +19,8 @@ import 'package:dhikir_app/core/persistence/custom_dhikir_service.dart';
 import 'package:dhikir_app/core/theme/app_theme.dart';
 import 'package:dhikir_app/core/widgets/splash_screen.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/features/recent/providers/recent_provider.dart';
+import 'package:dhikir_app/features/recent/services/recent_service.dart';
 import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
 Future<void> main() async {
@@ -31,6 +33,7 @@ Future<void> main() async {
   // Storage must be ready before providers read from it.
   await HiveService.init();
   await CustomDhikirService.init();
+  await RecentService.init();
 
   // Load persisted theme + locale before first paint to avoid flash.
   final themeProvider = await ThemeProvider.load();
@@ -43,6 +46,7 @@ Future<void> main() async {
         ChangeNotifierProvider.value(value: localeProvider),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => PrayerTimeProvider()),
+        ChangeNotifierProvider(create: (_) => RecentProvider()),
       ],
       child: const DhikirApp(),
     ),
