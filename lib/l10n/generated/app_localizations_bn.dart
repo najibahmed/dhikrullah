@@ -1232,4 +1232,18 @@ class AppLocalizationsBn extends AppLocalizations {
   @override
   String get dhikirSalawatOnNabiMeaning =>
       'হে আল্লাহ, আমাদের নবী মুহাম্মদ ﷺ-এর উপর আপনার শান্তি ও রহমত বর্ষণ করুন। দরুদ পাঠ রহমত এবং নবীজি ﷺ-এর নৈকট্য বয়ে আনে।';
+
+  @override
+  String get prayerWidgetSection => 'হোম স্ক্রিন উইজেট';
+
+  @override
+  String get prayerWidgetAddToHome => 'হোম স্ক্রিনে উইজেট যোগ করুন';
+
+  @override
+  String get prayerWidgetAddSubtitle =>
+      'ফোনের হোম স্ক্রিনে আজকের নামাজের সময় দেখুন';
+
+  @override
+  String get prayerWidgetPinUnsupported =>
+      'হোম স্ক্রিনে দীর্ঘক্ষণ চাপুন → উইজেট → Simply Muslim';
 }

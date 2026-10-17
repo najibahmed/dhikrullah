@@ -1234,4 +1234,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dhikirSalawatOnNabiMeaning =>
       'O Allah, send Your peace and blessings upon our Prophet Muhammad. Sending salawat brings blessings and closeness to the Prophet ﷺ.';
+
+  @override
+  String get prayerWidgetSection => 'Home screen widget';
+
+  @override
+  String get prayerWidgetAddToHome => 'Add widget to Home screen';
+
+  @override
+  String get prayerWidgetAddSubtitle =>
+      'Show today\'s prayer times on your phone\'s Home screen';
+
+  @override
+  String get prayerWidgetPinUnsupported =>
+      'Long-press your Home screen → Widgets → Simply Muslim';
 }

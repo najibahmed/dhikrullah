@@ -2257,6 +2257,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'O Allah, send Your peace and blessings upon our Prophet Muhammad. Sending salawat brings blessings and closeness to the Prophet ﷺ.'**
   String get dhikirSalawatOnNabiMeaning;
+
+  /// No description provided for @prayerWidgetSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Home screen widget'**
+  String get prayerWidgetSection;
+
+  /// No description provided for @prayerWidgetAddToHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Add widget to Home screen'**
+  String get prayerWidgetAddToHome;
+
+  /// No description provided for @prayerWidgetAddSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show today\'s prayer times on your phone\'s Home screen'**
+  String get prayerWidgetAddSubtitle;
+
+  /// No description provided for @prayerWidgetPinUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-press your Home screen → Widgets → Simply Muslim'**
+  String get prayerWidgetPinUnsupported;
 }
 
 class _AppLocalizationsDelegate

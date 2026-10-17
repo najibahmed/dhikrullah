@@ -63,6 +63,20 @@ class DuaListArgs {
   const DuaListArgs({required this.categoryName, required this.duas});
 }
 
+/// Root navigator, for navigation triggered outside the widget tree
+/// (e.g. a home-screen widget tap while the app is already running).
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+/// Routes the home-screen widget may open — anything else is ignored.
+const _widgetRoutes = {RouteNames.prayerTime};
+
+/// Push [route] if it's an allowed widget route. Returns whether it pushed.
+bool openWidgetRoute(String? route) {
+  if (route == null || !_widgetRoutes.contains(route)) return false;
+  navigatorKey.currentState?.pushNamed(route);
+  return true;
+}
+
 class AppRoutes {
   AppRoutes._();
 

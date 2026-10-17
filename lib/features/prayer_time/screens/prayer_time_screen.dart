@@ -17,6 +17,7 @@ import 'package:dhikir_app/core/widgets/date_header_row.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_settings_repository.dart';
 import 'package:dhikir_app/features/prayer_time/models/forbidden_period.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
+import 'package:dhikir_app/features/prayer_time/services/prayer_widget_service.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_notification_bottom_sheet.dart';
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
 import 'package:dhikir_app/core/l10n/prayer_localization.dart';
@@ -32,6 +33,7 @@ class PrayerTimeScreen extends StatefulWidget {
 class _PrayerTimeScreenState extends State<PrayerTimeScreen> {
   late DateTime _selectedDate;
   Map<String, bool> _alarmEnabled = {};
+  final Future<bool> _canPinWidget = PrayerWidgetService.canPin();
 
   @override
   void initState() {
@@ -84,6 +86,16 @@ class _PrayerTimeScreenState extends State<PrayerTimeScreen> {
       appBar: AppBar(
         title: Text(context.l10n.prayerTimesTitle),
         actions: [
+          FutureBuilder<bool>(
+            future: _canPinWidget,
+            builder: (context, snapshot) => snapshot.data == true
+                ? IconButton(
+                    tooltip: context.l10n.prayerWidgetAddToHome,
+                    icon: const Icon(Icons.widgets_outlined),
+                    onPressed: () => PrayerWidgetService.addToHomeScreen(context),
+                  )
+                : const SizedBox.shrink(),
+          ),
           IconButton(
             tooltip: context.l10n.prayerSettingsTooltip,
             icon: const Icon(Icons.settings_outlined),

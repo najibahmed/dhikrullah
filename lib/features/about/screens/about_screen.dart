@@ -13,6 +13,7 @@ import 'package:dhikir_app/core/providers/locale_provider.dart';
 import 'package:dhikir_app/core/providers/theme_provider.dart';
 import 'package:dhikir_app/core/routing/route_names.dart';
 import 'package:dhikir_app/features/about/support_actions.dart';
+import 'package:dhikir_app/features/prayer_time/services/prayer_widget_service.dart';
 import 'package:dhikir_app/l10n/generated/app_localizations.dart';
 
 const _appVersion = '1.0.0';
@@ -67,6 +68,7 @@ class AboutScreen extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showThemeDialog(context),
           ),
+          const _PrayerWidgetSection(),
           const SizedBox(height: 32),
           Row(
             children: [
@@ -223,6 +225,52 @@ class AboutScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// "Home screen widget" section — pins the prayer times widget from inside
+/// the app. Hidden entirely when the launcher can't pin widgets.
+class _PrayerWidgetSection extends StatefulWidget {
+  const _PrayerWidgetSection();
+
+  @override
+  State<_PrayerWidgetSection> createState() => _PrayerWidgetSectionState();
+}
+
+class _PrayerWidgetSectionState extends State<_PrayerWidgetSection> {
+  final Future<bool> _canPin = PrayerWidgetService.canPin();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    return FutureBuilder<bool>(
+      future: _canPin,
+      builder: (context, snapshot) {
+        if (snapshot.data != true) return const SizedBox.shrink();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 32),
+            Row(
+              children: [
+                Icon(Icons.widgets_outlined, size: 20, color: theme.colorScheme.onSurface),
+                const SizedBox(width: 8),
+                Text(l10n.prayerWidgetSection, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.prayerWidgetAddToHome),
+              subtitle: Text(l10n.prayerWidgetAddSubtitle),
+              trailing: const Icon(Icons.add_to_home_screen_outlined),
+              onTap: () => PrayerWidgetService.addToHomeScreen(context),
+            ),
+          ],
+        );
+      },
     );
   }
 }

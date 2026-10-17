@@ -400,5 +400,10 @@
 
   "dhikirSalawatOnNabiTitle": "নবীজির ﷺ উপর দরুদ",
   "dhikirSalawatOnNabiTransliteration": "নবীজির ﷺ উপর দরুদ",
-  "dhikirSalawatOnNabiMeaning": "হে আল্লাহ, আমাদের নবী মুহাম্মদ ﷺ-এর উপর আপনার শান্তি ও রহমত বর্ষণ করুন। দরুদ পাঠ রহমত এবং নবীজি ﷺ-এর নৈকট্য বয়ে আনে।"
+  "dhikirSalawatOnNabiMeaning": "হে আল্লাহ, আমাদের নবী মুহাম্মদ ﷺ-এর উপর আপনার শান্তি ও রহমত বর্ষণ করুন। দরুদ পাঠ রহমত এবং নবীজি ﷺ-এর নৈকট্য বয়ে আনে।",
+
+  "prayerWidgetSection": "হোম স্ক্রিন উইজেট",
+  "prayerWidgetAddToHome": "হোম স্ক্রিনে উইজেট যোগ করুন",
+  "prayerWidgetAddSubtitle": "ফোনের হোম স্ক্রিনে আজকের নামাজের সময় দেখুন",
+  "prayerWidgetPinUnsupported": "হোম স্ক্রিনে দীর্ঘক্ষণ চাপুন → উইজেট → Simply Muslim"
 }

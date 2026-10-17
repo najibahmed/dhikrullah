@@ -4,7 +4,7 @@ Status: in progress · Branch: `feat/prayer-home-widget` (from `chores`) · Date
 
 ## 1. Goal
 
-A 4×1 Android launcher widget that shows today's five prayers in one row. Each column has the name on top and the time below. The **next upcoming** prayer is bold, in primary text color, with a gold dot under it. Users can add the widget from the launcher's widget picker, or from inside the app with "Add to Home screen". Tapping the widget opens the Prayer Time screen.
+A 4×1 Android launcher widget that shows today's five prayers in one row. Each column has the name on top and the time below. The **current** prayer is bold, in primary text color, with a gold dot under it. "Current" uses the app's own prayer windows: Fajr until sunrise, Dhuhr until Asr, Asr until Maghrib, Maghrib until Isha, and Isha until the middle of the night. Between windows (sunrise until Dhuhr, or late night) the **next** prayer is highlighted instead. *(Changed after device testing: the user wanted the current prayer, not the next one.)* Users can add the widget from the launcher's widget picker, or from inside the app with "Add to Home screen". Tapping the widget opens the Prayer Time screen.
 
 ## 2. Wireframe
 
@@ -22,7 +22,7 @@ Dark (values-night)                         Light (values)
 
 - Times use `h:mm a` with `Locale.US`, the same as the app's `time_format.dart` rule (clock times are never localized).
 - Names follow the app language (ফজর … এশা in Bangla), written by Dart.
-- After Isha: show **tomorrow's** row with Fajr highlighted.
+- After Isha ends (at the middle of the night): show **tomorrow's** row with Fajr highlighted. Before that, even after midnight, yesterday's row keeps Isha highlighted.
 - No data or stale data (the app hasn't been opened for 7+ days, or no location yet): show the names with `—`. Tapping opens the app, which refreshes the data.
 
 ## 3. Architecture (same contract as the alarm module)
@@ -41,19 +41,22 @@ PrayerTimeProvider ──► PrayerWidgetService.sync(provider, locale)
                          └ schedules own refresh at min(next prayer, midnight)+1s
 ```
 
-### JSON contract (`prayer_widget_data`, v1)
+### JSON contract (`prayer_widget_data`, v2)
 
 ```json
 {
-  "v": 1,
+  "v": 2,
   "names": ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"],
   "days": [
-    {"date": "2026-10-17", "times": [1760658840000, 1760680500000, 1760692440000, 1760700720000, 1760705640000]}
+    {"date": "2026-10-16", "starts": [...5 ms], "ends": [...5 ms]},
+    {"date": "2026-10-17", "starts": [...], "ends": [...]}
   ]
 }
 ```
 
-- `days` holds 7 entries, today first, ordered ascending. `times` are epoch milliseconds in Fajr…Isha order.
+- `days` holds 8 entries, from yesterday through today+6, ordered ascending. `starts`/`ends` are epoch milliseconds in Fajr…Isha order.
+- The values come from `PrayerTimeProvider.windowsForDate`, the same windows the Prayer Time screen uses.
+- Yesterday is included so an Isha window that runs past midnight stays highlighted.
 - `days: []` means there is no location yet.
 
 ## 4. Phases
@@ -79,11 +82,11 @@ Kotlin package `com.bitbirds.simplymuslim`, in the existing `kotlin/com/example/
 
 - `PrayerWidgetProvider.kt`
   - Handles `onUpdate`, plus `onReceive` for `ACTION_REFRESH`, `ACTION_PINNED`, `BOOT_COMPLETED`, `TIME_SET`, `TIMEZONE_CHANGED` and `LOCALE_CHANGED`. All of them call `refreshAll(context)`.
-  - Selection: take the first day whose date is ≥ today's local date. Next prayer = the first time > now. If none is left, move to the next day and pick index 0.
+  - Selection: highlight the window where `start ≤ now < end`. If no window contains now, highlight the next prayer (the first start after now). The next refresh is at `min(that window's end, the next start)`, or at the next start.
   - Rendering: `RemoteViews(widget_prayer_times)`. The highlighted column gets a bold `SpannableString` and `@color/widget_text_primary`; the others get `widget_text_secondary`. The dot uses `setViewVisibility`.
   - Root click opens a `PendingIntent` to `MainActivity` with extra `open_route=/prayer-time` (`FLAG_IMMUTABLE`).
   - Self-refresh: a broadcast `PendingIntent` (`ACTION_REFRESH`, request code 9100, distinct from `AlarmArmer`'s codes).
-    - Uses `setExactAndAllowWhileIdle` when `canScheduleExactAlarms()`, otherwise `setAndAllowWhileIdle`.
+    - Uses `setExactAndAllowWhileIdle` when `canScheduleExactAlarms()`, otherwise `setWindow` with a 10-minute window. `setAndAllowWhileIdle` showed a 1-hour window on device.
     - It's cancelled in `onDisabled`.
 - `PrayerWidgetMethodChannel.kt` (`dhikir_app/widget`)
   - `refresh`

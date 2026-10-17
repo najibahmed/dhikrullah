@@ -23,6 +23,7 @@ import 'package:dhikir_app/features/alarm/services/alarm_service.dart';
 import 'package:dhikir_app/features/alarm/services/alarm_settings_repository.dart';
 import 'package:dhikir_app/features/prayer_time/providers/prayer_time_provider.dart';
 import 'package:dhikir_app/features/prayer_time/services/location_service.dart';
+import 'package:dhikir_app/features/prayer_time/services/prayer_widget_service.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/digital_clock.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_time_card.dart';
 import 'package:dhikir_app/features/prayer_time/widgets/prayer_schedule_cards.dart';
@@ -74,6 +75,8 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeWidgetState extends State<HomeWidget> {
+  Locale? _widgetLocale;
+
   @override
   void initState() {
     super.initState();
@@ -90,7 +93,23 @@ class _HomeWidgetState extends State<HomeWidget> {
           settingsRepository: AlarmSettingsRepository(),
         ),
       ).rescheduleAllPrayerAlarms(locale: Localizations.localeOf(context));
+      if (!mounted) return;
+      // Same trigger for the home-screen widget's persisted times.
+      _widgetLocale = Localizations.localeOf(context);
+      await PrayerWidgetService.sync(prayerTimeProvider, _widgetLocale!);
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Re-sync widget prayer names when the app language changes. Skipped
+    // until the initial sync above has run (_widgetLocale still null).
+    final locale = Localizations.localeOf(context);
+    if (_widgetLocale != null && locale != _widgetLocale) {
+      _widgetLocale = locale;
+      PrayerWidgetService.sync(context.read<PrayerTimeProvider>(), locale);
+    }
   }
 
   @override

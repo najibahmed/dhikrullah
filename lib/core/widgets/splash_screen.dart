@@ -10,7 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:dhikir_app/core/l10n/l10n_extensions.dart';
+import 'package:dhikir_app/core/routing/app_routes.dart';
 import 'package:dhikir_app/core/routing/route_names.dart';
+import 'package:dhikir_app/features/prayer_time/services/prayer_widget_channel.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,9 +25,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    Future.delayed(const Duration(milliseconds: 1500), () async {
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(RouteNames.home);
+      // Cold start from a home-screen widget tap → open its target on top
+      // of Home, so back still lands on Home.
+      try {
+        openWidgetRoute(await PrayerWidgetChannel.consumeLaunchRoute());
+      } catch (_) {}
     });
   }
 

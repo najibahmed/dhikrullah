@@ -449,5 +449,10 @@
 
   "dhikirSalawatOnNabiTitle": "Salawat on the Prophet ﷺ",
   "dhikirSalawatOnNabiTransliteration": "Allāhumma ṣalli wa sallim ʿalā nabiyyinā Muḥammad",
-  "dhikirSalawatOnNabiMeaning": "O Allah, send Your peace and blessings upon our Prophet Muhammad. Sending salawat brings blessings and closeness to the Prophet ﷺ."
+  "dhikirSalawatOnNabiMeaning": "O Allah, send Your peace and blessings upon our Prophet Muhammad. Sending salawat brings blessings and closeness to the Prophet ﷺ.",
+
+  "prayerWidgetSection": "Home screen widget",
+  "prayerWidgetAddToHome": "Add widget to Home screen",
+  "prayerWidgetAddSubtitle": "Show today's prayer times on your phone's Home screen",
+  "prayerWidgetPinUnsupported": "Long-press your Home screen → Widgets → Simply Muslim"
 }
